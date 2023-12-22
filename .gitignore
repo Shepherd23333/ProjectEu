@@ -1,39 +1,22 @@
-# IntelliJ
-/*.iml
-.idea/
+# eclipse
+bin
+*.launch
+.settings
+.metadata
+.classpath
+.project
+
+# idea
+out
 *.ipr
 *.iws
-.idea_modules/
-out/
+*.iml
+.idea
 
-# Gradle
+# gradle
+build
 .gradle
-build/
-run/
-logs/
 
-# Eclipse + other common
-*.pydevproject
-.project
-.metadata
-bin/
-tmp/
-*.tmp
-*.bak
-*.swp
-*~.nib
-local.properties
-.classpath
-.settings/
-*.launch
-eclipse/
-libs/
-
-# Windows
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
-
-# Mac crap
-.DS_Store
+# other
+eclipse
+run
