@@ -1,0 +1,45 @@
+package me.shepherd23333.projectex.net;
+
+import io.netty.buffer.ByteBuf;
+import me.shepherd23333.projectex.ProjectEX;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+
+import javax.annotation.Nullable;
+
+/**
+ * @author LatvianModder
+ */
+public class MessageSyncEMC implements IMessage {
+    public static void sync(@Nullable EntityPlayer player, long emc) {
+        if (player instanceof EntityPlayerMP) {
+            MessageSyncEMC message = new MessageSyncEMC();
+            message.emc = emc;
+            ProjectEXNetHandler.NET.sendTo(message, (EntityPlayerMP) player);
+        }
+    }
+
+    public long emc;
+
+    @Override
+    public void fromBytes(ByteBuf buf) {
+        emc = buf.readLong();
+    }
+
+    @Override
+    public void toBytes(ByteBuf buf) {
+        buf.writeLong(emc);
+    }
+
+    public static class Handler implements IMessageHandler<MessageSyncEMC, IMessage> {
+        @Override
+        public IMessage onMessage(MessageSyncEMC message, MessageContext ctx) {
+            FMLCommonHandler.instance().getWorldThread(ctx.netHandler).addScheduledTask(() -> ProjectEX.PROXY.updateEMC(message.emc));
+            return null;
+        }
+    }
+}
