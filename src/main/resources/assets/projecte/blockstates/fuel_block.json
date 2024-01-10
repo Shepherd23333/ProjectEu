@@ -6,9 +6,21 @@
   },
   "variants": {
     "fueltype": {
-      "alchemical_coal": { "textures": { "all": "projecte:blocks/fuels_0" } },
-      "mobius_fuel": { "textures": { "all": "projecte:blocks/fuels_1" } },
-      "aeternalis_fuel": { "textures": { "all": "projecte:blocks/fuels_2" } }
+      "alchemical_coal": {
+        "textures": {
+          "all": "projecte:blocks/fuels_0"
+        }
+      },
+      "mobius_fuel": {
+        "textures": {
+          "all": "projecte:blocks/fuels_1"
+        }
+      },
+      "aeternalis_fuel": {
+        "textures": {
+          "all": "projecte:blocks/fuels_2"
+        }
+      }
     }
   }
 }

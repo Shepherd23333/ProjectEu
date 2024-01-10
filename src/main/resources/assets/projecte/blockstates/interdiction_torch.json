@@ -8,18 +8,28 @@
   },
   "variants": {
     "facing": {
-      "up": { "model": "minecraft:torch" },
-      "east": {},
-      "south": { "y": 90 },
-      "west": { "y": 180 },
-      "north": { "y": 270}
-    },
-    "inventory": [{
-      "model": "builtin/generated",
-      "textures": {
-        "layer0": "projecte:blocks/interdiction_torch"
+      "up": {
+        "model": "minecraft:torch"
       },
-      "transform": "forge:default-item"
-    }]
+      "east": {},
+      "south": {
+        "y": 90
+      },
+      "west": {
+        "y": 180
+      },
+      "north": {
+        "y": 270
+      }
+    },
+    "inventory": [
+      {
+        "model": "builtin/generated",
+        "textures": {
+          "layer0": "projecte:blocks/interdiction_torch"
+        },
+        "transform": "forge:default-item"
+      }
+    ]
   }
 }

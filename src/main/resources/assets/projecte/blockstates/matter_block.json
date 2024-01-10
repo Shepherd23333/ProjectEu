@@ -5,7 +5,19 @@
     "transform": "forge:default-block"
   },
   "variants": {
-    "tier=dark_matter": [{ "textures": { "all": "projecte:blocks/dm" } }],
-    "tier=red_matter": [{ "textures": { "all": "projecte:blocks/rm" } }]
+    "tier=dark_matter": [
+      {
+        "textures": {
+          "all": "projecte:blocks/dm"
+        }
+      }
+    ],
+    "tier=red_matter": [
+      {
+        "textures": {
+          "all": "projecte:blocks/rm"
+        }
+      }
+    ]
   }
 }

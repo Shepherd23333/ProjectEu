@@ -26,7 +26,9 @@
         },
         {
           "output": "minecraft:grass_path|0",
-          "ingredients": [ "minecraft:grass|0" ]
+          "ingredients": [
+            "minecraft:grass|0"
+          ]
         },
         {
           "output": "minecraft:iron_horse_armor|0",
@@ -53,67 +55,99 @@
       "conversions": [
         {
           "output": "minecraft:concrete|0",
-          "ingredients": [ "minecraft:concrete_powder|0" ]
+          "ingredients": [
+            "minecraft:concrete_powder|0"
+          ]
         },
         {
           "output": "minecraft:concrete|1",
-          "ingredients": [ "minecraft:concrete_powder|1" ]
+          "ingredients": [
+            "minecraft:concrete_powder|1"
+          ]
         },
         {
           "output": "minecraft:concrete|2",
-          "ingredients": [ "minecraft:concrete_powder|2" ]
+          "ingredients": [
+            "minecraft:concrete_powder|2"
+          ]
         },
         {
           "output": "minecraft:concrete|3",
-          "ingredients": [ "minecraft:concrete_powder|3" ]
+          "ingredients": [
+            "minecraft:concrete_powder|3"
+          ]
         },
         {
           "output": "minecraft:concrete|4",
-          "ingredients": [ "minecraft:concrete_powder|4" ]
+          "ingredients": [
+            "minecraft:concrete_powder|4"
+          ]
         },
         {
           "output": "minecraft:concrete|5",
-          "ingredients": [ "minecraft:concrete_powder|5" ]
+          "ingredients": [
+            "minecraft:concrete_powder|5"
+          ]
         },
         {
           "output": "minecraft:concrete|6",
-          "ingredients": [ "minecraft:concrete_powder|6" ]
+          "ingredients": [
+            "minecraft:concrete_powder|6"
+          ]
         },
         {
           "output": "minecraft:concrete|7",
-          "ingredients": [ "minecraft:concrete_powder|7" ]
+          "ingredients": [
+            "minecraft:concrete_powder|7"
+          ]
         },
         {
           "output": "minecraft:concrete|8",
-          "ingredients": [ "minecraft:concrete_powder|8" ]
+          "ingredients": [
+            "minecraft:concrete_powder|8"
+          ]
         },
         {
           "output": "minecraft:concrete|9",
-          "ingredients": [ "minecraft:concrete_powder|9" ]
+          "ingredients": [
+            "minecraft:concrete_powder|9"
+          ]
         },
         {
           "output": "minecraft:concrete|10",
-          "ingredients": [ "minecraft:concrete_powder|10" ]
+          "ingredients": [
+            "minecraft:concrete_powder|10"
+          ]
         },
         {
           "output": "minecraft:concrete|11",
-          "ingredients": [ "minecraft:concrete_powder|11" ]
+          "ingredients": [
+            "minecraft:concrete_powder|11"
+          ]
         },
         {
           "output": "minecraft:concrete|12",
-          "ingredients": [ "minecraft:concrete_powder|12" ]
+          "ingredients": [
+            "minecraft:concrete_powder|12"
+          ]
         },
         {
           "output": "minecraft:concrete|13",
-          "ingredients": [ "minecraft:concrete_powder|13" ]
+          "ingredients": [
+            "minecraft:concrete_powder|13"
+          ]
         },
         {
           "output": "minecraft:concrete|14",
-          "ingredients": [ "minecraft:concrete_powder|14" ]
+          "ingredients": [
+            "minecraft:concrete_powder|14"
+          ]
         },
         {
           "output": "minecraft:concrete|15",
-          "ingredients": [ "minecraft:concrete_powder|15" ]
+          "ingredients": [
+            "minecraft:concrete_powder|15"
+          ]
         }
       ]
     },
@@ -181,7 +215,6 @@
       "minecraft:double_plant|3": 1,
       "minecraft:packed_ice|0": 4,
       "minecraft:magma|0": 128,
-
       "minecraft:chorus_plant|0": 64,
       "minecraft:chorus_flower|0": 96,
       "minecraft:wheat_seeds|0": 16,
@@ -205,7 +238,6 @@
       "minecraft:potato|0": 64,
       "minecraft:poisonous_potato|0": 64,
       "minecraft:chorus_fruit|0": 192,
-
       "minecraft:string|0": 12,
       "minecraft:rotten_flesh|0": 32,
       "minecraft:slime_ball|0": 32,
@@ -221,7 +253,6 @@
       "minecraft:ghast_tear|0": 4096,
       "minecraft:dragon_egg|0": 262144,
       "minecraft:potion|0": 0,
-
       "minecraft:saddle|0": 192,
       "minecraft:name_tag|0": 192,
       "minecraft:record_11|0": 2048,
@@ -236,7 +267,6 @@
       "minecraft:record_strad|0": 2048,
       "minecraft:record_wait|0": 2048,
       "minecraft:record_ward|0": 2048,
-
       "minecraft:diamond|0": 8192,
       "minecraft:flint|0": 4,
       "minecraft:coal|0": 128,

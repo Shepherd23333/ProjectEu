@@ -3,12 +3,16 @@
   "defaults": {
     "model": "projecte:pedestal",
     "textures": {
-      "pedestal" : "projecte:blocks/dm"
+      "pedestal": "projecte:blocks/dm"
     },
     "transform": "forge:default-block"
   },
   "variants": {
-    "normal": [{}],
-    "inventory": [{}]
+    "normal": [
+      {}
+    ],
+    "inventory": [
+      {}
+    ]
   }
 }
