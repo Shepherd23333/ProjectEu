@@ -1,16 +1,17 @@
 [
 {
-  "modid": "examplemod",
-  "name": "Example Mod",
-  "description": "Example placeholder mod.",
-  "version": "${version}",
-  "mcversion": "${mcversion}",
-  "url": "",
-  "updateUrl": "",
-  "authorList": ["CleanroomMC"],
-  "credits": "Authors of this project",
-  "logoFile": "",
-  "screenshots": [],
-  "dependencies": []
+   "modid": "projecte",
+   "name": "ProjectE",
+   "description": "",
+   "version": "2.0.0",
+   "mcversion": "1.12.2",
+   "logoFile": "assets/projecte/logo.png",
+   "url": "",
+   "updateUrl": "",
+   "authorList": ["Shepherd23333"],
+   "credits": "Thanks to:\nx3n0ph0b3 - EE2 creator. Allowed use of EE2 assets.\nMidnightLightning - EE2 GUI Textures.\nMagic Banana - Original ProjectE textures.\nMaPePeR - Assistant developer.\nWilliewillus - Assistant developer.\nLilylicious - Assistant developer.",
+   "parent": "",
+   "screenshots": [],
+   "dependencies": []
 }
 ]
