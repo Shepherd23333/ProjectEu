@@ -1,6 +1,7 @@
 package me.shepherd23333.projectex;
 
 import me.shepherd23333.projecte.PECore;
+import me.shepherd23333.projecte.Tags;
 import me.shepherd23333.projecte.utils.Constants;
 import me.shepherd23333.projectex.gui.EMCFormat;
 import me.shepherd23333.projectex.gui.ProjectEXGuiHandler;
@@ -25,13 +26,13 @@ import java.lang.reflect.Modifier;
 @Mod(
         modid = ProjectEX.MOD_ID,
         name = ProjectEX.MOD_NAME,
-        version = ProjectEX.VERSION,
+        version = Tags.VERSION,
         dependencies = "required-after:" + PECore.MODID
 )
 public class ProjectEX {
     public static final String MOD_ID = "projectex";
     public static final String MOD_NAME = "Project EX";
-    public static final String VERSION = "0.0.0.projectex";
+    public static final String VERSION = Tags.VERSION;
 
     public static final CreativeTabs TAB = new CreativeTabs(MOD_ID) {
         @Override
