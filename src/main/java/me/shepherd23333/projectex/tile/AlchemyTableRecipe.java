@@ -3,21 +3,23 @@ package me.shepherd23333.projectex.tile;
 import me.shepherd23333.projecte.api.ProjectEAPI;
 import net.minecraft.item.ItemStack;
 
+import java.math.BigInteger;
+
 /**
  * @author LatvianModder
  */
 public class AlchemyTableRecipe {
     public ItemStack input = ItemStack.EMPTY;
     public ItemStack output = ItemStack.EMPTY;
-    public long emcOverride = 0L;
+    public BigInteger emcOverride = BigInteger.ZERO;
     public int progressOverride = 0;
 
-    public long getTotalCost() {
-        if (emcOverride > 0L) {
+    public BigInteger getTotalCost() {
+        if (emcOverride.compareTo(BigInteger.ZERO) > 0) {
             return emcOverride;
         }
 
-        return Math.max(64L, (ProjectEAPI.getEMCProxy().getValue(input) + ProjectEAPI.getEMCProxy().getValue(output)) * 3L);
+        return ProjectEAPI.getEMCProxy().getValue(input).add(ProjectEAPI.getEMCProxy().getValue(output)).multiply(BigInteger.valueOf(3)).max(BigInteger.valueOf(64));
     }
 
     public int getTotalProgress() {

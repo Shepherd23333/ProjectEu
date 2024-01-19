@@ -29,6 +29,7 @@ import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -57,7 +58,7 @@ public final class KnowledgeImpl {
         private final EntityPlayer player;
         private final List<ItemStack> knowledge = new ArrayList<>();
         private final IItemHandlerModifiable inputLocks = new ItemStackHandler(9);
-        private long emc = 0;
+        private BigInteger emc = BigInteger.ZERO;
         private boolean fullKnowledge = false;
 
         private DefaultImpl(EntityPlayer player) {
@@ -172,12 +173,12 @@ public final class KnowledgeImpl {
         }
 
         @Override
-        public long getEmc() {
+        public BigInteger getEmc() {
             return emc;
         }
 
         @Override
-        public void setEmc(long emc) {
+        public void setEmc(BigInteger emc) {
             this.emc = emc;
         }
 
@@ -189,7 +190,7 @@ public final class KnowledgeImpl {
         @Override
         public NBTTagCompound serializeNBT() {
             NBTTagCompound properties = new NBTTagCompound();
-            properties.setLong("transmutationEmc", emc);
+            properties.setString("transmutationEmc", emc.toString());
 
             NBTTagList knowledgeWrite = new NBTTagList();
             for (ItemStack i : knowledge) {
@@ -205,7 +206,8 @@ public final class KnowledgeImpl {
 
         @Override
         public void deserializeNBT(NBTTagCompound properties) {
-            emc = properties.getLong("transmutationEmc");
+            String transmutationEmc = properties.getString("transmutationEmc");
+            emc = transmutationEmc.isEmpty() ? BigInteger.ZERO : new BigInteger(transmutationEmc);
 
             NBTTagList list = properties.getTagList("knowledge", Constants.NBT.TAG_COMPOUND);
             for (int i = 0; i < list.tagCount(); i++) {

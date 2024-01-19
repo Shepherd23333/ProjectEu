@@ -21,11 +21,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
-public class CondenserContainer extends LongContainer {
+public class CondenserContainer extends BigIntegerContainer {
     protected final CondenserTile tile;
-    public long displayEmc;
-    public long requiredEmc;
+    public BigInteger displayEmc;
+    public BigInteger requiredEmc;
 
     public CondenserContainer(InventoryPlayer invPlayer, CondenserTile condenser) {
         tile = condenser;
@@ -57,17 +59,17 @@ public class CondenserContainer extends LongContainer {
     @Override
     public void addListener(IContainerListener listener) {
         super.addListener(listener);
-        PacketHandler.sendProgressBarUpdateLong(listener, this, 0, tile.displayEmc);
-        PacketHandler.sendProgressBarUpdateLong(listener, this, 1, tile.requiredEmc);
+        PacketHandler.sendProgressBarUpdateBigInteger(listener, this, 0, tile.displayEmc);
+        PacketHandler.sendProgressBarUpdateBigInteger(listener, this, 1, tile.requiredEmc);
     }
 
     @Override
     public void detectAndSendChanges() {
         super.detectAndSendChanges();
 
-        if (displayEmc != tile.displayEmc) {
+        if (!displayEmc.equals(tile.displayEmc)) {
             for (IContainerListener listener : listeners) {
-                PacketHandler.sendProgressBarUpdateLong(listener, this, 0, tile.displayEmc);
+                PacketHandler.sendProgressBarUpdateBigInteger(listener, this, 0, tile.displayEmc);
             }
 
             displayEmc = tile.displayEmc;
@@ -75,7 +77,7 @@ public class CondenserContainer extends LongContainer {
 
         if (requiredEmc != tile.requiredEmc) {
             for (IContainerListener listener : listeners) {
-                PacketHandler.sendProgressBarUpdateLong(listener, this, 1, tile.requiredEmc);
+                PacketHandler.sendProgressBarUpdateBigInteger(listener, this, 1, tile.requiredEmc);
             }
 
             requiredEmc = tile.requiredEmc;
@@ -87,17 +89,17 @@ public class CondenserContainer extends LongContainer {
     public void updateProgressBar(int id, int data) {
         switch (id) {
             case 0:
-                displayEmc = data;
+                displayEmc = BigInteger.valueOf(data);
                 break;
             case 1:
-                requiredEmc = data;
+                requiredEmc = BigInteger.valueOf(data);
                 break;
         }
     }
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void updateProgressBarLong(int id, long data) {
+    public void updateProgressBarBigInteger(int id, BigInteger data) {
         switch (id) {
             case 0:
                 displayEmc = data;
@@ -160,14 +162,15 @@ public class CondenserContainer extends LongContainer {
     }
 
     public int getProgressScaled() {
-        if (requiredEmc == 0) {
+        if (requiredEmc.equals(BigInteger.ZERO)) {
             return 0;
         }
 
-        if (displayEmc >= requiredEmc) {
+        if (displayEmc.compareTo(requiredEmc) >= 0) {
             return Constants.MAX_CONDENSER_PROGRESS;
         }
 
-        return (int) (Constants.MAX_CONDENSER_PROGRESS * ((double) displayEmc / requiredEmc));
+        return new BigDecimal(displayEmc).divide(new BigDecimal(requiredEmc))
+                .multiply(BigDecimal.valueOf(Constants.MAX_CONDENSER_PROGRESS)).intValueExact();
     }
 }

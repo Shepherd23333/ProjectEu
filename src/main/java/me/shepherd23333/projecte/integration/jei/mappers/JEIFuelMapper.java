@@ -16,7 +16,7 @@ public class JEIFuelMapper extends JEICompatMapper<FuelUpgradeRecipe> {
         clear();
         for (SimpleStack stack : FuelMapper.getFuelMap()) {
             ItemStack fuelUpgrade = FuelMapper.getFuelUpgrade(stack.toItemStack());
-            if (EMCHelper.getEmcValue(stack.toItemStack()) <= EMCHelper.getEmcValue(fuelUpgrade)) {
+            if (EMCHelper.getEmcValue(stack.toItemStack()).compareTo(EMCHelper.getEmcValue(fuelUpgrade)) <= 0) {
                 addRecipe(new FuelUpgradeRecipe(stack.toItemStack(), fuelUpgrade));
             }
         }

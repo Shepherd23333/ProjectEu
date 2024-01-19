@@ -9,16 +9,17 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.oredict.OreDictionary;
 
+import java.math.BigInteger;
 import java.util.Set;
 
-public class OreDictionaryMapper implements IEMCMapper<NormalizedSimpleStack, Long> {
+public class OreDictionaryMapper implements IEMCMapper<NormalizedSimpleStack, BigInteger> {
 
     private static final Set<String> BLACKLIST_EXCEPTIONS = Sets.newHashSet(
             "dustPlastic"
     );
 
     @Override
-    public void addMappings(IMappingCollector<NormalizedSimpleStack, Long> mapper, Configuration config) {
+    public void addMappings(IMappingCollector<NormalizedSimpleStack, BigInteger> mapper, Configuration config) {
         if (config.getBoolean("blacklistOresAndDusts", "", true, "Set EMC=0 for everything that has an OD Name that starts with `ore`, `dust` or `crushed` besides `dustPlastic`")) {
             //Black-list all ores/dusts
             for (String s : OreDictionary.getOreNames()) {
@@ -37,8 +38,8 @@ public class OreDictionaryMapper implements IEMCMapper<NormalizedSimpleStack, Lo
                             continue;
                         }
 
-                        mapper.setValueBefore(NSSItem.create(stack), 0L);
-                        mapper.setValueAfter(NSSItem.create(stack), 0L);
+                        mapper.setValueBefore(NSSItem.create(stack), BigInteger.ZERO);
+                        mapper.setValueAfter(NSSItem.create(stack), BigInteger.ZERO);
                     }
                 }
             }

@@ -30,6 +30,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,9 +51,9 @@ public class HarvestGoddess extends RingToggle implements IPedestalItem {
         EntityPlayer player = (EntityPlayer) entity;
 
         if (ItemHelper.getOrCreateCompound(stack).getBoolean(TAG_ACTIVE)) {
-            long storedEmc = getEmc(stack);
+            BigInteger storedEmc = getEmc(stack);
 
-            if (storedEmc == 0 && !consumeFuel(player, stack, 64, true)) {
+            if (storedEmc.equals(BigInteger.ZERO) && !consumeFuel(player, stack, 64, true)) {
                 stack.getTagCompound().setBoolean(TAG_ACTIVE, false);
             } else {
                 WorldHelper.growNearbyRandomly(true, world, new BlockPos(player), player);

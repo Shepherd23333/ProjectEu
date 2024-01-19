@@ -13,6 +13,8 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
+import java.math.BigInteger;
+
 public class SyncEmcPKT implements IMessage {
     private EmcPKTInfo[] data;
 
@@ -29,7 +31,12 @@ public class SyncEmcPKT implements IMessage {
         data = new EmcPKTInfo[size];
 
         for (int i = 0; i < size; i++) {
-            data[i] = new EmcPKTInfo(ByteBufUtils.readVarInt(buf, 5), ByteBufUtils.readVarInt(buf, 5), buf.readLong());
+            int id = ByteBufUtils.readVarInt(buf, 5),
+                    damage = ByteBufUtils.readVarInt(buf, 5),
+                    length = buf.readInt();
+            byte[] bytes = new byte[length];
+            buf.readBytes(bytes);
+            data[i] = new EmcPKTInfo(id, damage, length > 0 ? new BigInteger(bytes) : BigInteger.ZERO);
         }
     }
 
@@ -40,7 +47,9 @@ public class SyncEmcPKT implements IMessage {
         for (EmcPKTInfo info : data) {
             ByteBufUtils.writeVarInt(buf, info.getId(), 5);
             ByteBufUtils.writeVarInt(buf, info.getDamage(), 5);
-            buf.writeLong(info.getEmc());
+            byte[] bytes = info.getEmc().toByteArray();
+            buf.writeInt(bytes.length);
+            buf.writeBytes(bytes);
         }
     }
 
@@ -75,9 +84,9 @@ public class SyncEmcPKT implements IMessage {
 
     public static class EmcPKTInfo {
         private int id, damage;
-        private long emc;
+        private BigInteger emc;
 
-        public EmcPKTInfo(int id, int damage, long emc) {
+        public EmcPKTInfo(int id, int damage, BigInteger emc) {
             this.id = id;
             this.damage = damage;
             this.emc = emc;
@@ -91,7 +100,7 @@ public class SyncEmcPKT implements IMessage {
             return id;
         }
 
-        public long getEmc() {
+        public BigInteger getEmc() {
             return emc;
         }
     }

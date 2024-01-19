@@ -30,6 +30,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,7 +49,7 @@ public class Ignition extends RingToggle implements IBauble, IPedestalItem, IFir
         EntityPlayerMP player = (EntityPlayerMP) entity;
 
         if (ItemHelper.getOrCreateCompound(stack).getBoolean(TAG_ACTIVE)) {
-            if (getEmc(stack) == 0 && !consumeFuel(player, stack, 64, false)) {
+            if (getEmc(stack).equals(BigInteger.ZERO) && !consumeFuel(player, stack, 64, false)) {
                 stack.getTagCompound().setBoolean(TAG_ACTIVE, false);
             } else {
                 WorldHelper.igniteNearby(world, player);

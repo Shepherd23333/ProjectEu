@@ -12,6 +12,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 
 public class GUICondenser extends GuiContainer {
@@ -53,16 +54,16 @@ public class GUICondenser extends GuiContainer {
 
     @Override
     protected void drawGuiContainerForegroundLayer(int var1, int var2) {
-        long toDisplay = container.displayEmc > container.requiredEmc ? container.requiredEmc : container.displayEmc;
+        BigInteger toDisplay = container.displayEmc.compareTo(container.requiredEmc) > 0 ? container.requiredEmc : container.displayEmc;
         String emc = TransmutationEMCFormatter.EMCFormat(toDisplay);
         this.fontRenderer.drawString(emc, 140, 10, 4210752);
     }
 
     @Override
     protected void renderHoveredToolTip(int mouseX, int mouseY) {
-        long toDisplay = container.displayEmc > container.requiredEmc ? container.requiredEmc : container.displayEmc;
+        BigInteger toDisplay = container.displayEmc.compareTo(container.requiredEmc) > 0 ? container.requiredEmc : container.displayEmc;
 
-        if (toDisplay < 1e12) {
+        if (toDisplay.compareTo(Constants.MAX_EXACT_TRANSMUTATION_DISPLAY) < 0) {
             super.renderHoveredToolTip(mouseX, mouseY);
             return;
         }

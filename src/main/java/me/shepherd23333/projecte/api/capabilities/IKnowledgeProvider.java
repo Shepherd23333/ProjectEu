@@ -9,6 +9,7 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -65,21 +66,12 @@ public interface IKnowledgeProvider extends INBTSerializable<NBTTagCompound> {
     /**
      * @return The emc in this player's transmutation tablet network
      */
-    long getEmc();
+    BigInteger getEmc();
 
     /**
      * @param emc The emc to set in this player's transmutation tablet network
      */
-    void setEmc(long emc);
-
-    /**
-     * @param emc The emc to set in this player's transmutation tablet network
-     * @deprecated
-     */
-    @Deprecated
-    default void setEmc(double emc) {
-        setEmc((long) emc);
-    }
+    void setEmc(BigInteger emc);
 
     /**
      * @param player The player to sync to.

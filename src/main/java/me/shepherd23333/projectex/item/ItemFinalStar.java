@@ -5,6 +5,7 @@ import me.shepherd23333.projecte.api.item.IItemEmc;
 import me.shepherd23333.projecte.api.item.IPedestalItem;
 import me.shepherd23333.projecte.utils.NBTWhitelist;
 import me.shepherd23333.projectex.ProjectEXConfig;
+import me.shepherd23333.projectex.ProjectEXUtils;
 import me.shepherd23333.projectex.tile.TileRelay;
 import net.minecraft.block.Block;
 import net.minecraft.client.resources.I18n;
@@ -23,6 +24,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
+import java.math.BigInteger;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,23 +37,23 @@ public class ItemFinalStar extends Item implements IItemEmc, IPedestalItem {
     }
 
     @Override
-    public long addEmc(ItemStack stack, long toAdd) {
-        return 0L;
+    public BigInteger addEmc(ItemStack stack, BigInteger toAdd) {
+        return BigInteger.ZERO;
     }
 
     @Override
-    public long extractEmc(ItemStack stack, long toRemove) {
+    public BigInteger extractEmc(ItemStack stack, BigInteger toRemove) {
         return toRemove;
     }
 
     @Override
-    public long getStoredEmc(ItemStack stack) {
-        return 1_000_000_000_000_000L;
+    public BigInteger getStoredEmc(ItemStack stack) {
+        return BigInteger.valueOf(Long.MAX_VALUE);
     }
 
     @Override
-    public long getMaximumEmc(ItemStack stack) {
-        return Long.MAX_VALUE;
+    public BigInteger getMaximumEmc(ItemStack stack) {
+        return ProjectEXUtils.MAX_EMC;
     }
 
     @Override

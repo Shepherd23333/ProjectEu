@@ -17,6 +17,7 @@ import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 
 public class CondenserTile extends TileEmc implements IEmcAcceptor {
     protected final ItemStackHandler inputInventory = createInput();
@@ -25,11 +26,11 @@ public class CondenserTile extends TileEmc implements IEmcAcceptor {
     private final ItemStackHandler lock = new StackHandler(1);
     private boolean isAcceptingEmc;
     private int ticksSinceSync;
-    public long displayEmc;
+    public BigInteger displayEmc;
     public float lidAngle;
     public float prevLidAngle;
     public int numPlayersUsing;
-    public long requiredEmc;
+    public BigInteger requiredEmc;
 
     public ItemStackHandler getLock() {
         return lock;
@@ -96,21 +97,21 @@ public class CondenserTile extends TileEmc implements IEmcAcceptor {
 
         displayEmc = this.getStoredEmc();
 
-        if (!lock.getStackInSlot(0).isEmpty() && requiredEmc != 0) {
+        if (!lock.getStackInSlot(0).isEmpty() && !requiredEmc.equals(BigInteger.ZERO)) {
             condense();
         }
     }
 
     private void checkLockAndUpdate() {
         if (lock.getStackInSlot(0).isEmpty()) {
-            displayEmc = 0;
-            requiredEmc = 0;
+            displayEmc = BigInteger.ZERO;
+            requiredEmc = BigInteger.ZERO;
             this.isAcceptingEmc = false;
             return;
         }
 
         if (EMCHelper.doesItemHaveEmc(lock.getStackInSlot(0))) {
-            long lockEmc = EMCHelper.getEmcValue(lock.getStackInSlot(0));
+            BigInteger lockEmc = EMCHelper.getEmcValue(lock.getStackInSlot(0));
 
             if (requiredEmc != lockEmc) {
                 requiredEmc = lockEmc;
@@ -119,8 +120,8 @@ public class CondenserTile extends TileEmc implements IEmcAcceptor {
         } else {
             lock.setStackInSlot(0, ItemStack.EMPTY);
 
-            displayEmc = 0;
-            requiredEmc = 0;
+            displayEmc = BigInteger.ZERO;
+            requiredEmc = BigInteger.ZERO;
             this.isAcceptingEmc = false;
         }
     }
@@ -138,7 +139,7 @@ public class CondenserTile extends TileEmc implements IEmcAcceptor {
             break;
         }
 
-        if (this.getStoredEmc() >= requiredEmc && this.hasSpace()) {
+        if (this.getStoredEmc().compareTo(requiredEmc) >= 0 && this.hasSpace()) {
             this.removeEMC(requiredEmc);
             pushStack();
         }
@@ -242,13 +243,13 @@ public class CondenserTile extends TileEmc implements IEmcAcceptor {
     }
 
     @Override
-    public long acceptEMC(@Nonnull EnumFacing side, long toAccept) {
+    public BigInteger acceptEMC(@Nonnull EnumFacing side, BigInteger toAccept) {
         if (isAcceptingEmc) {
-            long toAdd = Math.min(maximumEMC - currentEMC, toAccept);
+            BigInteger toAdd = maximumEMC.subtract(currentEMC).min(toAccept);
             addEMC(toAdd);
             return toAdd;
         } else {
-            return 0;
+            return BigInteger.ZERO;
         }
     }
 }

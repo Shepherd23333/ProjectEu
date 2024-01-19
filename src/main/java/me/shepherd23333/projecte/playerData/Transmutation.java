@@ -7,6 +7,7 @@ import me.shepherd23333.projecte.utils.EMCHelper;
 import me.shepherd23333.projecte.utils.ItemHelper;
 import net.minecraft.item.ItemStack;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -30,7 +31,7 @@ public final class Transmutation {
                 s.setCount(1);
 
                 //Apparently items can still not have EMC if they are in the EMC map.
-                if (EMCHelper.doesItemHaveEmc(s) && EMCHelper.getEmcValue(s) > 0 && !ItemHelper.containsItemStack(CACHED_TOME_KNOWLEDGE, s)) {
+                if (EMCHelper.doesItemHaveEmc(s) && EMCHelper.getEmcValue(s).compareTo(BigInteger.ZERO) > 0 && !ItemHelper.containsItemStack(CACHED_TOME_KNOWLEDGE, s)) {
                     CACHED_TOME_KNOWLEDGE.add(s);
                 }
             } catch (Exception e) {

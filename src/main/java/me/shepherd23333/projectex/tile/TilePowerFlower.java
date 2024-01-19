@@ -7,6 +7,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 
+import java.math.BigInteger;
 import java.util.UUID;
 
 /**
@@ -15,14 +16,13 @@ import java.util.UUID;
 public class TilePowerFlower extends TileEntity implements ITickable {
     public UUID owner = new UUID(0L, 0L);
     public String name = "";
-    public long storedEMC = 0L;
+    public BigInteger storedEMC = BigInteger.ZERO;
 
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         owner = nbt.getUniqueId("owner");
         name = nbt.getString("name");
-        double storedEMC1 = nbt.getDouble("emc");
-        storedEMC = storedEMC1 > Long.MAX_VALUE ? Long.MAX_VALUE : (long) storedEMC1;
+        storedEMC = new BigInteger(nbt.getString("emc"));
         super.readFromNBT(nbt);
     }
 
@@ -31,8 +31,8 @@ public class TilePowerFlower extends TileEntity implements ITickable {
         nbt.setUniqueId("owner", owner);
         nbt.setString("name", name);
 
-        if (storedEMC > 0L) {
-            nbt.setLong("emc", storedEMC);
+        if (storedEMC.compareTo(BigInteger.ZERO) > 0) {
+            nbt.setString("emc", storedEMC.toString());
         }
 
         return super.writeToNBT(nbt);
@@ -53,13 +53,13 @@ public class TilePowerFlower extends TileEntity implements ITickable {
             return;
         }
 
-        storedEMC += EnumTier.byMeta(getBlockMetadata()).properties.powerFlowerOutput();
+        storedEMC = storedEMC.add(EnumTier.byMeta(getBlockMetadata()).properties.powerFlowerOutput().toBigInteger());
 
         EntityPlayerMP player = world.getMinecraftServer().getPlayerList().getPlayerByUUID(owner);
 
         if (player != null) {
             PersonalEMC.add(PersonalEMC.get(player), storedEMC);
-            storedEMC = 0;
+            storedEMC = BigInteger.ZERO;
         } else {
             world.markChunkDirty(pos, this);
         }

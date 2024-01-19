@@ -16,12 +16,13 @@ import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.fluids.FluidStack;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class FluidMapper implements IEMCMapper<NormalizedSimpleStack, Long> {
+public class FluidMapper implements IEMCMapper<NormalizedSimpleStack, BigInteger> {
     private static final List<Pair<NormalizedSimpleStack, FluidStack>> melting = new ArrayList<>();
 
     private static void addMelting(String odName, String fluidName, int amount) {
@@ -84,14 +85,14 @@ public class FluidMapper implements IEMCMapper<NormalizedSimpleStack, Long> {
     }
 
     @Override
-    public void addMappings(IMappingCollector<NormalizedSimpleStack, Long> mapper, Configuration config) {
-        mapper.setValueBefore(NSSFluid.create(FluidRegistry.WATER), Long.MIN_VALUE/*=Free. TODO: Use IntArithmetic*/);
+    public void addMappings(IMappingCollector<NormalizedSimpleStack, BigInteger> mapper, Configuration config) {
+        mapper.setValueBefore(NSSFluid.create(FluidRegistry.WATER), BigInteger.valueOf(Long.MIN_VALUE)/*=Free. TODO: Use IntArithmetic*/);
         //1 Bucket of Lava = 1 Block of Obsidian
         mapper.addConversion(1000, NSSFluid.create(FluidRegistry.LAVA), Collections.singletonList(NSSItem.create(Blocks.OBSIDIAN)));
 
         //Add Conversion in case MFR is not present and milk is not an actual fluid
         NormalizedSimpleStack fakeMilkFluid = NSSFake.create("fakeMilkFluid");
-        mapper.setValueBefore(fakeMilkFluid, 16L);
+        mapper.setValueBefore(fakeMilkFluid, BigInteger.valueOf(16));
         mapper.addConversion(1, NSSItem.create(Items.MILK_BUCKET), Arrays.asList(NSSItem.create(Items.BUCKET), fakeMilkFluid));
 
         Fluid milkFluid = FluidRegistry.getFluid("milk");

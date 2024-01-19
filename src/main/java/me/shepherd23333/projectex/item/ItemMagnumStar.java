@@ -6,20 +6,22 @@ import me.shepherd23333.projecte.gameObjs.items.KleinStar;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.MathHelper;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 /**
  * @author LatvianModder
  */
 public class ItemMagnumStar extends Item implements IItemEmc {
-    public static final long[] STAR_EMC = new long[12];
+    public static final BigInteger[] STAR_EMC = new BigInteger[12];
 
     static {
-        long emc = 204800000L;
+        BigInteger emc = BigInteger.valueOf(204800000L);
 
         for (int i = 0; i < STAR_EMC.length; i++) {
             STAR_EMC[i] = emc;
-            emc *= 4L;
+            emc = emc.multiply(BigInteger.valueOf(4));
         }
     }
 
@@ -32,36 +34,38 @@ public class ItemMagnumStar extends Item implements IItemEmc {
 
     @Override
     public boolean showDurabilityBar(ItemStack stack) {
-        return getStoredEmc(stack) > 0D;
+        return getStoredEmc(stack).compareTo(BigInteger.ZERO) > 0;
     }
 
     @Override
     public double getDurabilityForDisplay(ItemStack stack) {
-        long emc = getStoredEmc(stack);
-        return emc == 0D ? 1D : MathHelper.clamp(1D - emc / (double) getMaximumEmc(stack), 0D, 1D);
+        BigInteger emc = getStoredEmc(stack);
+        return emc.equals(BigInteger.ZERO) ? 1D :
+                BigDecimal.ONE.subtract(new BigDecimal(emc).divide(new BigDecimal(getMaximumEmc(stack)))
+                        .max(BigDecimal.ZERO)).doubleValue();
     }
 
     @Override
-    public long addEmc(ItemStack stack, long toAdd) {
-        long add = Math.min(getMaximumEmc(stack) - getStoredEmc(stack), toAdd);
+    public BigInteger addEmc(ItemStack stack, BigInteger toAdd) {
+        BigInteger add = getMaximumEmc(stack).subtract(getStoredEmc(stack)).min(toAdd);
         ItemPE.addEmcToStack(stack, add);
         return add;
     }
 
     @Override
-    public long extractEmc(ItemStack stack, long toRemove) {
-        long sub = Math.min(getStoredEmc(stack), toRemove);
+    public BigInteger extractEmc(ItemStack stack, BigInteger toRemove) {
+        BigInteger sub = getStoredEmc(stack).min(toRemove);
         ItemPE.removeEmc(stack, sub);
         return sub;
     }
 
     @Override
-    public long getStoredEmc(ItemStack stack) {
+    public BigInteger getStoredEmc(ItemStack stack) {
         return ItemPE.getEmc(stack);
     }
 
     @Override
-    public long getMaximumEmc(ItemStack stack) {
+    public BigInteger getMaximumEmc(ItemStack stack) {
         return STAR_EMC[tier.ordinal()];
     }
 

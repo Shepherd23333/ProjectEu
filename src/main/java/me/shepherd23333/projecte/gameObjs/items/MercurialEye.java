@@ -29,6 +29,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
@@ -130,16 +131,16 @@ public class MercurialEye extends ItemMode implements IExtraFunction {
 
         World world = player.getEntityWorld();
         IBlockState startingState = world.getBlockState(startingPos);
-        long startingBlockEmc = EMCHelper.getEmcValue(ItemHelper.stateToStack(startingState, 1));
+        BigInteger startingBlockEmc = EMCHelper.getEmcValue(ItemHelper.stateToStack(startingState, 1));
         ItemStack target = inventory.getStackInSlot(1);
         IBlockState newState;
-        long newBlockEmc;
+        BigInteger newBlockEmc;
         byte mode = getMode(eye);
 
         if (!target.isEmpty()) {
             newState = ItemHelper.stackToState(target);
             newBlockEmc = EMCHelper.getEmcValue(target);
-        } else if (startingBlockEmc != 0 && (mode == EXTENSION_MODE || mode == EXTENSION_MODE_CLASSIC)) {
+        } else if (!startingBlockEmc.equals(BigInteger.ZERO) && (mode == EXTENSION_MODE || mode == EXTENSION_MODE_CLASSIC)) {
             //If there is no item key, attempt to determine it for extension mode
             newState = startingState;
             newBlockEmc = startingBlockEmc;
@@ -161,7 +162,7 @@ public class MercurialEye extends ItemMode implements IExtraFunction {
                 if (!offsetState.getBlock().isReplaceable(world, offsetPos)) {
                     return EnumActionResult.FAIL;
                 }
-                long offsetBlockEmc = EMCHelper.getEmcValue(ItemHelper.stateToStack(offsetState, 1));
+                BigInteger offsetBlockEmc = EMCHelper.getEmcValue(ItemHelper.stateToStack(offsetState, 1));
                 //Just in case it is not air but is a replaceable block like tall grass, get the proper EMC instead of just using 0
                 if (doBlockPlace(player, offsetState, offsetPos, newState, eye, offsetBlockEmc, newBlockEmc, drops)) {
                     hitTargets++;
@@ -210,7 +211,7 @@ public class MercurialEye extends ItemMode implements IExtraFunction {
                     if (mode == EXTENSION_MODE) {
                         AxisAlignedBB cbBox = startingState.getCollisionBoundingBox(world, offsetPos);
                         if (cbBox == null || world.checkNoEntityCollision(cbBox)) {
-                            long offsetBlockEmc = EMCHelper.getEmcValue(ItemHelper.stateToStack(offsetState, 1));
+                            BigInteger offsetBlockEmc = EMCHelper.getEmcValue(ItemHelper.stateToStack(offsetState, 1));
                             hit = doBlockPlace(player, offsetState, offsetPos, newState, eye, offsetBlockEmc, newBlockEmc, drops);
                         }
                     } else if (mode == TRANSMUTATION_MODE) {
@@ -251,39 +252,39 @@ public class MercurialEye extends ItemMode implements IExtraFunction {
         return EnumActionResult.SUCCESS;
     }
 
-    private boolean doBlockPlace(EntityPlayer player, IBlockState oldState, BlockPos placePos, IBlockState newState, ItemStack eye, long oldEMC, long newEMC, NonNullList<ItemStack> drops) {
+    private boolean doBlockPlace(EntityPlayer player, IBlockState oldState, BlockPos placePos, IBlockState newState, ItemStack eye, BigInteger oldEMC, BigInteger newEMC, NonNullList<ItemStack> drops) {
         IItemHandler capability = eye.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
         if (capability == null) {
             return false;
         }
         ItemStack klein = capability.getStackInSlot(0);
 
-        if (klein.isEmpty() || oldState == newState || ItemPE.getEmc(klein) < newEMC - oldEMC || player.getEntityWorld().getTileEntity(placePos) != null) {
+        if (klein.isEmpty() || oldState == newState || ItemPE.getEmc(klein).compareTo(newEMC.subtract(oldEMC)) < 0 || player.getEntityWorld().getTileEntity(placePos) != null) {
             return false;
         }
 
-        if (oldEMC == 0 && oldState.getBlock().blockHardness == -1.0F) {
+        if (oldEMC.equals(BigInteger.ZERO) && oldState.getBlock().blockHardness == -1.0F) {
             //Don't allow replacing unbreakable blocks (unless they have an EMC value)
             return false;
         }
 
         if (PlayerHelper.checkedReplaceBlock((EntityPlayerMP) player, placePos, newState)) {
             IItemEmc itemEMC = (IItemEmc) klein.getItem();
-            if (oldEMC == 0) {
+            if (oldEMC.equals(BigInteger.ZERO)) {
                 //Drop the block because it doesn't have an emc value
                 oldState.getBlock().getDrops(drops, player.getEntityWorld(), placePos, oldState, 0);
                 itemEMC.extractEmc(klein, newEMC);
-            } else if (oldEMC > newEMC) {
-                itemEMC.addEmc(klein, oldEMC - newEMC);
-            } else if (oldEMC < newEMC) {
-                itemEMC.extractEmc(klein, newEMC - oldEMC);
+            } else if (oldEMC.compareTo(newEMC) > 0) {
+                itemEMC.addEmc(klein, oldEMC.subtract(newEMC));
+            } else if (oldEMC.compareTo(newEMC) < 0) {
+                itemEMC.extractEmc(klein, newEMC.subtract(oldEMC));
             }
             return true;
         }
         return false;
     }
 
-    private int fillGaps(ItemStack eye, EntityPlayer player, World world, IBlockState startingState, IBlockState newState, long newBlockEmc, Pair<BlockPos, BlockPos> corners, NonNullList<ItemStack> drops) {
+    private int fillGaps(ItemStack eye, EntityPlayer player, World world, IBlockState startingState, IBlockState newState, BigInteger newBlockEmc, Pair<BlockPos, BlockPos> corners, NonNullList<ItemStack> drops) {
         int hitTargets = 0;
         for (BlockPos pos : WorldHelper.getPositionsFromBox(new AxisAlignedBB(corners.getLeft(), corners.getRight()))) {
             AxisAlignedBB bb = startingState.getCollisionBoundingBox(world, pos);
@@ -291,7 +292,7 @@ public class MercurialEye extends ItemMode implements IExtraFunction {
                 IBlockState placeState = world.getBlockState(pos);
                 if (placeState.getBlock().isReplaceable(world, pos)) {
                     //Only replace replaceable blocks
-                    long placeBlockEmc = EMCHelper.getEmcValue(ItemHelper.stateToStack(placeState, 1));
+                    BigInteger placeBlockEmc = EMCHelper.getEmcValue(ItemHelper.stateToStack(placeState, 1));
                     if (doBlockPlace(player, placeState, pos, newState, eye, placeBlockEmc, newBlockEmc, drops)) {
                         hitTargets++;
                     }

@@ -25,9 +25,10 @@ import net.minecraftforge.items.wrapper.InvWrapper;
 import net.minecraftforge.items.wrapper.SidedInvWrapper;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 
 public class RMFurnaceTile extends TileEmc implements IEmcAcceptor {
-    private static final long EMC_CONSUMPTION = 2;
+    private static final BigInteger EMC_CONSUMPTION = BigInteger.valueOf(2);
     private final ItemStackHandler inputInventory = new StackHandler(getInvSize());
     private final ItemStackHandler outputInventory = new StackHandler(getInvSize());
     private final ItemStackHandler fuelInv = new StackHandler(1);
@@ -63,7 +64,7 @@ public class RMFurnaceTile extends TileEmc implements IEmcAcceptor {
     }
 
     protected RMFurnaceTile(int ticksBeforeSmelt, int efficiencyBonus) {
-        super(64);
+        super(BigInteger.valueOf(64));
         this.ticksBeforeSmelt = ticksBeforeSmelt;
         this.efficiencyBonus = efficiencyBonus;
     }
@@ -132,13 +133,13 @@ public class RMFurnaceTile extends TileEmc implements IEmcAcceptor {
 
             if (canSmelt() && !getFuelItem().isEmpty() && getFuelItem().getItem() instanceof IItemEmc) {
                 IItemEmc itemEmc = ((IItemEmc) getFuelItem().getItem());
-                if (itemEmc.getStoredEmc(getFuelItem()) >= EMC_CONSUMPTION) {
+                if (itemEmc.getStoredEmc(getFuelItem()).compareTo(EMC_CONSUMPTION) >= 0) {
                     itemEmc.extractEmc(getFuelItem(), EMC_CONSUMPTION);
                     this.addEMC(EMC_CONSUMPTION);
                 }
             }
 
-            if (this.getStoredEmc() >= EMC_CONSUMPTION) {
+            if (this.getStoredEmc().compareTo(EMC_CONSUMPTION) >= 0) {
                 furnaceBurnTime = 1;
                 this.removeEMC(EMC_CONSUMPTION);
             }
@@ -312,13 +313,13 @@ public class RMFurnaceTile extends TileEmc implements IEmcAcceptor {
     }
 
     @Override
-    public long acceptEMC(@Nonnull EnumFacing side, long toAccept) {
-        if (this.getStoredEmc() < EMC_CONSUMPTION) {
-            long needed = EMC_CONSUMPTION - this.getStoredEmc();
-            long accept = Math.min(needed, toAccept);
+    public BigInteger acceptEMC(@Nonnull EnumFacing side, BigInteger toAccept) {
+        if (this.getStoredEmc().compareTo(EMC_CONSUMPTION) < 0) {
+            BigInteger needed = EMC_CONSUMPTION.subtract(this.getStoredEmc());
+            BigInteger accept = needed.min(toAccept);
             this.addEMC(accept);
             return accept;
         }
-        return 0;
+        return BigInteger.ZERO;
     }
 }

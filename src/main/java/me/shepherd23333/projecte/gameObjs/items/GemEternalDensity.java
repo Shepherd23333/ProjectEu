@@ -36,6 +36,7 @@ import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,7 +61,7 @@ public class GemEternalDensity extends ItemPE implements IAlchBagItem, IAlchChes
      * @return Whether the inventory was changed
      */
     private static boolean condense(ItemStack gem, IItemHandler inv) {
-        if (!ItemHelper.getOrCreateCompound(gem).getBoolean(TAG_ACTIVE) || ItemPE.getEmc(gem) >= Constants.TILE_MAX_EMC) {
+        if (!ItemHelper.getOrCreateCompound(gem).getBoolean(TAG_ACTIVE) || ItemPE.getEmc(gem).compareTo(Constants.TILE_MAX_EMC) > 0) {
             return false;
         }
 
@@ -75,7 +76,7 @@ public class GemEternalDensity extends ItemPE implements IAlchBagItem, IAlchChes
 
             if (s.isEmpty()
                     || !EMCHelper.doesItemHaveEmc(s) || s.getMaxStackSize() == 1
-                    || EMCHelper.getEmcValue(s) >= EMCHelper.getEmcValue(target)
+                    || EMCHelper.getEmcValue(s).compareTo(EMCHelper.getEmcValue(target)) >= 0
                     || inv.extractItem(i, s.getCount() == 1 ? 1 : s.getCount() / 2, true).isEmpty()) {
                 continue;
             }
@@ -85,19 +86,19 @@ public class GemEternalDensity extends ItemPE implements IAlchBagItem, IAlchChes
 
                 addToList(gem, copy);
 
-                ItemPE.addEmcToStack(gem, EMCHelper.getEmcValue(copy) * copy.getCount());
+                ItemPE.addEmcToStack(gem, EMCHelper.getEmcValue(copy).multiply(BigInteger.valueOf(copy.getCount())));
                 hasChanged = true;
                 break;
             }
         }
 
-        long value = EMCHelper.getEmcValue(target);
+        BigInteger value = EMCHelper.getEmcValue(target);
 
         if (!EMCHelper.doesItemHaveEmc(target)) {
             return hasChanged;
         }
 
-        while (getEmc(gem) >= value) {
+        while (getEmc(gem).compareTo(value) >= 0) {
             ItemStack remain = ItemHandlerHelper.insertItemStacked(inv, target.copy(), false);
 
             if (!remain.isEmpty()) {
@@ -125,7 +126,7 @@ public class GemEternalDensity extends ItemPE implements IAlchBagItem, IAlchChes
                         WorldHelper.createLootDrop(items, world, player.posX, player.posY, player.posZ);
 
                         setItems(stack, new ArrayList<>());
-                        ItemPE.setEmc(stack, 0);
+                        ItemPE.setEmc(stack, BigInteger.ZERO);
                     }
 
                     stack.getTagCompound().setBoolean(TAG_ACTIVE, false);

@@ -12,6 +12,7 @@ import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.LoaderState;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 
 public class EMCProxyImpl implements IEMCProxy {
     public static final IEMCProxy instance = new EMCProxyImpl();
@@ -20,7 +21,7 @@ public class EMCProxyImpl implements IEMCProxy {
     }
 
     @Override
-    public void registerCustomEMC(@Nonnull ItemStack stack, long value) {
+    public void registerCustomEMC(@Nonnull ItemStack stack, BigInteger value) {
         Preconditions.checkNotNull(stack);
         boolean flag = Loader.instance().isInState(LoaderState.PREINITIALIZATION) || Loader.instance().isInState(LoaderState.INITIALIZATION) || Loader.instance().isInState(LoaderState.POSTINITIALIZATION);
         Preconditions.checkState(flag, String.format("Mod %s tried to register EMC at an invalid time!", Loader.instance().activeModContainer().getModId()));
@@ -29,7 +30,7 @@ public class EMCProxyImpl implements IEMCProxy {
     }
 
     @Override
-    public void registerCustomEMC(@Nonnull Object o, long value) {
+    public void registerCustomEMC(@Nonnull Object o, BigInteger value) {
         Preconditions.checkNotNull(o);
         boolean flag = Loader.instance().isInState(LoaderState.PREINITIALIZATION) || Loader.instance().isInState(LoaderState.INITIALIZATION) || Loader.instance().isInState(LoaderState.POSTINITIALIZATION);
         Preconditions.checkState(flag, String.format("Mod %s tried to register EMC at an invalid time!", Loader.instance().activeModContainer().getModId()));
@@ -56,25 +57,25 @@ public class EMCProxyImpl implements IEMCProxy {
     }
 
     @Override
-    public long getValue(@Nonnull Block block) {
+    public BigInteger getValue(@Nonnull Block block) {
         Preconditions.checkNotNull(block);
         return EMCHelper.getEmcValue(block);
     }
 
     @Override
-    public long getValue(@Nonnull Item item) {
+    public BigInteger getValue(@Nonnull Item item) {
         Preconditions.checkNotNull(item);
         return EMCHelper.getEmcValue(item);
     }
 
     @Override
-    public long getValue(@Nonnull ItemStack stack) {
+    public BigInteger getValue(@Nonnull ItemStack stack) {
         Preconditions.checkNotNull(stack);
         return EMCHelper.getEmcValue(stack);
     }
 
     @Override
-    public long getSellValue(@Nonnull ItemStack stack) {
+    public BigInteger getSellValue(@Nonnull ItemStack stack) {
         Preconditions.checkNotNull(stack);
         return EMCHelper.getEmcSellValue(stack);
     }

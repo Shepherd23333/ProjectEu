@@ -9,6 +9,9 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 /**
  * @author LatvianModder
  */
@@ -42,17 +45,18 @@ public class TileCollector extends TileEntity implements ITickable {
                 if (emcAcceptor instanceof TileRelay) {
                     ((TileRelay) emcAcceptor).addRelayBonus(EnumFacing.VALUES[i].getOpposite());
                 } else if (emcAcceptor instanceof RelayMK3Tile) {
-                    emcAcceptor.acceptEMC(EnumFacing.VALUES[i].getOpposite(), 10L);
+                    emcAcceptor.acceptEMC(EnumFacing.VALUES[i].getOpposite(), BigInteger.valueOf(10L));
                 } else if (emcAcceptor instanceof RelayMK2Tile) {
-                    emcAcceptor.acceptEMC(EnumFacing.VALUES[i].getOpposite(), 3L);
+                    emcAcceptor.acceptEMC(EnumFacing.VALUES[i].getOpposite(), BigInteger.valueOf(3L));
                 } else if (emcAcceptor instanceof RelayMK1Tile) {
-                    emcAcceptor.acceptEMC(EnumFacing.VALUES[i].getOpposite(), 1L);
+                    emcAcceptor.acceptEMC(EnumFacing.VALUES[i].getOpposite(), BigInteger.ONE);
                 }
             }
         }
 
         if (tempSize > 0) {
-            long s = (long) (EnumTier.byMeta(getBlockMetadata()).properties.collector_output / tempSize);
+            BigInteger s = EnumTier.byMeta(getBlockMetadata()).properties.getCo()
+                    .divide(BigDecimal.valueOf(tempSize)).toBigInteger();
 
             for (int i = 0; i < 6; i++) {
                 IEmcAcceptor emcAcceptor = TileRelay.TEMP[i];

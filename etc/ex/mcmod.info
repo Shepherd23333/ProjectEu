@@ -1,0 +1,41 @@
+[
+  {
+    "modid": "projecte",
+    "name": "ProjectE:Unoffical",
+    "description": "An unofficial edition of ProjectE.",
+    "version": "${version}",
+    "url": "",
+    "authorList": [
+      "Shepherd23333"
+    ],
+    "credits": "Thanks to:\nx3n0ph0b3 - EE2 creator. Allowed use of EE2 assets.\nMidnightLightning - EE2 GUI Textures.\nMagic Banana - Original ProjectE textures.\nMaPePeR - Assistant developer.\nWilliewillus - Assistant developer.\nLilylicious - Assistant developer.",
+    "logoFile": "assets/projecte/logo.png",
+    "screenshots": [],
+    "dependencies": [],
+    "mcversion": "1.12.2",
+    "updateUrl": "",
+    "parent": ""
+  },
+  {
+    "modid": "projectex",
+    "name": "Project EX:Unoffical",
+    "description": "An unofficial edition of Project EX.",
+    "version": "${version}",
+    "url": "",
+    "updateUrl": "",
+    "authorList": [
+      "Shepherd23333"
+    ],
+    "credits": "",
+    "logoFile": "assets/projectex/textures/logo.png",
+    "screenshots": [],
+    "useDependencyInformation": true,
+    "dependencies": [
+      "projecte"
+    ],
+    "requiredMods": [
+      "projecte@[${version}]"
+    ],
+    "mcversion": "1.12.2"
+  }
+]

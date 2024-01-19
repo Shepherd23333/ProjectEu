@@ -4,6 +4,9 @@ import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.Random;
 
 /**
@@ -32,15 +35,16 @@ public final class MathUtils {
     /**
      * Scales this proportion into redstone, where 0 means none, 15 means full, and the rest are an appropriate scaling.
      */
-    public static int scaleToRedstone(long currentAmount, long max) {
-        double proportion = currentAmount / (double) max;
-        if (currentAmount <= 0) {
+    public static int scaleToRedstone(BigInteger currentAmount, BigInteger max) {
+        BigDecimal proportion = new BigDecimal(currentAmount).divide(new BigDecimal(max));
+        if (currentAmount.compareTo(BigInteger.ZERO) <= 0) {
             return 0;
         }
-        if (currentAmount >= max) {
+        if (currentAmount.compareTo(max) >= 0) {
             return 15;
         }
-        return (int) Math.round(proportion * 13 + 1);
+        return proportion.multiply(BigDecimal.valueOf(13)).add(BigDecimal.ONE)
+                .setScale(0, RoundingMode.HALF_EVEN).intValue();
     }
 
     public static double tickToSec(int ticks) {

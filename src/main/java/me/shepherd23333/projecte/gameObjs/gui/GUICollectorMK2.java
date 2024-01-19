@@ -10,6 +10,8 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
 
+import java.math.BigInteger;
+
 public class GUICollectorMK2 extends GuiContainer {
     private static final ResourceLocation texture = new ResourceLocation(PECore.MODID.toLowerCase(), "textures/gui/collector2.png");
     private final CollectorMK2Tile tile;
@@ -32,10 +34,10 @@ public class GUICollectorMK2 extends GuiContainer {
 
     @Override
     protected void drawGuiContainerForegroundLayer(int var1, int var2) {
-        this.fontRenderer.drawString(Long.toString(container.emc), 75, 32, 4210752);
+        this.fontRenderer.drawString(container.emc.toString(), 75, 32, 4210752);
 
-        long kleinCharge = container.kleinEmc;
-        if (kleinCharge > 0)
+        BigInteger kleinCharge = container.kleinEmc;
+        if (kleinCharge.compareTo(BigInteger.ZERO) > 0)
             this.fontRenderer.drawString(Constants.EMC_FORMATTER.format(kleinCharge), 75, 44, 4210752);
     }
 
@@ -54,7 +56,7 @@ public class GUICollectorMK2 extends GuiContainer {
         this.drawTexturedModalRect(x + 142, y + 49 - progress, 202, 13 - progress, 12, progress);
 
         //EMC storage. Max is 48
-        this.drawTexturedModalRect(x + 80, y + 18, 0, 166, (int) (container.emc / tile.getMaximumEmc() * 48), 10);
+        this.drawTexturedModalRect(x + 80, y + 18, 0, 166, (container.emc.divide(tile.getMaximumEmc()).intValue() * 48), 10);
 
         //Klein Star Charge Progress. Max is 48
         progress = (int) (container.kleinChargeProgress * 48);

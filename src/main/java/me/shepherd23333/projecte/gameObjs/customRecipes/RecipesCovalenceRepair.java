@@ -11,6 +11,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -53,26 +54,26 @@ public class RecipesCovalenceRepair extends IForgeRegistryEntry.Impl<IRecipe> im
         if (ingredients.getFirst().isEmpty() || ingredients.getSecond().isEmpty())
             return false;
 
-        long emcPerDurability = EMCHelper.getEMCPerDurability(ingredients.getFirst());
-        long dustEmc = 0;
+        BigInteger emcPerDurability = EMCHelper.getEMCPerDurability(ingredients.getFirst());
+        BigInteger dustEmc = BigInteger.ZERO;
         for (ItemStack stack : ingredients.getSecond()) {
-            dustEmc += EMCHelper.getEmcValue(stack);
+            dustEmc = dustEmc.add(EMCHelper.getEmcValue(stack));
         }
-        return dustEmc >= emcPerDurability;
+        return dustEmc.compareTo(emcPerDurability) >= 0;
     }
 
     @Nonnull
     @Override
     public ItemStack getCraftingResult(@Nonnull InventoryCrafting inv) {
         Tuple<ItemStack, List<ItemStack>> ingredients = findIngredients(inv);
-        long emcPerDurability = EMCHelper.getEMCPerDurability(ingredients.getFirst());
-        long dustEmc = 0;
+        BigInteger emcPerDurability = EMCHelper.getEMCPerDurability(ingredients.getFirst());
+        BigInteger dustEmc = BigInteger.ZERO;
         for (ItemStack stack : ingredients.getSecond()) {
-            dustEmc += EMCHelper.getEmcValue(stack);
+            dustEmc = dustEmc.add(EMCHelper.getEmcValue(stack));
         }
 
         ItemStack output = ingredients.getFirst().copy();
-        output.setItemDamage((int) Math.max(output.getItemDamage() - (dustEmc / emcPerDurability), 0));
+        output.setItemDamage(Math.max(output.getItemDamage() - dustEmc.divide(emcPerDurability).intValue(), 0));
         return output;
     }
 

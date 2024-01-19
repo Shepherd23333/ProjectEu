@@ -14,6 +14,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -195,16 +196,16 @@ public class ContainerArcaneTablet extends ContainerTableBase {
 
     private boolean transferFromTablet(int i, ItemStack[] possibilities) {
         if (possibilities.length > 1) {
-            Arrays.sort(possibilities, Comparator.comparingLong(o -> ProjectEAPI.getEMCProxy().getValue(o)));
+            Arrays.sort(possibilities, Comparator.comparing(o -> ProjectEAPI.getEMCProxy().getValue(o)));
         }
 
         for (ItemStack stack : possibilities) {
             ItemStack stack1 = ProjectEXUtils.fixOutput(stack);
 
             if (playerData.hasKnowledge(stack1)) {
-                long value = ProjectEAPI.getEMCProxy().getValue(stack1);
+                BigInteger value = ProjectEAPI.getEMCProxy().getValue(stack1);
 
-                if (value > 0L && playerData.getEmc() >= value) {
+                if (value.compareTo(BigInteger.ZERO) > 0 && playerData.getEmc().compareTo(value) >= 0) {
                     ItemStack slotItem = craftMatrix.getStackInSlot(i);
 
                     if (slotItem.isEmpty()) {
@@ -265,7 +266,7 @@ public class ContainerArcaneTablet extends ContainerTableBase {
                     int k = ProjectEXUtils.addKnowledge(player, playerData, ProjectEXUtils.fixOutput(stack));
 
                     if (k > 0) {
-                        PersonalEMC.add(playerData, ProjectEAPI.getEMCProxy().getValue(stack) * stack.getCount());
+                        PersonalEMC.add(playerData, ProjectEAPI.getEMCProxy().getValue(stack).multiply(BigInteger.valueOf(stack.getCount())));
 
                         if (k > 1 && knowledgeUpdate != null) {
                             knowledgeUpdate.updateKnowledge();

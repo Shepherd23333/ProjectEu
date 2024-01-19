@@ -10,12 +10,15 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 import javax.annotation.Nullable;
+import java.math.BigInteger;
 
 /**
  * @author LatvianModder
  */
 public class MessageSyncEMC implements IMessage {
-    public static void sync(@Nullable EntityPlayer player, long emc) {
+    public BigInteger emc;
+
+    public static void sync(@Nullable EntityPlayer player, BigInteger emc) {
         if (player instanceof EntityPlayerMP) {
             MessageSyncEMC message = new MessageSyncEMC();
             message.emc = emc;
@@ -23,16 +26,19 @@ public class MessageSyncEMC implements IMessage {
         }
     }
 
-    public long emc;
-
     @Override
     public void fromBytes(ByteBuf buf) {
-        emc = buf.readLong();
+        int length = buf.readInt();
+        byte[] bytes = new byte[length];
+        buf.readBytes(bytes);
+        emc = length > 0 ? new BigInteger(bytes) : BigInteger.ZERO;
     }
 
     @Override
     public void toBytes(ByteBuf buf) {
-        buf.writeLong(emc);
+        byte[] bytes = emc.toByteArray();
+        buf.writeInt(bytes.length);
+        buf.writeBytes(bytes);
     }
 
     public static class Handler implements IMessageHandler<MessageSyncEMC, IMessage> {

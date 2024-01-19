@@ -5,16 +5,19 @@ import me.shepherd23333.projecte.api.capabilities.IKnowledgeProvider;
 import me.shepherd23333.projecte.api.event.PlayerAttemptLearnEvent;
 import me.shepherd23333.projecte.api.item.IItemEmc;
 import me.shepherd23333.projecte.emc.FuelMapper;
-import me.shepherd23333.projecte.utils.*;
+import me.shepherd23333.projecte.utils.EMCHelper;
+import me.shepherd23333.projecte.utils.ItemHelper;
+import me.shepherd23333.projecte.utils.NBTWhitelist;
+import me.shepherd23333.projecte.utils.PlayerHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 
+import java.math.BigInteger;
 import java.util.*;
 
 public class TransmutationInventory extends CombinedInvWrapper {
@@ -105,10 +108,10 @@ public class TransmutationInventory extends CombinedInvWrapper {
     }
 
     public void checkForUpdates() {
-        long matterEmc = EMCHelper.getEmcValue(outputs.getStackInSlot(0));
-        long fuelEmc = EMCHelper.getEmcValue(outputs.getStackInSlot(FUEL_START));
+        BigInteger matterEmc = EMCHelper.getEmcValue(outputs.getStackInSlot(0));
+        BigInteger fuelEmc = EMCHelper.getEmcValue(outputs.getStackInSlot(FUEL_START));
 
-        if (Math.max(matterEmc, fuelEmc) > getAvailableEMC()) {
+        if (matterEmc.max(fuelEmc).compareTo(getAvailableEMC()) > 0) {
             updateClientTargets();
         }
     }
@@ -135,9 +138,9 @@ public class TransmutationInventory extends CombinedInvWrapper {
                 lockCopy.setItemDamage(0);
             }
 
-            long reqEmc = EMCHelper.getEmcValue(inputLocks.getStackInSlot(LOCK_INDEX));
+            BigInteger reqEmc = EMCHelper.getEmcValue(inputLocks.getStackInSlot(LOCK_INDEX));
 
-            if (getAvailableEMC() < reqEmc) {
+            if (getAvailableEMC().compareTo(reqEmc) < 0) {
                 return;
             }
 
@@ -151,7 +154,7 @@ public class TransmutationInventory extends CombinedInvWrapper {
             while (iter.hasNext()) {
                 ItemStack stack = iter.next();
 
-                if (EMCHelper.getEmcValue(stack) > reqEmc) {
+                if (getAvailableEMC().compareTo(EMCHelper.getEmcValue(stack)) < 0) {
                     iter.remove();
                     continue;
                 }
@@ -178,7 +181,7 @@ public class TransmutationInventory extends CombinedInvWrapper {
             while (iter.hasNext()) {
                 ItemStack stack = iter.next();
 
-                if (getAvailableEMC() < EMCHelper.getEmcValue(stack)) {
+                if (getAvailableEMC().compareTo(EMCHelper.getEmcValue(stack)) < 0) {
                     iter.remove();
                     continue;
                 }
@@ -247,7 +250,7 @@ public class TransmutationInventory extends CombinedInvWrapper {
     public void writeIntoOutputSlot(int slot, ItemStack item) {
 
         if (EMCHelper.doesItemHaveEmc(item)
-                && EMCHelper.getEmcValue(item) <= getAvailableEMC()
+                && EMCHelper.getEmcValue(item).compareTo(getAvailableEMC()) <= 0
                 && provider.hasKnowledge(item)) {
             outputs.setStackInSlot(slot, item);
         } else {
@@ -255,14 +258,15 @@ public class TransmutationInventory extends CombinedInvWrapper {
         }
     }
 
-    public void addEmc(long value) {
-        if (value == 0) {
+    public void addEmc(BigInteger value) {
+        int comp = value.compareTo(BigInteger.ZERO);
+        if (comp == 0) {
             //Optimization to not look at the items if nothing will happen anyways
             return;
         }
-        if (value < 0) {
+        if (comp < 0) {
             //Make sure it is using the correct method so that it handles the klein stars properly
-            removeEmc(-value);
+            removeEmc(value.negate());
         }
         //Start by trying to add it to the EMC items on the left
         for (int i = 0; i < inputLocks.getSlots(); i++) {
@@ -272,76 +276,44 @@ public class TransmutationInventory extends CombinedInvWrapper {
             ItemStack stack = inputLocks.getStackInSlot(i);
             if (!stack.isEmpty() && stack.getItem() instanceof IItemEmc) {
                 IItemEmc itemEmc = ((IItemEmc) stack.getItem());
-                long neededEmc = itemEmc.getMaximumEmc(stack) - itemEmc.getStoredEmc(stack);
-                if (value <= neededEmc) {
+                BigInteger neededEmc = itemEmc.getMaximumEmc(stack).subtract(itemEmc.getStoredEmc(stack));
+                if (value.compareTo(neededEmc) <= 0) {
                     //This item can store all of the amount being added
                     itemEmc.addEmc(stack, value);
                     return;
                 }
                 //else more than this item can fit, so fill the item and then continue going
                 itemEmc.addEmc(stack, neededEmc);
-                value -= neededEmc;
-            }
-        }
-        long emcToMax = Constants.TILE_MAX_EMC - provider.getEmc();
-        if (value > emcToMax) {
-            long excessEMC = value - emcToMax;
-            value = emcToMax;
-            //Will finish filling provider
-            //Now with excess EMC we can check against the lock slot as that is the last spot that has its EMC used.
-            ItemStack stack = inputLocks.getStackInSlot(LOCK_INDEX);
-            if (!stack.isEmpty() && stack.getItem() instanceof IItemEmc) {
-                IItemEmc itemEmc = ((IItemEmc) stack.getItem());
-                long neededEmc = itemEmc.getMaximumEmc(stack) - itemEmc.getStoredEmc(stack);
-                if (excessEMC > neededEmc) {
-                    itemEmc.addEmc(stack, neededEmc);
-                } else {
-                    itemEmc.addEmc(stack, excessEMC);
-                }
+                value = value.subtract(neededEmc);
             }
         }
 
-        provider.setEmc(provider.getEmc() + value);
+        provider.setEmc(provider.getEmc().add(value));
 
-        if (provider.getEmc() >= Constants.TILE_MAX_EMC || provider.getEmc() < 0) {
-            provider.setEmc(Constants.TILE_MAX_EMC);
+        if (provider.getEmc().compareTo(BigInteger.ZERO) < 0) {
+            provider.setEmc(BigInteger.ZERO);
         }
 
         if (!player.getEntityWorld().isRemote) {
-            PlayerHelper.updateScore((EntityPlayerMP) player, PlayerHelper.SCOREBOARD_EMC, MathHelper.floor(provider.getEmc()));
+            PlayerHelper.updateScore((EntityPlayerMP) player, PlayerHelper.SCOREBOARD_EMC, provider.getEmc());
         }
     }
 
-    public void removeEmc(long value) {
-        if (value == 0) {
+    public void removeEmc(BigInteger value) {
+        int comp = value.compareTo(BigInteger.ZERO);
+        if (comp == 0) {
             //Optimization to not look at the items if nothing will happen anyways
             return;
         }
-        if (value < 0) {
+        if (comp < 0) {
             //Make sure it is using the correct method so that it handles the klein stars properly
-            addEmc(-value);
+            addEmc(value.negate());
         }
-        if (hasMaxedEmc()) {
-            //If the EMC is maxed, check and try to remove from the lock slot if it is IItemEMC
-            //This is the only case if the provider is full when the IItemEMC was put in the lock slot
-            ItemStack stack = inputLocks.getStackInSlot(LOCK_INDEX);
-            if (!stack.isEmpty() && stack.getItem() instanceof IItemEmc) {
-                IItemEmc itemEmc = ((IItemEmc) stack.getItem());
-                long storedEmc = itemEmc.getStoredEmc(stack);
-                if (storedEmc >= value) {
-                    //All of it can be removed from the lock item
-                    itemEmc.extractEmc(stack, value);
-                    return;
-                }
-                itemEmc.extractEmc(stack, storedEmc);
-                value -= storedEmc;
-            }
-        }
-        if (value > provider.getEmc()) {
+        if (value.compareTo(provider.getEmc()) > 0) {
             //Remove from provider first
             //This code runs first to simplify the logic
             //But it simulates removal first by extracting the amount from value and then removing that excess from items
-            long toRemove = value - provider.getEmc();
+            BigInteger toRemove = value.subtract(provider.getEmc());
             value = provider.getEmc();
             for (int i = 0; i < inputLocks.getSlots(); i++) {
                 if (i == LOCK_INDEX) {
@@ -350,8 +322,8 @@ public class TransmutationInventory extends CombinedInvWrapper {
                 ItemStack stack = inputLocks.getStackInSlot(i);
                 if (!stack.isEmpty() && stack.getItem() instanceof IItemEmc) {
                     IItemEmc itemEmc = ((IItemEmc) stack.getItem());
-                    long storedEmc = itemEmc.getStoredEmc(stack);
-                    if (toRemove <= storedEmc) {
+                    BigInteger storedEmc = itemEmc.getStoredEmc(stack);
+                    if (toRemove.compareTo(storedEmc) <= 0) {
                         //The EMC that is being removed that the provider does not contain is satisfied by this IItemEMC
                         //Remove it and then
                         itemEmc.extractEmc(stack, toRemove);
@@ -359,23 +331,19 @@ public class TransmutationInventory extends CombinedInvWrapper {
                     }
                     //Removes all the emc from this item
                     itemEmc.extractEmc(stack, storedEmc);
-                    toRemove -= storedEmc;
+                    toRemove = toRemove.subtract(storedEmc);
                 }
             }
         }
-        provider.setEmc(provider.getEmc() - value);
+        provider.setEmc(provider.getEmc().subtract(value));
 
-        if (provider.getEmc() < 0) {
-            provider.setEmc(0);
+        if (provider.getEmc().compareTo(BigInteger.ZERO) < 0) {
+            provider.setEmc(BigInteger.ZERO);
         }
 
         if (!player.getEntityWorld().isRemote) {
-            PlayerHelper.updateScore((EntityPlayerMP) player, PlayerHelper.SCOREBOARD_EMC, MathHelper.floor(provider.getEmc()));
+            PlayerHelper.updateScore((EntityPlayerMP) player, PlayerHelper.SCOREBOARD_EMC, provider.getEmc());
         }
-    }
-
-    public boolean hasMaxedEmc() {
-        return provider.getEmc() >= Constants.TILE_MAX_EMC;
     }
 
     public IItemHandlerModifiable getHandlerForSlot(int slot) {
@@ -395,14 +363,10 @@ public class TransmutationInventory extends CombinedInvWrapper {
     /**
      * @return EMC available from the Provider + any klein stars in the input slots.
      */
-    public long getAvailableEMC() {
+    public BigInteger getAvailableEMC() {
         //TODO: Cache this value somehow, or at least cache which slots have IItemEMC in them?
-        if (hasMaxedEmc()) {
-            return Constants.TILE_MAX_EMC;
-        }
 
-        long emc = provider.getEmc();
-        long emcToMax = Constants.TILE_MAX_EMC - emc;
+        BigInteger emc = provider.getEmc();
         for (int i = 0; i < inputLocks.getSlots(); i++) {
             if (i == LOCK_INDEX) {
                 //Skip it even though this technically could add to available EMC.
@@ -412,12 +376,8 @@ public class TransmutationInventory extends CombinedInvWrapper {
             ItemStack stack = inputLocks.getStackInSlot(i);
             if (!stack.isEmpty() && stack.getItem() instanceof IItemEmc) {
                 IItemEmc itemEmc = ((IItemEmc) stack.getItem());
-                long storedEmc = itemEmc.getStoredEmc(stack);
-                if (storedEmc >= emcToMax) {
-                    return Constants.TILE_MAX_EMC;
-                }
-                emc += storedEmc;
-                emcToMax -= storedEmc;
+                BigInteger storedEmc = itemEmc.getStoredEmc(stack);
+                emc = emc.add(storedEmc);
             }
         }
         return emc;

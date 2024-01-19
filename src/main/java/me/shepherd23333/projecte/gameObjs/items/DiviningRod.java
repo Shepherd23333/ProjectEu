@@ -25,6 +25,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -47,8 +48,8 @@ public class DiviningRod extends ItemPE implements IModeChanger {
         }
 
         PlayerHelper.swingItem(player, hand);
-        List<Long> emcValues = new ArrayList<>();
-        long totalEmc = 0;
+        List<BigInteger> emcValues = new ArrayList<>();
+        BigInteger totalEmc = BigInteger.ZERO;
         int numBlocks = 0;
 
         byte mode = getMode(player.getHeldItem(hand));
@@ -70,9 +71,9 @@ public class DiviningRod extends ItemPE implements IModeChanger {
             }
 
             ItemStack blockStack = drops.get(0);
-            long blockEmc = EMCHelper.getEmcValue(blockStack);
+            BigInteger blockEmc = EMCHelper.getEmcValue(blockStack);
 
-            if (blockEmc == 0) {
+            if (blockEmc.equals(BigInteger.ZERO)) {
                 Map<ItemStack, ItemStack> map = FurnaceRecipes.instance().getSmeltingList();
 
                 for (Entry<ItemStack, ItemStack> entry : map.entrySet()) {
@@ -81,14 +82,14 @@ public class DiviningRod extends ItemPE implements IModeChanger {
                     }
 
                     if (ItemHelper.areItemStacksEqualIgnoreNBT(entry.getKey(), blockStack)) {
-                        long currentValue = EMCHelper.getEmcValue(entry.getValue());
+                        BigInteger currentValue = EMCHelper.getEmcValue(entry.getValue());
 
-                        if (currentValue != 0) {
+                        if (!currentValue.equals(BigInteger.ZERO)) {
                             if (!emcValues.contains(currentValue)) {
                                 emcValues.add(currentValue);
                             }
 
-                            totalEmc += currentValue;
+                            totalEmc = totalEmc.add(currentValue);
                         }
                     }
                 }
@@ -97,7 +98,7 @@ public class DiviningRod extends ItemPE implements IModeChanger {
                     emcValues.add(blockEmc);
                 }
 
-                totalEmc += blockEmc;
+                totalEmc = totalEmc.add(blockEmc);
             }
 
             numBlocks++;
@@ -107,10 +108,10 @@ public class DiviningRod extends ItemPE implements IModeChanger {
             return EnumActionResult.FAIL;
         }
 
-        long[] maxValues = new long[3];
+        BigInteger[] maxValues = new BigInteger[3];
 
         for (int i = 0; i < 3; i++) {
-            maxValues[i] = 1;
+            maxValues[i] = BigInteger.ONE;
         }
 
         emcValues.sort(Comparator.reverseOrder());
@@ -121,7 +122,7 @@ public class DiviningRod extends ItemPE implements IModeChanger {
             maxValues[i] = emcValues.get(i);
         }
 
-        player.sendMessage(new TextComponentTranslation("pe.divining.avgemc", numBlocks, (totalEmc / numBlocks)));
+        player.sendMessage(new TextComponentTranslation("pe.divining.avgemc", numBlocks, totalEmc.divide(BigInteger.valueOf(numBlocks))));
 
         if (this == ObjHandler.dRod2 || this == ObjHandler.dRod3) {
             player.sendMessage(new TextComponentTranslation("pe.divining.maxemc", maxValues[0]));

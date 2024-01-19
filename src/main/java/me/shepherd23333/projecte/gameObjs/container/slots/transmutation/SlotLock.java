@@ -3,13 +3,13 @@ package me.shepherd23333.projecte.gameObjs.container.slots.transmutation;
 import me.shepherd23333.projecte.api.item.IItemEmc;
 import me.shepherd23333.projecte.gameObjs.container.inventory.TransmutationInventory;
 import me.shepherd23333.projecte.gameObjs.container.slots.SlotPredicates;
-import me.shepherd23333.projecte.utils.Constants;
 import me.shepherd23333.projecte.utils.EMCHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.SlotItemHandler;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 
 public class SlotLock extends SlotItemHandler {
     private final TransmutationInventory inv;
@@ -34,15 +34,9 @@ public class SlotLock extends SlotItemHandler {
 
         if (stack.getItem() instanceof IItemEmc) {
             IItemEmc itemEmc = ((IItemEmc) stack.getItem());
-            long remainEmc = Constants.TILE_MAX_EMC - inv.provider.getEmc();
-
-            if (itemEmc.getStoredEmc(stack) >= remainEmc) {
-                inv.addEmc(remainEmc);
-                itemEmc.extractEmc(stack, remainEmc);
-            } else {
-                inv.addEmc(itemEmc.getStoredEmc(stack));
-                itemEmc.extractEmc(stack, itemEmc.getStoredEmc(stack));
-            }
+            BigInteger storedEmc = itemEmc.getStoredEmc(stack);
+            inv.addEmc(storedEmc);
+            itemEmc.extractEmc(stack, storedEmc);
         }
 
         if (EMCHelper.doesItemHaveEmc(stack)) {

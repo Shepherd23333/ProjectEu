@@ -17,12 +17,13 @@ import net.minecraftforge.oredict.OreDictionary;
 import org.apache.commons.io.IOUtils;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class CustomConversionMapper implements IEMCMapper<NormalizedSimpleStack, Long> {
+public class CustomConversionMapper implements IEMCMapper<NormalizedSimpleStack, BigInteger> {
     private static final String EXAMPLE_FILENAME = "example";
     private static final ImmutableList<String> defaultFilenames = ImmutableList.of("defaults", "ODdefaults", "metals");
     public static final Gson GSON = new GsonBuilder()
@@ -48,7 +49,7 @@ public class CustomConversionMapper implements IEMCMapper<NormalizedSimpleStack,
     }
 
     @Override
-    public void addMappings(IMappingCollector<NormalizedSimpleStack, Long> mapper, Configuration config) {
+    public void addMappings(IMappingCollector<NormalizedSimpleStack, BigInteger> mapper, Configuration config) {
         File customConversionFolder = getCustomConversionFolder();
         if (customConversionFolder.isDirectory() || customConversionFolder.mkdir()) {
             tryToWriteDefaultFiles();
@@ -70,7 +71,7 @@ public class CustomConversionMapper implements IEMCMapper<NormalizedSimpleStack,
         }
     }
 
-    private static void readFile(File f, Configuration config, IMappingCollector<NormalizedSimpleStack, Long> mapper, boolean allowDefaults) {
+    private static void readFile(File f, Configuration config, IMappingCollector<NormalizedSimpleStack, BigInteger> mapper, boolean allowDefaults) {
         if (f.isFile() && f.canRead() && f.getName().toLowerCase().endsWith(".json")) {
             String name = f.getName().substring(0, f.getName().length() - ".json".length());
 
@@ -94,11 +95,11 @@ public class CustomConversionMapper implements IEMCMapper<NormalizedSimpleStack,
         return new File(PECore.CONFIG_DIR, "customConversions");
     }
 
-    private static void addMappingsFromFile(Reader json, IMappingCollector<NormalizedSimpleStack, Long> mapper) {
+    private static void addMappingsFromFile(Reader json, IMappingCollector<NormalizedSimpleStack, BigInteger> mapper) {
         addMappingsFromFile(parseJson(json), mapper);
     }
 
-    private static void addMappingsFromFile(CustomConversionFile file, IMappingCollector<NormalizedSimpleStack, Long> mapper) {
+    private static void addMappingsFromFile(CustomConversionFile file, IMappingCollector<NormalizedSimpleStack, BigInteger> mapper) {
         //TODO implement buffered IMappingCollector to recover from failures
         for (Map.Entry<String, ConversionGroup> entry : file.groups.entrySet()) {
             PECore.debugLog("Adding conversions from group '{}' with comment '{}'", entry.getKey(), entry.getValue().comment);
@@ -114,7 +115,7 @@ public class CustomConversionMapper implements IEMCMapper<NormalizedSimpleStack,
 
         try {
             if (file.values.setValueBefore != null) {
-                for (Map.Entry<NormalizedSimpleStack, Long> entry : file.values.setValueBefore.entrySet()) {
+                for (Map.Entry<NormalizedSimpleStack, BigInteger> entry : file.values.setValueBefore.entrySet()) {
                     NormalizedSimpleStack something = entry.getKey();
                     mapper.setValueBefore(something, entry.getValue());
                     if (something instanceof NSSOreDictionary) {
@@ -126,7 +127,7 @@ public class CustomConversionMapper implements IEMCMapper<NormalizedSimpleStack,
                 }
             }
             if (file.values.setValueAfter != null) {
-                for (Map.Entry<NormalizedSimpleStack, Long> entry : file.values.setValueAfter.entrySet()) {
+                for (Map.Entry<NormalizedSimpleStack, BigInteger> entry : file.values.setValueAfter.entrySet()) {
                     NormalizedSimpleStack something = entry.getKey();
                     mapper.setValueAfter(something, entry.getValue());
                     if (something instanceof NSSOreDictionary) {

@@ -7,6 +7,7 @@ import me.shepherd23333.projecte.emc.json.NormalizedSimpleStack;
 
 import java.io.*;
 import java.lang.reflect.Type;
+import java.math.BigInteger;
 import java.util.Map;
 
 public class PregeneratedEMC {
@@ -14,9 +15,9 @@ public class PregeneratedEMC {
             .registerTypeAdapter(NormalizedSimpleStack.class, NormalizedSimpleStack.Serializer.INSTANCE)
             .enableComplexMapKeySerialization().setPrettyPrinting().create();
 
-    public static boolean tryRead(File f, Map<NormalizedSimpleStack, Long> map) {
+    public static boolean tryRead(File f, Map<NormalizedSimpleStack, BigInteger> map) {
         try {
-            Map<NormalizedSimpleStack, Long> m = read(f);
+            Map<NormalizedSimpleStack, BigInteger> m = read(f);
             map.clear();
             map.putAll(m);
             return true;
@@ -25,17 +26,17 @@ public class PregeneratedEMC {
         }
     }
 
-    private static Map<NormalizedSimpleStack, Long> read(File file) throws IOException {
-        Type type = new TypeToken<Map<NormalizedSimpleStack, Long>>() {
+    private static Map<NormalizedSimpleStack, BigInteger> read(File file) throws IOException {
+        Type type = new TypeToken<Map<NormalizedSimpleStack, BigInteger>>() {
         }.getType();
         try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            Map<NormalizedSimpleStack, Long> map = gson.fromJson(reader, type);
+            Map<NormalizedSimpleStack, BigInteger> map = gson.fromJson(reader, type);
             map.remove(null);
             return map;
         }
     }
 
-    public static void write(File file, Map<NormalizedSimpleStack, Long> map) throws IOException {
+    public static void write(File file, Map<NormalizedSimpleStack, BigInteger> map) throws IOException {
         Type type = new TypeToken<Map<NormalizedSimpleStack, Integer>>() {
         }.getType();
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {

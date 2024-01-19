@@ -1,5 +1,6 @@
 package me.shepherd23333.projectex;
 
+import me.shepherd23333.projecte.utils.Constants;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -10,6 +11,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.oredict.OreDictionary;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -58,27 +61,28 @@ public class ProjectEXConfig {
         public boolean override_emc_formatter = true;
 
         @Config.Comment("With this enabled, Power Flowers will not be affected by Watch of Flowing Time.")
-        public boolean blacklist_power_flower_from_watch = true;
+        public boolean blacklist_power_flower_from_watch = false;
 
         @Config.Comment("If set to false, it will only copy items with EMC value.")
-        public boolean final_star_copy_any_item = true;
+        public boolean final_star_copy_any_item = false;
 
         @Config.Comment("If set to false, it will remove item NBT.")
         public boolean final_star_copy_nbt = false;
 
         @Config.Comment("Set to 0 to completely disable itemc copying.")
         @Config.RangeInt(min = 0)
-        public int final_star_update_interval = 20;
+        public int final_star_update_interval = 10;
 
         @Config.Comment({
                 "Max item that will be displayed.",
                 "0 disables item exporting from links and makes refined ones useless.",
                 "Reduce this if you are having problems with auto-crafting or similar things."
         })
+        @Config.RangeInt(min = 1)
         public int emc_link_max_out = 2000000000;
 
         @Config.Comment("The whitelist for Stone Table will be ignored unless this is set to true.")
-        public boolean enable_stone_table_whitelist = false;
+        public boolean enable_stone_table_whitelist = true;
 
         public String[] stone_table_whitelist = {
                 "oredict:ingot",
@@ -203,9 +207,9 @@ public class ProjectEXConfig {
     }
 
     public static class Tiers {
-        public final BlockTier basic = new BlockTier(4, 1, 64);
-        public final BlockTier dark = new BlockTier(12, 3, 192);
-        public final BlockTier red = new BlockTier(40, 10, 640);
+        public final BlockTier basic = new BlockTier(Constants.COLLECTOR_MK1_GEN, ProjectEXUtils.getBonus(1), Constants.RELAY_MK1_OUTPUT);
+        public final BlockTier dark = new BlockTier(Constants.COLLECTOR_MK2_GEN, ProjectEXUtils.getBonus(2), Constants.RELAY_MK2_OUTPUT);
+        public final BlockTier red = new BlockTier(Constants.COLLECTOR_MK3_GEN, ProjectEXUtils.getBonus(3), Constants.RELAY_MK3_OUTPUT);
         public final BlockTier magenta = new BlockTier(160, 40, 2560);
         public final BlockTier pink = new BlockTier(640, 150, 10240);
         public final BlockTier purple = new BlockTier(2560, 750, 40960);
@@ -223,25 +227,50 @@ public class ProjectEXConfig {
 
     public static class BlockTier {
         @Config.LangKey("projectex.tiers.collector_output")
-        @Config.RangeDouble(min = 0D, max = Long.MAX_VALUE)
+        @Config.RangeDouble(min = 0D)
         public double collector_output;
 
         @Config.LangKey("projectex.tiers.relay_bonus")
-        @Config.RangeDouble(min = 0D, max = Long.MAX_VALUE)
+        @Config.RangeDouble(min = 0D)
         public double relay_bonus;
 
         @Config.LangKey("projectex.tiers.relay_transfer")
-        @Config.RangeDouble(min = 1D, max = Long.MAX_VALUE)
+        @Config.RangeDouble(min = 1D)
         public double relay_transfer;
+        private BigDecimal co, rb, rt;
 
-        public BlockTier(double co, double rb, double rt) {
-            collector_output = co;
-            relay_bonus = rb;
-            relay_transfer = rt;
+        public BlockTier(double col, double rbs, double rtf) {
+            /*collector_output = col;
+            relay_bonus = rbs;
+            relay_transfer = rtf;*/
+            co = new BigDecimal(col);
+            rb = new BigDecimal(rbs);
+            rt = new BigDecimal(rtf);
         }
 
-        public double powerFlowerOutput() {
-            return collector_output * 18D + relay_bonus * 30D;
+        public BlockTier(BigInteger col, BigInteger rbs, BigInteger rtf) {
+            /*collector_output =col.doubleValue();
+            relay_bonus =rbs.doubleValue();
+            relay_transfer =rtf.doubleValue();*/
+            co = new BigDecimal(col);
+            rb = new BigDecimal(rbs);
+            rt = new BigDecimal(rtf);
+        }
+
+        public BigDecimal getCo() {
+            return co;
+        }
+
+        public BigDecimal getRb() {
+            return rb;
+        }
+
+        public BigDecimal getRt() {
+            return rt;
+        }
+
+        public BigDecimal powerFlowerOutput() {
+            return co.multiply(BigDecimal.valueOf(18)).add(rb.multiply(BigDecimal.valueOf(30)));
         }
     }
 
@@ -269,7 +298,7 @@ public class ProjectEXConfig {
         public boolean arcane_tablet = true;
 
         @Config.LangKey("item.projectex.matter.clay.name")
-        public boolean clay_matter = false;
+        public boolean clay_matter = true;
 
         @Config.LangKey("tile.projectex.alchemy_table.name")
         public boolean alchemy_table = true;

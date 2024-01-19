@@ -1,34 +1,47 @@
 package me.shepherd23333.projecte.utils;
 
-import java.text.DecimalFormat;
+import java.math.BigInteger;
+import java.text.NumberFormat;
 
 public final class Constants {
-    public static final DecimalFormat EMC_FORMATTER = new DecimalFormat("#,###.##");
-    public static final DecimalFormat SINGLE_DP_EMC_FORMATTER = new DecimalFormat("#,###.#");
+    public static final NumberFormat EMC_FORMATTER = getFormatter();
 
-    public static final long[] MAX_KLEIN_EMC = new long[]{50000, 200000, 800000, 3200000, 12800000, 51200000};
-    public static final long[] RELAY_KLEIN_CHARGE_RATE = new long[]{16, 48, 160};
+    private static NumberFormat getFormatter() {
+        NumberFormat format = NumberFormat.getInstance();
+        //Only ever use a single decimal point for our formatter,
+        // because the majority of the time we are a whole number
+        // except for when we are abbreviating
+        format.setMaximumFractionDigits(1);
+        return format;
+    }
+
+    public static final BigInteger MAX_EXACT_TRANSMUTATION_DISPLAY = BigInteger.valueOf(1_000_000_000_000L);
+    public static final BigInteger MAX_INTEGER = BigInteger.valueOf(Integer.MAX_VALUE);
+    public static final BigInteger MULTIPLE = BigInteger.valueOf(4);
+    public static final BigInteger cons1 = BigInteger.valueOf(64);
+    public static final BigInteger MAX_KLEIN_EMC = BigInteger.valueOf(50000);
+    public static final BigInteger RELAY_KLEIN_CHARGE_RATE = BigInteger.valueOf(16);
     public static final float[] COLLECTOR_LIGHT_VALS = new float[]{0.4375F, 0.6875F, 1.0F};
 
     public static final float[] EXPLOSIVE_LENS_RADIUS = new float[]{4.0F, 8.0F, 12.0F, 16.0F, 16.0F, 16.0F, 16.0F, 16.0F};
     public static final long[] EXPLOSIVE_LENS_COST = new long[]{384, 768, 1536, 2304, 2304, 2304, 2304, 2304};
 
-    public static final long TILE_MAX_EMC = Long.MAX_VALUE;
+    public static final BigInteger TILE_MAX_EMC = BigInteger.valueOf(Long.MAX_VALUE);
 
-    public static final long COLLECTOR_MK1_MAX = 10000;
-    public static final long COLLECTOR_MK2_MAX = 30000;
-    public static final long COLLECTOR_MK3_MAX = 60000;
-    public static final long COLLECTOR_MK1_GEN = 4;
-    public static final long COLLECTOR_MK2_GEN = 12;
-    public static final long COLLECTOR_MK3_GEN = 40;
+    public static final BigInteger COLLECTOR_MK1_MAX = BigInteger.valueOf(10000);
+    public static final BigInteger COLLECTOR_MK2_MAX = COLLECTOR_MK1_MAX.multiply(MULTIPLE);
+    public static final BigInteger COLLECTOR_MK3_MAX = COLLECTOR_MK2_MAX.multiply(MULTIPLE);
+    public static final BigInteger COLLECTOR_MK1_GEN = BigInteger.valueOf(4);
+    public static final BigInteger COLLECTOR_MK2_GEN = COLLECTOR_MK1_GEN.multiply(MULTIPLE);
+    public static final BigInteger COLLECTOR_MK3_GEN = COLLECTOR_MK2_GEN.multiply(MULTIPLE);
 
-    public static final long RELAY_MK1_OUTPUT = 64;
-    public static final long RELAY_MK2_OUTPUT = 192;
-    public static final long RELAY_MK3_OUTPUT = 640;
+    public static final BigInteger RELAY_MK1_OUTPUT = BigInteger.valueOf(64);
+    public static final BigInteger RELAY_MK2_OUTPUT = RELAY_MK1_OUTPUT.multiply(MULTIPLE);
+    public static final BigInteger RELAY_MK3_OUTPUT = RELAY_MK2_OUTPUT.multiply(MULTIPLE);
 
-    public static final long RELAY_MK1_MAX = 100000;
-    public static final long RELAY_MK2_MAX = 1000000;
-    public static final long RELAY_MK3_MAX = 10000000;
+    public static final BigInteger RELAY_MK1_MAX = BigInteger.valueOf(100000);
+    public static final BigInteger RELAY_MK2_MAX = RELAY_MK1_MAX.multiply(MULTIPLE);
+    public static final BigInteger RELAY_MK3_MAX = RELAY_MK2_MAX.multiply(MULTIPLE);
 
     public static final int COAL_BURN_TIME = 1600;
     public static final int ALCH_BURN_TIME = COAL_BURN_TIME * 4;
