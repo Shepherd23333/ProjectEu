@@ -13,6 +13,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -26,7 +27,7 @@ public class OfflineKnowledgeProvider implements IKnowledgeProvider {
     public final UUID playerId;
     private final List<ItemStack> knowledge;
     private final IItemHandlerModifiable inputLocks;
-    private long emc;
+    private BigInteger emc;
     private boolean fullKnowledge;
     public boolean shouldSave;
 
@@ -34,7 +35,7 @@ public class OfflineKnowledgeProvider implements IKnowledgeProvider {
         playerId = id;
         knowledge = new ArrayList<>();
         inputLocks = new ItemStackHandler(9);
-        emc = 0L;
+        emc = BigInteger.ZERO;
         fullKnowledge = false;
         shouldSave = false;
     }
@@ -139,12 +140,12 @@ public class OfflineKnowledgeProvider implements IKnowledgeProvider {
     }
 
     @Override
-    public long getEmc() {
+    public BigInteger getEmc() {
         return emc;
     }
 
     @Override
-    public void setEmc(long e) {
+    public void setEmc(BigInteger e) {
         emc = e;
         shouldSave = true;
     }
@@ -156,7 +157,7 @@ public class OfflineKnowledgeProvider implements IKnowledgeProvider {
     @Override
     public NBTTagCompound serializeNBT() {
         NBTTagCompound nbt = new NBTTagCompound();
-        nbt.setDouble("transmutationEmc", emc);
+        nbt.setString("transmutationEmc", emc.toString());
         NBTTagList knowledgeWrite = new NBTTagList();
 
         for (ItemStack is : knowledge) {
@@ -171,8 +172,8 @@ public class OfflineKnowledgeProvider implements IKnowledgeProvider {
 
     @Override
     public void deserializeNBT(NBTTagCompound nbt) {
-        double emc1 = nbt.getDouble("transmutationEmc");
-        emc = emc1 > Long.MAX_VALUE ? Long.MAX_VALUE : (long) emc1;
+        String emcs = nbt.getString("transmutationEmc");
+        emc = emcs.isEmpty() ? BigInteger.ZERO : new BigInteger(emcs);
 
         NBTTagList list = nbt.getTagList("knowledge", 10);
 

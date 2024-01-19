@@ -27,6 +27,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,9 +49,9 @@ public class BodyStone extends RingToggle implements IBauble, IPedestalItem {
         EntityPlayer player = (EntityPlayer) entity;
 
         if (ItemHelper.getOrCreateCompound(stack).getBoolean(TAG_ACTIVE)) {
-            long itemEmc = getEmc(stack);
+            BigInteger itemEmc = getEmc(stack);
 
-            if (itemEmc < 64 && !consumeFuel(player, stack, 64, false)) {
+            if (itemEmc.compareTo(BigInteger.valueOf(64)) < 0 && !consumeFuel(player, stack, 64, false)) {
                 stack.getTagCompound().setBoolean(TAG_ACTIVE, false);
             } else {
                 player.getCapability(InternalTimers.CAPABILITY, null).activateFeed();
@@ -58,7 +59,7 @@ public class BodyStone extends RingToggle implements IBauble, IPedestalItem {
                 if (player.getFoodStats().needFood() && player.getCapability(InternalTimers.CAPABILITY, null).canFeed()) {
                     world.playSound(null, player.posX, player.posY, player.posZ, PESounds.HEAL, SoundCategory.PLAYERS, 1.0F, 1.0F);
                     player.getFoodStats().addStats(2, 10);
-                    removeEmc(stack, 64);
+                    removeEmc(stack, BigInteger.valueOf(64));
                 }
             }
         }

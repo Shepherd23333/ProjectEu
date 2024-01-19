@@ -15,12 +15,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
-public class RelayMK1Container extends LongContainer {
+public class RelayMK1Container extends BigIntegerContainer {
     final RelayMK1Tile tile;
-    public double kleinChargeProgress = 0;
-    public double inputBurnProgress = 0;
-    public long emc = 0;
+    public BigDecimal kleinChargeProgress = BigDecimal.ZERO;
+    public BigDecimal inputBurnProgress = BigDecimal.ZERO;
+    public BigInteger emc = BigInteger.ZERO;
 
     public RelayMK1Container(InventoryPlayer invPlayer, RelayMK1Tile relay) {
         this.tile = relay;
@@ -56,9 +58,9 @@ public class RelayMK1Container extends LongContainer {
     @Override
     public void addListener(IContainerListener listener) {
         super.addListener(listener);
-        PacketHandler.sendProgressBarUpdateLong(listener, this, 0, tile.getStoredEmc());
-        PacketHandler.sendProgressBarUpdateInt(listener, this, 1, (int) (tile.getItemChargeProportion() * 8000));
-        PacketHandler.sendProgressBarUpdateInt(listener, this, 2, (int) (tile.getInputBurnProportion() * 8000));
+        PacketHandler.sendProgressBarUpdateBigInteger(listener, this, 0, tile.getStoredEmc());
+        PacketHandler.sendProgressBarUpdateInt(listener, this, 1, tile.getItemChargeProportion().multiply(BigDecimal.valueOf(8000)).intValue());
+        PacketHandler.sendProgressBarUpdateInt(listener, this, 2, tile.getInputBurnProportion().multiply(BigDecimal.valueOf(8000)).intValue());
     }
 
     @Override
@@ -67,7 +69,7 @@ public class RelayMK1Container extends LongContainer {
 
         if (emc != tile.getStoredEmc()) {
             for (IContainerListener icrafting : this.listeners) {
-                PacketHandler.sendProgressBarUpdateLong(icrafting, this, 0, tile.getStoredEmc());
+                PacketHandler.sendProgressBarUpdateBigInteger(icrafting, this, 0, tile.getStoredEmc());
             }
 
             emc = tile.getStoredEmc();
@@ -75,7 +77,7 @@ public class RelayMK1Container extends LongContainer {
 
         if (kleinChargeProgress != tile.getItemChargeProportion()) {
             for (IContainerListener icrafting : this.listeners) {
-                PacketHandler.sendProgressBarUpdateInt(icrafting, this, 1, (int) (tile.getItemChargeProportion() * 8000));
+                PacketHandler.sendProgressBarUpdateInt(icrafting, this, 1, tile.getItemChargeProportion().multiply(BigDecimal.valueOf(8000)).intValue());
             }
 
             kleinChargeProgress = tile.getItemChargeProportion();
@@ -83,7 +85,7 @@ public class RelayMK1Container extends LongContainer {
 
         if (inputBurnProgress != tile.getInputBurnProportion()) {
             for (IContainerListener icrafting : this.listeners) {
-                PacketHandler.sendProgressBarUpdateInt(icrafting, this, 2, (int) (tile.getInputBurnProportion() * 8000));
+                PacketHandler.sendProgressBarUpdateInt(icrafting, this, 2, tile.getInputBurnProportion().multiply(BigDecimal.valueOf(8000)).intValue());
             }
 
             inputBurnProgress = tile.getInputBurnProportion();
@@ -96,26 +98,26 @@ public class RelayMK1Container extends LongContainer {
     public void updateProgressBar(int id, int data) {
         switch (id) {
             case 0:
-                emc = data;
+                emc = BigInteger.valueOf(data);
                 break;
             case 1:
-                kleinChargeProgress = data / 8000.0;
+                kleinChargeProgress = BigDecimal.valueOf(data / 8000.0);
                 break;
             case 2:
-                inputBurnProgress = data / 8000.0;
+                inputBurnProgress = BigDecimal.valueOf(data / 8000.0);
                 break;
         }
     }
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void updateProgressBarLong(int id, long data) {
+    public void updateProgressBarBigInteger(int id, BigInteger data) {
         switch (id) {
             case 0:
                 emc = data;
                 break;
             default:
-                updateProgressBar(id, (int) data);
+                updateProgressBar(id, data.intValueExact());
         }
     }
 

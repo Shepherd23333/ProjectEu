@@ -7,6 +7,7 @@ import me.shepherd23333.projecte.api.item.IPedestalItem;
 import me.shepherd23333.projecte.config.ProjectEConfig;
 import me.shepherd23333.projecte.gameObjs.tiles.DMPedestalTile;
 import me.shepherd23333.projecte.handlers.InternalTimers;
+import me.shepherd23333.projecte.utils.Constants;
 import me.shepherd23333.projecte.utils.ItemHelper;
 import me.shepherd23333.projecte.utils.MathUtils;
 import net.minecraft.client.resources.I18n;
@@ -47,7 +48,7 @@ public class SoulStone extends RingToggle implements IBauble, IPedestalItem {
         EntityPlayer player = (EntityPlayer) entity;
 
         if (ItemHelper.getOrCreateCompound(stack).getBoolean(TAG_ACTIVE)) {
-            if (getEmc(stack) < 64 && !consumeFuel(player, stack, 64, false)) {
+            if (getEmc(stack).compareTo(Constants.cons1) < 0 && !consumeFuel(player, stack, 64, false)) {
                 stack.getTagCompound().setBoolean(TAG_ACTIVE, false);
             } else {
                 player.getCapability(InternalTimers.CAPABILITY, null).activateHeal();
@@ -55,7 +56,7 @@ public class SoulStone extends RingToggle implements IBauble, IPedestalItem {
                 if (player.getHealth() < player.getMaxHealth() && player.getCapability(InternalTimers.CAPABILITY, null).canHeal()) {
                     world.playSound(null, player.posX, player.posY, player.posZ, PESounds.HEAL, SoundCategory.PLAYERS, 1.0F, 1.0F);
                     player.heal(2.0F);
-                    removeEmc(stack, 64);
+                    removeEmc(stack, Constants.cons1);
                 }
             }
         }

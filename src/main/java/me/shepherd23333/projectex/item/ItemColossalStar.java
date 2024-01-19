@@ -4,6 +4,8 @@ import me.shepherd23333.projecte.gameObjs.items.KleinStar;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemStack;
 
+import java.math.BigInteger;
+
 /**
  * @author LatvianModder
  */
@@ -18,7 +20,7 @@ public class ItemColossalStar extends ItemMagnumStar {
     }
 
     @Override
-    public long getMaximumEmc(ItemStack stack) {
+    public BigInteger getMaximumEmc(ItemStack stack) {
         return STAR_EMC[tier.ordinal() + 6];
     }
 

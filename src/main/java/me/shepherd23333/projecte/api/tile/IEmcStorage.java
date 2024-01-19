@@ -1,5 +1,7 @@
 package me.shepherd23333.projecte.api.tile;
 
+import java.math.BigInteger;
+
 /**
  * Defines the contract for arbitrary objects that can store EMC
  * You usually do not want to use this directly
@@ -13,12 +15,12 @@ public interface IEmcStorage {
      *
      * @return The current EMC stored
      */
-    long getStoredEmc();
+    BigInteger getStoredEmc();
 
     /**
      * Gets the maximum amount of EMC this IEMCStorage is allowed to contain
      *
      * @return The maximum EMC allowed
      */
-    long getMaximumEmc();
+    BigInteger getMaximumEmc();
 }

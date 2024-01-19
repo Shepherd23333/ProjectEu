@@ -19,6 +19,7 @@ import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -118,12 +119,12 @@ public class TransmutationOffline {
             }
 
             @Override
-            public long getEmc() {
+            public BigInteger getEmc() {
                 return toCopy.getEmc();
             }
 
             @Override
-            public void setEmc(long emc) {
+            public void setEmc(BigInteger emc) {
             }
 
             @Override

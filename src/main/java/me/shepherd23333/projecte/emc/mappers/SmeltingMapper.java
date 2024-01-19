@@ -8,11 +8,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraftforge.common.config.Configuration;
 
+import java.math.BigInteger;
 import java.util.Map;
 
-public class SmeltingMapper implements IEMCMapper<NormalizedSimpleStack, Long> {
+public class SmeltingMapper implements IEMCMapper<NormalizedSimpleStack, BigInteger> {
     @Override
-    public void addMappings(IMappingCollector<NormalizedSimpleStack, Long> mapper, Configuration config) {
+    public void addMappings(IMappingCollector<NormalizedSimpleStack, BigInteger> mapper, Configuration config) {
         Map<ItemStack, ItemStack> smelting = FurnaceRecipes.instance().getSmeltingList();
         for (Map.Entry<ItemStack, ItemStack> entry : smelting.entrySet()) {
             ItemStack input = entry.getKey();

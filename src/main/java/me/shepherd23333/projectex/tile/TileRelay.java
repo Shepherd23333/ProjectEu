@@ -3,11 +3,14 @@ package me.shepherd23333.projectex.tile;
 import me.shepherd23333.projecte.api.tile.IEmcAcceptor;
 import me.shepherd23333.projecte.api.tile.IEmcProvider;
 import me.shepherd23333.projecte.gameObjs.tiles.RelayMK1Tile;
+import me.shepherd23333.projectex.ProjectEXUtils;
 import me.shepherd23333.projectex.block.EnumTier;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
+
+import java.math.BigInteger;
 
 /**
  * @author LatvianModder
@@ -20,18 +23,18 @@ public class TileRelay extends TileEntity implements ITickable, IEmcAcceptor, IE
         return i < 0 ? i + n : i;
     }
 
-    public long stored = 0L;
+    public BigInteger stored = BigInteger.ZERO;
     private boolean isDirty = false;
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
-        nbt.setLong("stored_emc", stored);
+        nbt.setString("stored_emc", stored.toString());
         return super.writeToNBT(nbt);
     }
 
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
-        stored = nbt.getLong("stored_emc");
+        stored = new BigInteger(nbt.getString("stored_emc"));
         super.readFromNBT(nbt);
     }
 
@@ -46,7 +49,7 @@ public class TileRelay extends TileEntity implements ITickable, IEmcAcceptor, IE
 
     @Override
     public void update() {
-        if (world.isRemote || stored <= 0L || world.getTotalWorldTime() % 20L != mod(hashCode(), 20)) {
+        if (world.isRemote || stored.compareTo(BigInteger.ZERO) <= 0 || world.getTotalWorldTime() % 20L != mod(hashCode(), 20)) {
             return;
         }
 
@@ -63,14 +66,15 @@ public class TileRelay extends TileEntity implements ITickable, IEmcAcceptor, IE
         }
 
         if (tempSize > 0) {
-            long s = (long) (Math.min(stored / tempSize, Math.min(Long.MAX_VALUE, EnumTier.byMeta(getBlockMetadata()).properties.relay_transfer)));
+            BigInteger s = stored.divide(BigInteger.valueOf(tempSize))
+                    .min(EnumTier.byMeta(getBlockMetadata()).properties.getRt().toBigInteger());
 
             for (int i = 0; i < 6; i++) {
                 if (TEMP[i] != null) {
-                    long a = TEMP[i].acceptEMC(EnumFacing.VALUES[i].getOpposite(), s);
+                    BigInteger a = TEMP[i].acceptEMC(EnumFacing.VALUES[i].getOpposite(), s);
 
-                    if (a > 0L) {
-                        stored -= a;
+                    if (a.compareTo(BigInteger.ZERO) > 0L) {
+                        stored = stored.subtract(a);
                         markDirty();
                     }
                 }
@@ -89,11 +93,11 @@ public class TileRelay extends TileEntity implements ITickable, IEmcAcceptor, IE
     }
 
     @Override
-    public long acceptEMC(EnumFacing facing, long v) {
-        long v1 = Math.min(getMaximumEmc() - stored, v);
+    public BigInteger acceptEMC(EnumFacing facing, BigInteger v) {
+        BigInteger v1 = getMaximumEmc().subtract(stored).min(v);
 
-        if (v1 > 0L) {
-            stored += v1;
+        if (v1.compareTo(BigInteger.ZERO) > 0) {
+            stored = stored.add(v1);
             markDirty();
         }
 
@@ -101,11 +105,11 @@ public class TileRelay extends TileEntity implements ITickable, IEmcAcceptor, IE
     }
 
     @Override
-    public long provideEMC(EnumFacing facing, long v) {
-        long v1 = Math.min(stored, v);
+    public BigInteger provideEMC(EnumFacing facing, BigInteger v) {
+        BigInteger v1 = stored.min(v);
 
-        if (v1 > 0L) {
-            stored -= v1;
+        if (v1.compareTo(BigInteger.ZERO) > 0) {
+            stored = stored.subtract(v1);
             markDirty();
         }
 
@@ -113,16 +117,16 @@ public class TileRelay extends TileEntity implements ITickable, IEmcAcceptor, IE
     }
 
     @Override
-    public long getStoredEmc() {
+    public BigInteger getStoredEmc() {
         return stored;
     }
 
     @Override
-    public long getMaximumEmc() {
-        return Long.MAX_VALUE;
+    public BigInteger getMaximumEmc() {
+        return ProjectEXUtils.MAX_EMC;
     }
 
     public void addRelayBonus(EnumFacing facing) {
-        acceptEMC(facing, (long) EnumTier.byMeta(getBlockMetadata()).properties.relay_bonus);
+        acceptEMC(facing, EnumTier.byMeta(getBlockMetadata()).properties.getRb().toBigInteger());
     }
 }

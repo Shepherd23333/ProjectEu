@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.TextFormatting;
 
+import java.math.BigInteger;
 import java.util.List;
 
 /**
@@ -139,14 +140,14 @@ public class GuiLink extends GuiContainer {
 
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        double emc = PersonalEMC.get(container.player).getEmc();
+        BigInteger emc = PersonalEMC.get(container.player).getEmc();
 
         fontRenderer.drawString(container.link.name, 8, 6, 4210752);
 
         String s = EMCFormat.INSTANCE.format(emc);
 
-        if (ProjectEXClientEventHandler.emcs != 0D) {
-            s += (ProjectEXClientEventHandler.emcs > 0D ? (TextFormatting.DARK_GREEN + "+") : (TextFormatting.RED + "-")) + EMCFormat.INSTANCE.format(Math.abs(ProjectEXClientEventHandler.emcs)) + "/s";
+        if (!ProjectEXClientEventHandler.emcs.equals(BigInteger.ZERO)) {
+            s += (ProjectEXClientEventHandler.emcs.compareTo(BigInteger.ZERO) > 0 ? (TextFormatting.DARK_GREEN + "+") : (TextFormatting.RED + "-")) + EMCFormat.INSTANCE.format(ProjectEXClientEventHandler.emcs.abs()) + "/s";
         }
 
         if (container.link instanceof TileLinkMK3) {

@@ -10,14 +10,16 @@ import net.minecraft.util.ITickable;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.ItemStackHandler;
 
+import java.math.BigInteger;
+
 /**
  * @author LatvianModder
  */
 public class TileAlchemyTable extends TileEntity implements ITickable, IEmcAcceptor {
-    public long storedEMC = 0L;
+    public BigInteger storedEMC = BigInteger.ZERO;
     public int progress = 0;
 
-    public long totalCost = 0L;
+    public BigInteger totalCost = BigInteger.ZERO;
     public int totalProgress = 0;
 
     public final ItemStackHandler items = new ItemStackHandler(2) {
@@ -38,7 +40,7 @@ public class TileAlchemyTable extends TileEntity implements ITickable, IEmcAccep
 
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
-        storedEMC = nbt.getLong("emc");
+        storedEMC = new BigInteger(nbt.getString("emc"));
         progress = nbt.getInteger("progress");
 
         NBTTagCompound itemsTag = new NBTTagCompound();
@@ -50,8 +52,8 @@ public class TileAlchemyTable extends TileEntity implements ITickable, IEmcAccep
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
-        if (storedEMC > 0L) {
-            nbt.setLong("emc", storedEMC);
+        if (storedEMC.compareTo(BigInteger.ZERO) > 0) {
+            nbt.setString("emc", storedEMC.toString());
         }
 
         if (progress > 0) {
@@ -77,7 +79,7 @@ public class TileAlchemyTable extends TileEntity implements ITickable, IEmcAccep
             return;
         }
 
-        totalCost = 0L;
+        totalCost = BigInteger.ZERO;
         totalProgress = 0;
 
         ItemStack output = items.getStackInSlot(1);
@@ -102,14 +104,14 @@ public class TileAlchemyTable extends TileEntity implements ITickable, IEmcAccep
         totalCost = recipe.getTotalCost();
         totalProgress = recipe.getTotalProgress();
 
-        if (storedEMC < totalCost) {
+        if (storedEMC.compareTo(totalCost) < 0) {
             return;
         }
 
         progress++;
 
         if (progress >= totalProgress) {
-            storedEMC -= totalCost;
+            storedEMC = storedEMC.subtract(totalCost);
             progress = 0;
 
             input.shrink(1);
@@ -134,28 +136,28 @@ public class TileAlchemyTable extends TileEntity implements ITickable, IEmcAccep
     }
 
     @Override
-    public long acceptEMC(EnumFacing facing, long v) {
+    public BigInteger acceptEMC(EnumFacing facing, BigInteger v) {
         if (!world.isRemote) {
-            if (totalCost <= 0L) {
-                return 0L;
+            if (totalCost.compareTo(BigInteger.ZERO) <= 0) {
+                return BigInteger.ZERO;
             }
 
-            long d = Math.min(v, getMaximumEmc() - storedEMC);
-            storedEMC += d;
+            BigInteger d = getMaximumEmc().subtract(storedEMC).min(v);
+            storedEMC = storedEMC.add(d);
             markDirty();
             return d;
         }
 
-        return 0L;
+        return BigInteger.ZERO;
     }
 
     @Override
-    public long getStoredEmc() {
+    public BigInteger getStoredEmc() {
         return storedEMC;
     }
 
     @Override
-    public long getMaximumEmc() {
-        return totalCost * 8L;
+    public BigInteger getMaximumEmc() {
+        return totalCost.multiply(BigInteger.valueOf(8));
     }
 }

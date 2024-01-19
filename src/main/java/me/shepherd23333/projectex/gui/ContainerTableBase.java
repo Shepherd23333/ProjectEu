@@ -12,6 +12,9 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.ItemHandlerHelper;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 /**
  * @author LatvianModder
  */
@@ -60,7 +63,12 @@ public class ContainerTableBase extends Container {
                 knowledgeUpdate.updateKnowledge();
             }
 
-            PersonalEMC.add(playerData, (long) (ProjectEAPI.getEMCProxy().getValue(stack) * stack.getCount() * ProjectEConfig.difficulty.covalenceLoss));
+            PersonalEMC.add(playerData,
+                    new BigDecimal(ProjectEAPI.getEMCProxy().getValue(stack))
+                            .multiply(BigDecimal.valueOf(stack.getCount()))
+                            .multiply(BigDecimal.valueOf(ProjectEConfig.difficulty.covalenceLoss))
+                            .toBigInteger()
+            );
             slot.putStack(ItemStack.EMPTY);
             return stack1;
         }
@@ -83,12 +91,12 @@ public class ContainerTableBase extends Container {
         if (mode == BURN || mode == BURN_ALT) {
             if (mode == BURN_ALT && stack.getItem() instanceof IItemEmc) {
                 IItemEmc emcItem = (IItemEmc) stack.getItem();
-                long stored = emcItem.getStoredEmc(stack);
+                BigInteger stored = emcItem.getStoredEmc(stack);
 
-                if (stored > 0L) {
+                if (stored.compareTo(BigInteger.ZERO) > 0) {
                     PersonalEMC.add(playerData, emcItem.extractEmc(stack, stored));
                 } else {
-                    PersonalEMC.remove(playerData, emcItem.addEmc(stack, Math.min(playerData.getEmc(), emcItem.getMaximumEmc(stack))));
+                    PersonalEMC.remove(playerData, emcItem.addEmc(stack, playerData.getEmc().min(emcItem.getMaximumEmc(stack))));
                 }
 
                 player.inventory.setItemStack(stack);
@@ -113,7 +121,12 @@ public class ContainerTableBase extends Container {
                 knowledgeUpdate.updateKnowledge();
             }
 
-            PersonalEMC.add(playerData, (long) (ProjectEAPI.getEMCProxy().getValue(stack) * stack.getCount() * ProjectEConfig.difficulty.covalenceLoss));
+            PersonalEMC.add(playerData,
+                    new BigDecimal(ProjectEAPI.getEMCProxy().getValue(stack))
+                            .multiply(BigDecimal.valueOf(stack.getCount()))
+                            .multiply(BigDecimal.valueOf(ProjectEConfig.difficulty.covalenceLoss))
+                            .toBigInteger()
+            );
             player.inventory.setItemStack(ItemStack.EMPTY);
             return true;
         } else if (mode == TAKE_STACK) {
@@ -122,15 +135,15 @@ public class ContainerTableBase extends Container {
             }
 
             ItemStack stack1 = ItemHandlerHelper.copyStackWithSize(type, 1);
-            long value = ProjectEAPI.getEMCProxy().getValue(stack1);
+            BigInteger value = ProjectEAPI.getEMCProxy().getValue(stack1);
 
-            if (value <= 0L) {
+            if (value.compareTo(BigInteger.ZERO) <= 0) {
                 return false;
             }
 
             int amount = type.getMaxStackSize();
 
-            long max = playerData.getEmc() / value;
+            long max = playerData.getEmc().divide(value).longValueExact();
 
             if (amount > max) {
                 amount = (int) Math.min(amount, max);
@@ -140,7 +153,7 @@ public class ContainerTableBase extends Container {
                 return false;
             }
 
-            PersonalEMC.remove(playerData, value * amount);
+            PersonalEMC.remove(playerData, value.multiply(BigInteger.valueOf(amount)));
             stack1.setCount(amount);
             player.inventory.placeItemBackInInventory(player.world, stack1);
             return true;
@@ -154,13 +167,13 @@ public class ContainerTableBase extends Container {
             }
 
             ItemStack stack1 = ItemHandlerHelper.copyStackWithSize(type, 1);
-            long value = ProjectEAPI.getEMCProxy().getValue(stack1);
+            BigInteger value = ProjectEAPI.getEMCProxy().getValue(stack1);
 
-            if (value <= 0L) {
+            if (value.compareTo(BigInteger.ZERO) <= 0) {
                 return false;
             }
 
-            if (playerData.getEmc() < value) {
+            if (playerData.getEmc().compareTo(value) < 0) {
                 return false;
             }
 

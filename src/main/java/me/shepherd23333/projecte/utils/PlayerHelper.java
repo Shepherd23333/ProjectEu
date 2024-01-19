@@ -34,6 +34,8 @@ import net.minecraftforge.items.IItemHandler;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.math.BigInteger;
+
 /**
  * Helper class for player-related methods.
  * Notice: Please try to keep methods tidy and alphabetically ordered. Thanks!
@@ -159,6 +161,10 @@ public final class PlayerHelper {
     public static void updateClientServerStepHeight(EntityPlayerMP player, float value) {
         player.stepHeight = value;
         PacketHandler.sendTo(new StepHeightPKT(value), player);
+    }
+
+    public static void updateScore(EntityPlayerMP player, IScoreCriteria objective, BigInteger value) {
+        updateScore(player, objective, value.compareTo(Constants.MAX_INTEGER) > 0 ? Integer.MAX_VALUE : value.intValueExact());
     }
 
     public static void updateScore(EntityPlayerMP player, IScoreCriteria objective, int value) {

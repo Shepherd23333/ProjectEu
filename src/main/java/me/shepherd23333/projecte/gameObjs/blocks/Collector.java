@@ -22,6 +22,7 @@ import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 
 public class Collector extends BlockDirection {
     private final int tier;
@@ -86,12 +87,12 @@ public class Collector extends BlockDirection {
         if (!charging.isEmpty()) {
             if (charging.getItem() instanceof IItemEmc) {
                 IItemEmc itemEmc = ((IItemEmc) charging.getItem());
-                long max = itemEmc.getMaximumEmc(charging);
-                long current = itemEmc.getStoredEmc(charging);
+                BigInteger max = itemEmc.getMaximumEmc(charging);
+                BigInteger current = itemEmc.getStoredEmc(charging);
                 return MathUtils.scaleToRedstone(current, max);
             } else {
-                long needed = tile.getEmcToNextGoal();
-                long current = tile.getStoredEmc();
+                BigInteger needed = tile.getEmcToNextGoal();
+                BigInteger current = tile.getStoredEmc();
                 return MathUtils.scaleToRedstone(current, needed);
             }
         } else {

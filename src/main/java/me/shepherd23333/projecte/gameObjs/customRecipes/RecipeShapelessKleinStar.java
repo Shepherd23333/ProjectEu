@@ -14,6 +14,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.common.Optional;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,15 +36,15 @@ public class RecipeShapelessKleinStar extends net.minecraftforge.registries.IFor
     @Override
     public ItemStack getCraftingResult(@Nonnull InventoryCrafting inv) {
         ItemStack result = compose.getCraftingResult(inv);
-        long storedEMC = 0;
+        BigInteger storedEMC = BigInteger.ZERO;
         for (int i = 0; i < inv.getSizeInventory(); i++) {
             ItemStack stack = inv.getStackInSlot(i);
             if (!stack.isEmpty() && stack.getItem() == ObjHandler.kleinStars) {
-                storedEMC += KleinStar.getEmc(stack);
+                storedEMC = storedEMC.add(KleinStar.getEmc(stack));
             }
         }
 
-        if (storedEMC != 0 && result.getItem() == ObjHandler.kleinStars) {
+        if (!storedEMC.equals(BigInteger.ZERO) && result.getItem() == ObjHandler.kleinStars) {
             KleinStar.setEmc(result, storedEMC);
         }
         return result;

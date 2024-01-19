@@ -15,6 +15,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
 public class KleinStar extends ItemPE implements IItemEmc {
     public KleinStar() {
@@ -32,13 +34,15 @@ public class KleinStar extends ItemPE implements IItemEmc {
 
     @Override
     public double getDurabilityForDisplay(ItemStack stack) {
-        long starEmc = getEmc(stack);
+        BigInteger starEmc = getEmc(stack);
 
-        if (starEmc == 0) {
+        if (starEmc.equals(BigInteger.ZERO)) {
             return 1.0D;
         }
 
-        return 1.0D - starEmc / (double) EMCHelper.getKleinStarMaxEmc(stack);
+        return BigDecimal.ONE.subtract(
+                new BigDecimal(starEmc).divide(new BigDecimal(EMCHelper.getKleinStarMaxEmc(stack)))
+        ).doubleValue();
     }
 
 
@@ -92,26 +96,26 @@ public class KleinStar extends ItemPE implements IItemEmc {
     // -- IItemEmc -- //
 
     @Override
-    public long addEmc(@Nonnull ItemStack stack, long toAdd) {
-        long add = Math.min(getMaximumEmc(stack) - getStoredEmc(stack), toAdd);
+    public BigInteger addEmc(@Nonnull ItemStack stack, BigInteger toAdd) {
+        BigInteger add = getMaximumEmc(stack).subtract(getStoredEmc(stack)).min(toAdd);
         ItemPE.addEmcToStack(stack, add);
         return add;
     }
 
     @Override
-    public long extractEmc(@Nonnull ItemStack stack, long toRemove) {
-        long sub = Math.min(getStoredEmc(stack), toRemove);
+    public BigInteger extractEmc(@Nonnull ItemStack stack, BigInteger toRemove) {
+        BigInteger sub = getStoredEmc(stack).min(toRemove);
         ItemPE.removeEmc(stack, sub);
         return sub;
     }
 
     @Override
-    public long getStoredEmc(@Nonnull ItemStack stack) {
+    public BigInteger getStoredEmc(@Nonnull ItemStack stack) {
         return ItemPE.getEmc(stack);
     }
 
     @Override
-    public long getMaximumEmc(@Nonnull ItemStack stack) {
+    public BigInteger getMaximumEmc(@Nonnull ItemStack stack) {
         return EMCHelper.getKleinStarMaxEmc(stack);
     }
 }

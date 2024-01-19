@@ -38,6 +38,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,7 +63,7 @@ public class SWRG extends ItemPE implements IBauble, IPedestalItem, IFlightProvi
 
         EntityPlayerMP playerMP = (EntityPlayerMP) player;
 
-        if (getEmc(stack) == 0 && !consumeFuel(player, stack, 64, false)) {
+        if (getEmc(stack).equals(BigInteger.ZERO) && !consumeFuel(player, stack, 64, false)) {
             if (stack.getTagCompound().getInteger(TAG_MODE) > 0) {
                 changeMode(player, stack, 0);
             }

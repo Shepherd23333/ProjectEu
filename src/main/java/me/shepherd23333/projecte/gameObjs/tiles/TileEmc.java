@@ -5,7 +5,6 @@ import com.google.common.collect.Maps;
 import me.shepherd23333.projecte.api.tile.IEmcAcceptor;
 import me.shepherd23333.projecte.api.tile.IEmcProvider;
 import me.shepherd23333.projecte.api.tile.TileEmcBase;
-import me.shepherd23333.projecte.utils.Constants;
 import me.shepherd23333.projecte.utils.WorldHelper;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
@@ -17,14 +16,14 @@ import net.minecraft.world.World;
 import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 import java.util.Map;
 
 public abstract class TileEmc extends TileEmcBase implements ITickable {
     public TileEmc() {
-        setMaximumEMC(Constants.TILE_MAX_EMC);
     }
 
-    public TileEmc(long maxAmount) {
+    public TileEmc(BigInteger maxAmount) {
         setMaximumEMC(maxAmount);
     }
 
@@ -39,7 +38,7 @@ public abstract class TileEmc extends TileEmcBase implements ITickable {
     }
 
     protected boolean hasMaxedEmc() {
-        return getStoredEmc() >= getMaximumEmc();
+        return getStoredEmc().compareTo(getMaximumEmc()) >= 0;
     }
 
     /**
@@ -48,7 +47,7 @@ public abstract class TileEmc extends TileEmcBase implements ITickable {
      *
      * @param emc The maximum combined emc to send to others
      */
-    protected void sendToAllAcceptors(long emc) {
+    protected void sendToAllAcceptors(BigInteger emc) {
         if (!(this instanceof IEmcProvider)) {
             // todo move this method somewhere
             throw new UnsupportedOperationException("sending without being a provider");
@@ -60,13 +59,13 @@ public abstract class TileEmc extends TileEmcBase implements ITickable {
             return;
         }
 
-        long emcPer = emc / tiles.size();
+        BigInteger emcPer = emc.divide(BigInteger.valueOf(tiles.size()));
         for (Map.Entry<EnumFacing, TileEntity> entry : tiles.entrySet()) {
             if (this instanceof RelayMK1Tile && entry.getValue() instanceof RelayMK1Tile) {
                 continue;
             }
-            long provide = ((IEmcProvider) this).provideEMC(entry.getKey().getOpposite(), emcPer);
-            long remain = provide - ((IEmcAcceptor) entry.getValue()).acceptEMC(entry.getKey(), provide);
+            BigInteger provide = ((IEmcProvider) this).provideEMC(entry.getKey().getOpposite(), emcPer);
+            BigInteger remain = provide.subtract(((IEmcAcceptor) entry.getValue()).acceptEMC(entry.getKey(), provide));
             this.addEMC(remain);
         }
     }

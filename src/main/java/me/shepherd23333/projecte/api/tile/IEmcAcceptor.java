@@ -3,6 +3,7 @@ package me.shepherd23333.projecte.api.tile;
 import net.minecraft.util.EnumFacing;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 
 /**
  * Implement this interface to specify that "EMC can be given to this Tile Entity from an external source"
@@ -20,18 +21,6 @@ public interface IEmcAcceptor extends IEmcStorage {
      * @param toAccept The maximum amount to accept
      * @return The amount actually accepted
      */
-    long acceptEMC(@Nonnull EnumFacing side, long toAccept);
+    BigInteger acceptEMC(@Nonnull EnumFacing side, BigInteger toAccept);
 
-    /**
-     * Accept, at most, the given amount of EMC from the given side
-     *
-     * @param side     The side to accept EMC from
-     * @param toAccept The maximum amount to accept
-     * @return The amount actually accepted
-     * @deprecated Since ProjectE API version 1.2.0
-     */
-    @Deprecated
-    default double acceptEMC(@Nonnull EnumFacing side, double toAccept) {
-        return acceptEMC(side, (long) toAccept);
-    }
 }

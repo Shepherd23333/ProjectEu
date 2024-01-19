@@ -9,6 +9,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.text.TextComponentTranslation;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 
 public class SetEmcCMD extends CommandBase {
     @Nonnull
@@ -89,7 +90,7 @@ public class SetEmcCMD extends CommandBase {
             }
         }
 
-        if (CustomEMCParser.addToFile(name, meta, emc)) {
+        if (CustomEMCParser.addToFile(name, meta, BigInteger.valueOf(emc))) {
             sender.sendMessage(new TextComponentTranslation("pe.command.set.success", name, emc));
             sender.sendMessage(new TextComponentTranslation("pe.command.reload.notice"));
         } else {

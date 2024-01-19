@@ -10,9 +10,10 @@ import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
 
+import java.math.BigInteger;
 import java.util.*;
 
-public class APICustomEMCMapper implements IEMCMapper<NormalizedSimpleStack, Long> {
+public class APICustomEMCMapper implements IEMCMapper<NormalizedSimpleStack, BigInteger> {
     public static final APICustomEMCMapper instance = new APICustomEMCMapper();
     private static final int PRIORITY_MIN_VALUE = 0;
     private static final int PRIORITY_MAX_VALUE = 512;
@@ -22,15 +23,17 @@ public class APICustomEMCMapper implements IEMCMapper<NormalizedSimpleStack, Lon
     }
 
     //Need a special Map for Items and Blocks because the ItemID-mapping might change, so we need to store modid:unlocalizedName instead of the NormalizedSimpleStack which only holds itemid and metadata
-    private final Map<String, Map<NormalizedSimpleStack, Long>> customEMCforMod = new HashMap<>();
-    private final Map<String, Map<NormalizedSimpleStack, Long>> customNonItemEMCforMod = new HashMap<>();
+    private final Map<String, Map<NormalizedSimpleStack, BigInteger>> customEMCforMod = new HashMap<>();
+    private final Map<String, Map<NormalizedSimpleStack, BigInteger>> customNonItemEMCforMod = new HashMap<>();
 
-    public void registerCustomEMC(ItemStack stack, long emcValue) {
-        if (stack.isEmpty()) return;
-        if (emcValue < 0) emcValue = 0;
+    public void registerCustomEMC(ItemStack stack, BigInteger emcValue) {
+        if (stack.isEmpty())
+            return;
+        if (emcValue.compareTo(BigInteger.ZERO) < 0)
+            emcValue = BigInteger.ZERO;
         ModContainer activeMod = Loader.instance().activeModContainer();
         String modId = activeMod == null ? null : activeMod.getModId();
-        Map<NormalizedSimpleStack, Long> modMap;
+        Map<NormalizedSimpleStack, BigInteger> modMap;
         if (customEMCforMod.containsKey(modId)) {
             modMap = customEMCforMod.get(modId);
         } else {
@@ -40,13 +43,15 @@ public class APICustomEMCMapper implements IEMCMapper<NormalizedSimpleStack, Lon
         modMap.put(NSSItem.create(stack), emcValue);
     }
 
-    public void registerCustomEMC(Object o, long emcValue) {
+    public void registerCustomEMC(Object o, BigInteger emcValue) {
         NormalizedSimpleStack stack = ConversionProxyImpl.instance.objectToNSS(o);
-        if (stack == null) return;
-        if (emcValue < 0) emcValue = 0;
+        if (stack == null)
+            return;
+        if (emcValue.compareTo(BigInteger.ZERO) < 0)
+            emcValue = BigInteger.ZERO;
         ModContainer activeMod = Loader.instance().activeModContainer();
         String modId = activeMod == null ? null : activeMod.getModId();
-        Map<NormalizedSimpleStack, Long> modMap;
+        Map<NormalizedSimpleStack, BigInteger> modMap;
         if (customNonItemEMCforMod.containsKey(modId)) {
             modMap = customNonItemEMCforMod.get(modId);
         } else {
@@ -72,7 +77,7 @@ public class APICustomEMCMapper implements IEMCMapper<NormalizedSimpleStack, Lon
     }
 
     @Override
-    public void addMappings(IMappingCollector<NormalizedSimpleStack, Long> mapper, Configuration config) {
+    public void addMappings(IMappingCollector<NormalizedSimpleStack, BigInteger> mapper, Configuration config) {
         Map<String, Integer> priorityMap = new HashMap<>();
         Set<String> modIdSet = new HashSet<>();
         modIdSet.addAll(customEMCforMod.keySet());
@@ -106,7 +111,7 @@ public class APICustomEMCMapper implements IEMCMapper<NormalizedSimpleStack, Lon
         for (String modId : modIds) {
             String modIdOrUnknown = modId == null ? "unknown mod" : modId;
             if (customEMCforMod.containsKey(modId)) {
-                for (Map.Entry<NormalizedSimpleStack, Long> entry : customEMCforMod.get(modId).entrySet()) {
+                for (Map.Entry<NormalizedSimpleStack, BigInteger> entry : customEMCforMod.get(modId).entrySet()) {
                     NormalizedSimpleStack normStack = entry.getKey();
                     if (isAllowedToSet(modId, normStack, entry.getValue(), config)) {
                         mapper.setValueBefore(normStack, entry.getValue());
@@ -117,7 +122,7 @@ public class APICustomEMCMapper implements IEMCMapper<NormalizedSimpleStack, Lon
                 }
             }
             if (customNonItemEMCforMod.containsKey(modId)) {
-                for (Map.Entry<NormalizedSimpleStack, Long> entry : customNonItemEMCforMod.get(modId).entrySet()) {
+                for (Map.Entry<NormalizedSimpleStack, BigInteger> entry : customNonItemEMCforMod.get(modId).entrySet()) {
                     NormalizedSimpleStack normStack = entry.getKey();
                     if (isAllowedToSet(modId, normStack, entry.getValue(), config)) {
                         mapper.setValueBefore(normStack, entry.getValue());
@@ -130,7 +135,7 @@ public class APICustomEMCMapper implements IEMCMapper<NormalizedSimpleStack, Lon
         }
     }
 
-    private boolean isAllowedToSet(String modId, NormalizedSimpleStack stack, Long value, Configuration config) {
+    private boolean isAllowedToSet(String modId, NormalizedSimpleStack stack, BigInteger value, Configuration config) {
         String itemName;
         if (stack instanceof NSSItem) {
             NSSItem item = (NSSItem) stack;
@@ -143,7 +148,7 @@ public class APICustomEMCMapper implements IEMCMapper<NormalizedSimpleStack, Lon
         if (permission.equals("both")) {
             return true;
         }
-        if (value == 0) {
+        if (value.equals(BigInteger.ZERO)) {
             return permission.equals("remove");
         } else {
             return permission.equals("set");

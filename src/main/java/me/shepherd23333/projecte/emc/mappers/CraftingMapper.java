@@ -15,16 +15,17 @@ import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
 
+import java.math.BigInteger;
 import java.util.*;
 
-public class CraftingMapper implements IEMCMapper<NormalizedSimpleStack, Long> {
+public class CraftingMapper implements IEMCMapper<NormalizedSimpleStack, BigInteger> {
 
     private final List<IRecipeMapper> recipeMappers = Arrays.asList(new VanillaRecipeMapper(), new PECustomRecipeMapper(), new CraftTweakerRecipeMapper(), new RecipeStagesRecipeMapper());
     private final Set<Class> canNotMap = new HashSet<>();
     private final Map<Class, Integer> recipeCount = new HashMap<>();
 
     @Override
-    public void addMappings(IMappingCollector<NormalizedSimpleStack, Long> mapper, final Configuration config) {
+    public void addMappings(IMappingCollector<NormalizedSimpleStack, BigInteger> mapper, final Configuration config) {
         recipeCount.clear();
         canNotMap.clear();
         nextRecipe:

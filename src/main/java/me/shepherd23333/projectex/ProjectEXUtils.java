@@ -2,16 +2,25 @@ package me.shepherd23333.projectex;
 
 import me.shepherd23333.projecte.api.capabilities.IKnowledgeProvider;
 import me.shepherd23333.projecte.api.event.PlayerAttemptLearnEvent;
+import me.shepherd23333.projecte.utils.Constants;
 import me.shepherd23333.projecte.utils.NBTWhitelist;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.items.ItemHandlerHelper;
 
+import java.math.BigInteger;
+
 /**
  * @author LatvianModder
  */
 public class ProjectEXUtils {
+    public static final BigInteger MAX_EMC = BigInteger.valueOf(10).pow(100);
+    public static final BigInteger bonus = BigInteger.ONE;
+
+    public static BigInteger getBonus(int level) {
+        return level < 2 ? bonus : Constants.MULTIPLE.pow(level - 1);
+    }
     public static ItemStack fixOutput(ItemStack stack) {
         if (stack.isEmpty()) {
             return ItemStack.EMPTY;

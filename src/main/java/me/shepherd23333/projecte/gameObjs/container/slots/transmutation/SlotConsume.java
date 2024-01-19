@@ -7,6 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.SlotItemHandler;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 
 public class SlotConsume extends SlotItemHandler {
     private final TransmutationInventory inv;
@@ -21,23 +22,13 @@ public class SlotConsume extends SlotItemHandler {
         if (stack.isEmpty()) {
             return;
         }
-
-        ItemStack cache = stack.copy();
-
-        long toAdd = 0;
-
-        while (!inv.hasMaxedEmc() && stack.getCount() > 0) {
-            toAdd += EMCHelper.getEmcSellValue(stack);
-            stack.shrink(1);
-        }
-
-        inv.addEmc(toAdd);
+        inv.addEmc(EMCHelper.getEmcSellValue(stack).multiply(BigInteger.valueOf(stack.getCount())));
         this.onSlotChanged();
-        inv.handleKnowledge(cache);
+        inv.handleKnowledge(stack.copy());
     }
 
     @Override
     public boolean isItemValid(@Nonnull ItemStack stack) {
-        return !inv.hasMaxedEmc() && (EMCHelper.doesItemHaveEmc(stack) || stack.getItem() == ObjHandler.tome);
+        return EMCHelper.doesItemHaveEmc(stack) || stack.getItem() == ObjHandler.tome;
     }
 }

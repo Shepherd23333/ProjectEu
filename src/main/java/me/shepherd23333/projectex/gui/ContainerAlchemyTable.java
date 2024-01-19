@@ -10,6 +10,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.SlotItemHandler;
 
+import java.math.BigInteger;
+
 /**
  * @author LatvianModder
  */
@@ -73,7 +75,7 @@ public class ContainerAlchemyTable extends Container {
 
     public void sendData(IContainerListener listener) {
         listener.sendWindowProperty(this, 0, Math.min(255, table.totalProgress <= 0 ? 0 : (table.progress * 255 / table.totalProgress)));
-        listener.sendWindowProperty(this, 1, Math.min(255, table.totalCost <= 0D ? 0 : (int) (table.storedEMC * 255L / table.totalCost)));
+        listener.sendWindowProperty(this, 1, Math.min(255, table.totalCost.compareTo(BigInteger.ZERO) <= 0 ? 0 : table.storedEMC.multiply(BigInteger.valueOf(255)).divide(table.totalCost).intValue()));
     }
 
     @Override

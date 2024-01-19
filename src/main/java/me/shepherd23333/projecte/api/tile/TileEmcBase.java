@@ -4,6 +4,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 
 /**
  * Base class for the reference implementations TileEmcProvider, TileEmcAcceptor, and TileEmcHandler
@@ -13,36 +14,35 @@ import javax.annotation.Nonnull;
  * @author williewillus
  */
 public class TileEmcBase extends TileEntity implements IEmcStorage {
-    protected long maximumEMC;
-    protected long currentEMC = 0;
+    protected BigInteger maximumEMC;
+    protected BigInteger currentEMC = BigInteger.ZERO;
 
     protected TileEmcBase() {
-        setMaximumEMC(Long.MAX_VALUE);
     }
 
-    public final void setMaximumEMC(long max) {
+    public final void setMaximumEMC(BigInteger max) {
         maximumEMC = max;
-        if (currentEMC > maximumEMC) {
+        if (currentEMC.compareTo(maximumEMC) > 0) {
             currentEMC = maximumEMC;
         }
     }
 
     @Override
-    public long getStoredEmc() {
+    public BigInteger getStoredEmc() {
         return currentEMC;
     }
 
     @Override
-    public long getMaximumEmc() {
+    public BigInteger getMaximumEmc() {
         return maximumEMC;
     }
 
     /**
      * Add EMC directly into the internal buffer. Use for internal implementation of your tile
      */
-    protected void addEMC(long toAdd) {
-        currentEMC += toAdd;
-        if (currentEMC > maximumEMC) {
+    protected void addEMC(BigInteger toAdd) {
+        currentEMC = currentEMC.add(toAdd);
+        if (currentEMC.compareTo(maximumEMC) > 0) {
             currentEMC = maximumEMC;
         }
     }
@@ -50,10 +50,10 @@ public class TileEmcBase extends TileEntity implements IEmcStorage {
     /**
      * Removes EMC directly into the internal buffer. Use for internal implementation of your tile
      */
-    protected void removeEMC(long toRemove) {
-        currentEMC -= toRemove;
-        if (currentEMC < 0) {
-            currentEMC = 0;
+    protected void removeEMC(BigInteger toRemove) {
+        currentEMC = currentEMC.subtract(toRemove);
+        if (currentEMC.compareTo(BigInteger.ZERO) < 0) {
+            currentEMC = BigInteger.ZERO;
         }
     }
 
@@ -61,18 +61,18 @@ public class TileEmcBase extends TileEntity implements IEmcStorage {
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound tag) {
         tag = super.writeToNBT(tag);
-        if (currentEMC > maximumEMC) {
+        if (currentEMC.compareTo(maximumEMC) > 0) {
             currentEMC = maximumEMC;
         }
-        tag.setLong("EMC", currentEMC);
+        tag.setString("EMC", currentEMC.toString());
         return tag;
     }
 
     @Override
     public void readFromNBT(NBTTagCompound tag) {
         super.readFromNBT(tag);
-        long set = tag.getLong("EMC");
-        if (set > maximumEMC) {
+        BigInteger set = new BigInteger(tag.getString("EMC"));
+        if (set.compareTo(maximumEMC) > 0) {
             set = maximumEMC;
         }
         currentEMC = set;

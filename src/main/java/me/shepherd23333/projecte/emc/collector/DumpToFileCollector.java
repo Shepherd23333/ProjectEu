@@ -8,15 +8,16 @@ import me.shepherd23333.projecte.emc.mappers.customConversions.json.CustomConver
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.Map;
 
-public class DumpToFileCollector<A extends IValueArithmetic> extends AbstractMappingCollector<NormalizedSimpleStack, Long, A> {
+public class DumpToFileCollector<A extends IValueArithmetic> extends AbstractMappingCollector<NormalizedSimpleStack, BigInteger, A> {
     public static String currentGroupName = "default";
     private final CustomConversionFile out = new CustomConversionFile();
-    private final IExtendedMappingCollector<NormalizedSimpleStack, Long, A> inner;
+    private final IExtendedMappingCollector<NormalizedSimpleStack, BigInteger, A> inner;
     private final File file;
 
-    public DumpToFileCollector(File f, IExtendedMappingCollector<NormalizedSimpleStack, Long, A> inner) {
+    public DumpToFileCollector(File f, IExtendedMappingCollector<NormalizedSimpleStack, BigInteger, A> inner) {
         super(inner.getArithmetic());
         this.file = f;
         this.inner = inner;
@@ -39,14 +40,14 @@ public class DumpToFileCollector<A extends IValueArithmetic> extends AbstractMap
     }
 
     @Override
-    public void setValueBefore(NormalizedSimpleStack something, Long value) {
+    public void setValueBefore(NormalizedSimpleStack something, BigInteger value) {
         inner.setValueBefore(something, value);
         if (something == null) return;
         out.values.setValueBefore.put(something, value);
     }
 
     @Override
-    public void setValueAfter(NormalizedSimpleStack something, Long value) {
+    public void setValueAfter(NormalizedSimpleStack something, BigInteger value) {
         inner.setValueAfter(something, value);
         if (something == null) return;
         out.values.setValueAfter.put(something, value);

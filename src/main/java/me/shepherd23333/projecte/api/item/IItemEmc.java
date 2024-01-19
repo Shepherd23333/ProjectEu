@@ -3,6 +3,7 @@ package me.shepherd23333.projecte.api.item;
 import net.minecraft.item.ItemStack;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 
 /**
  * This interface defines the contract for items that wish to expose their internal EMC storage for external manipulation
@@ -17,20 +18,7 @@ public interface IItemEmc {
      * @param toAdd The maximum amount to add
      * @return The amount that was actually added
      */
-    long addEmc(@Nonnull ItemStack stack, long toAdd);
-
-    /**
-     * Adds EMC to the itemstack
-     *
-     * @param stack The itemstack to add to
-     * @param toAdd The maximum amount to add
-     * @return The amount that was actually added
-     * @deprecated Since ProjectE API version 1.2.0
-     */
-    @Deprecated
-    default double addEmc(@Nonnull ItemStack stack, double toAdd) {
-        return addEmc(stack, (long) toAdd);
-    }
+    BigInteger addEmc(@Nonnull ItemStack stack, BigInteger toAdd);
 
     /**
      * Extracts EMC from the itemstack
@@ -39,28 +27,15 @@ public interface IItemEmc {
      * @param toRemove The maximum amount to remove
      * @return The amount that was actually extracted
      */
-    long extractEmc(@Nonnull ItemStack stack, long toRemove);
+    BigInteger extractEmc(@Nonnull ItemStack stack, BigInteger toRemove);
 
     /**
-     * Extracts EMC from the itemstack
+     * Gets the current amount of EMC in this IEMCStorage
      *
-     * @param stack    The itemstack to remove from
-     * @param toRemove The maximum amount to remove
-     * @return The amount that was actually extracted
-     * @deprecated Since ProjectE API version 1.2.0
+     * @return The current EMC stored
      */
-    @Deprecated
-    default double extractEmc(@Nonnull ItemStack stack, double toRemove) {
-        return extractEmc(stack, (long) toRemove);
-    }
 
-    /**
-     * Gets the current EMC this stack is showing to the public
-     *
-     * @param stack The stack to query
-     * @return The current publicly-accessible EMC stored in this stack
-     */
-    long getStoredEmc(@Nonnull ItemStack stack);
+    BigInteger getStoredEmc(@Nonnull ItemStack stack);
 
     /**
      * Gets the maximum EMC that is allowed to be stored in this stack
@@ -68,5 +43,9 @@ public interface IItemEmc {
      * @param stack The stack to query
      * @return The maximum amount of publicly-accessible EMC that can be stored in this stack
      */
-    long getMaximumEmc(@Nonnull ItemStack stack);
+    BigInteger getMaximumEmc(@Nonnull ItemStack stack);
+
+    default BigInteger getNeededEmc(@Nonnull ItemStack stack) {
+        return getMaximumEmc(stack).subtract(getStoredEmc(stack)).max(BigInteger.ZERO);
+    }
 }

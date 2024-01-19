@@ -4,8 +4,10 @@ import net.minecraft.inventory.Container;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public abstract class LongContainer extends Container {
+import java.math.BigInteger;
+
+public abstract class BigIntegerContainer extends Container {
     @SideOnly(Side.CLIENT)
-    public void updateProgressBarLong(int id, long data) {
+    public void updateProgressBarBigInteger(int id, BigInteger data) {
     }
 }

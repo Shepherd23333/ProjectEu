@@ -7,6 +7,7 @@ import me.shepherd23333.projecte.api.item.IPedestalItem;
 import me.shepherd23333.projecte.config.ProjectEConfig;
 import me.shepherd23333.projecte.gameObjs.tiles.DMPedestalTile;
 import me.shepherd23333.projecte.handlers.InternalTimers;
+import me.shepherd23333.projecte.utils.Constants;
 import me.shepherd23333.projecte.utils.ItemHelper;
 import me.shepherd23333.projecte.utils.MathUtils;
 import net.minecraft.client.resources.I18n;
@@ -58,13 +59,13 @@ public class LifeStone extends RingToggle implements IBauble, IPedestalItem {
                 if (player.getHealth() < player.getMaxHealth() && player.getCapability(InternalTimers.CAPABILITY, null).canHeal()) {
                     world.playSound(null, player.posX, player.posY, player.posZ, PESounds.HEAL, SoundCategory.PLAYERS, 1, 1);
                     player.heal(2.0F);
-                    removeEmc(stack, 64);
+                    removeEmc(stack, Constants.cons1);
                 }
 
                 if (player.getFoodStats().needFood() && player.getCapability(InternalTimers.CAPABILITY, null).canFeed()) {
                     world.playSound(null, player.posX, player.posY, player.posZ, PESounds.HEAL, SoundCategory.PLAYERS, 1, 1);
                     player.getFoodStats().addStats(2, 10);
-                    removeEmc(stack, 64);
+                    removeEmc(stack, Constants.cons1);
                 }
             }
         }

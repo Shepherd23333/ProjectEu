@@ -60,14 +60,14 @@ public class ToolTipEvent {
 
         if (ProjectEConfig.misc.emcToolTips) {
             if (EMCHelper.doesItemHaveEmc(current)) {
-                long value = EMCHelper.getEmcValue(current);
+                BigInteger value = EMCHelper.getEmcValue(current);
 
                 event.getToolTip().add(TextFormatting.YELLOW +
                         I18n.format("pe.emc.emc_tooltip_prefix") + " " + TextFormatting.WHITE + Constants.EMC_FORMATTER.format(value) + TextFormatting.BLUE + EMCHelper.getEmcSellString(current, 1));
 
                 if (current.getCount() > 1) {
                     event.getToolTip().add(TextFormatting.YELLOW + I18n.format("pe.emc.stackemc_tooltip_prefix") + " " +
-                            TextFormatting.WHITE + Constants.EMC_FORMATTER.format(BigInteger.valueOf(value).multiply(BigInteger.valueOf(current.getCount()))) +
+                            TextFormatting.WHITE + Constants.EMC_FORMATTER.format(value.multiply(BigInteger.valueOf(current.getCount()))) +
                             TextFormatting.BLUE + EMCHelper.getEmcSellString(current, current.getCount()));
                 }
 
@@ -146,9 +146,9 @@ public class ToolTipEvent {
 
         if (current.hasTagCompound()) {
             if (current.getItem() instanceof IItemEmc || current.getTagCompound().hasKey("StoredEMC")) {
-                long value;
+                BigInteger value;
                 if (current.getTagCompound().hasKey("StoredEMC")) {
-                    value = current.getTagCompound().getLong("StoredEMC");
+                    value = new BigInteger(current.getTagCompound().getString("StoredEMC"));
                 } else {
                     value = ((IItemEmc) current.getItem()).getStoredEmc(current);
                 }

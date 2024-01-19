@@ -38,9 +38,9 @@ public class BlockRelay extends BlockTier {
         ProjectEXConfig.BlockTier properties = EnumTier.byMeta(stack.getMetadata()).properties;
         tooltip.add(I18n.format("tile.projectex.relay.tooltip"));
 
-        if (properties.relay_transfer != Double.MAX_VALUE) {
+        /*if (properties.relay_transfer != Double.MAX_VALUE) {
             tooltip.add(I18n.format("tile.projectex.relay.max_transfer", TextFormatting.GREEN + EMCFormat.INSTANCE.format(properties.relay_transfer)));
-        }
+        }*/
 
         tooltip.add(I18n.format("tile.projectex.relay.relay_bonus", TextFormatting.GREEN + EMCFormat.INSTANCE.format(properties.relay_bonus)));
     }

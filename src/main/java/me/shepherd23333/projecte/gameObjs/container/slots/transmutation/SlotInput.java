@@ -8,6 +8,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.SlotItemHandler;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 
 public class SlotInput extends SlotItemHandler {
     private final TransmutationInventory inv;
@@ -45,10 +46,10 @@ public class SlotInput extends SlotItemHandler {
 
         if (stack.getItem() instanceof IItemEmc) {
             IItemEmc itemEmc = ((IItemEmc) stack.getItem());
-            long remainingEmc = itemEmc.getMaximumEmc(stack) - itemEmc.getStoredEmc(stack);
-            long availableEMC = inv.getAvailableEMC();
+            BigInteger remainingEmc = itemEmc.getMaximumEmc(stack).subtract(itemEmc.getStoredEmc(stack));
+            BigInteger availableEMC = inv.getAvailableEMC();
 
-            if (availableEMC >= remainingEmc) {
+            if (availableEMC.compareTo(remainingEmc) >= 0) {
                 itemEmc.addEmc(stack, remainingEmc);
                 inv.removeEmc(remainingEmc);
             } else {

@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -32,9 +33,9 @@ public final class CustomEMCParser {
     public static class CustomEMCEntry {
         @SerializedName("item")
         public final NormalizedSimpleStack nss;
-        public final long emc;
+        public final BigInteger emc;
 
-        private CustomEMCEntry(NormalizedSimpleStack nss, long emc) {
+        private CustomEMCEntry(NormalizedSimpleStack nss, BigInteger emc) {
             this.nss = nss;
             this.emc = emc;
         }
@@ -50,7 +51,7 @@ public final class CustomEMCParser {
         @Override
         public int hashCode() {
             int result = nss != null ? nss.hashCode() : 0;
-            result = 31 * result + (int) (emc ^ (emc >>> 32));
+            result = 31 * result + emc.xor(emc.shiftRight(32)).intValueExact();
             return result;
         }
     }
@@ -73,7 +74,7 @@ public final class CustomEMCParser {
 
         try (BufferedReader reader = new BufferedReader(new FileReader(CONFIG))) {
             currentEntries = GSON.fromJson(reader, CustomEMCFile.class);
-            currentEntries.entries.removeIf(e -> e.nss == null || e.emc < 0 || !(e.nss instanceof NSSItem || e.nss instanceof NSSOreDictionary));
+            currentEntries.entries.removeIf(e -> e.nss == null || e.emc.compareTo(BigInteger.ZERO) < 0 || !(e.nss instanceof NSSItem || e.nss instanceof NSSOreDictionary));
         } catch (IOException | JsonParseException e) {
             PECore.LOGGER.fatal("Couldn't read custom emc file");
             e.printStackTrace();
@@ -89,7 +90,7 @@ public final class CustomEMCParser {
         }
     }
 
-    public static boolean addToFile(String toAdd, int meta, long emc) {
+    public static boolean addToFile(String toAdd, int meta, BigInteger emc) {
         NormalizedSimpleStack nss = getNss(toAdd, meta);
         CustomEMCEntry entry = new CustomEMCEntry(nss, emc);
 

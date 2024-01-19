@@ -17,6 +17,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 
+import java.math.BigInteger;
 import java.util.Map;
 
 public final class PacketHandler {
@@ -35,7 +36,7 @@ public final class PacketHandler {
         HANDLER.registerMessage(KnowledgeClearPKT.Handler.class, KnowledgeClearPKT.class, disc++, Side.CLIENT);
         HANDLER.registerMessage(UpdateGemModePKT.Handler.class, UpdateGemModePKT.class, disc++, Side.SERVER);
         HANDLER.registerMessage(UpdateWindowIntPKT.Handler.class, UpdateWindowIntPKT.class, disc++, Side.CLIENT);
-        HANDLER.registerMessage(UpdateWindowLongPKT.Handler.class, UpdateWindowLongPKT.class, disc++, Side.CLIENT);
+        HANDLER.registerMessage(UpdateWindowBigIntegerPKT.Handler.class, UpdateWindowBigIntegerPKT.class, disc++, Side.CLIENT);
         HANDLER.registerMessage(CooldownResetPKT.Handler.class, CooldownResetPKT.class, disc++, Side.CLIENT);
         HANDLER.registerMessage(LeftClickArchangelPKT.Handler.class, LeftClickArchangelPKT.class, disc++, Side.SERVER);
         HANDLER.registerMessage(SyncCovalencePKT.Handler.class, SyncCovalencePKT.class, disc++, Side.CLIENT);
@@ -48,9 +49,9 @@ public final class PacketHandler {
         }
     }
 
-    public static void sendProgressBarUpdateLong(IContainerListener listener, Container container, int propId, long propVal) {
+    public static void sendProgressBarUpdateBigInteger(IContainerListener listener, Container container, int propId, BigInteger propVal) {
         if (listener instanceof EntityPlayerMP) {
-            sendTo(new UpdateWindowLongPKT((short) container.windowId, (short) propId, propVal), (EntityPlayerMP) listener);
+            sendTo(new UpdateWindowBigIntegerPKT((short) container.windowId, (short) propId, propVal), (EntityPlayerMP) listener);
         }
     }
 
@@ -74,7 +75,7 @@ public final class PacketHandler {
     private static EmcPKTInfo[] serializeEmcData() {
         EmcPKTInfo[] ret = new EmcPKTInfo[EMCMapper.emc.size()];
         int i = 0;
-        for (Map.Entry<SimpleStack, Long> entry : EMCMapper.emc.entrySet()) {
+        for (Map.Entry<SimpleStack, BigInteger> entry : EMCMapper.emc.entrySet()) {
             SimpleStack stack = entry.getKey();
             int id = Item.REGISTRY.getIDForObject(Item.REGISTRY.getObject(stack.id));
             ret[i] = new EmcPKTInfo(id, stack.damage, entry.getValue());

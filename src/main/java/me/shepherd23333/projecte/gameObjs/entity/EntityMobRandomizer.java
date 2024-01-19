@@ -9,6 +9,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 
+import java.math.BigInteger;
+
 public class EntityMobRandomizer extends PEProjectile {
     public EntityMobRandomizer(World world) {
         super(world);
@@ -52,7 +54,7 @@ public class EntityMobRandomizer extends PEProjectile {
         EntityLiving ent = ((EntityLiving) mop.entityHit);
         EntityLiving randomized = WorldHelper.getRandomEntity(this.getEntityWorld(), ent);
 
-        if (randomized != null && EMCHelper.consumePlayerFuel(((EntityPlayer) getThrower()), 384) != -1) {
+        if (randomized != null && !EMCHelper.consumePlayerFuel(((EntityPlayer) getThrower()), BigInteger.valueOf(384)).equals(-1)) {
             ent.setDead();
             randomized.setLocationAndAngles(ent.posX, ent.posY, ent.posZ, ent.rotationYaw, ent.rotationPitch);
             randomized.onInitialSpawn(world.getDifficultyForLocation(new BlockPos(randomized)), null);

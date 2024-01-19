@@ -11,6 +11,8 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
 
+import java.math.BigDecimal;
+
 public class GUIRelayMK1 extends GuiContainer {
     private static final ResourceLocation texture = new ResourceLocation(PECore.MODID.toLowerCase(), "textures/gui/relay1.png");
     private final RelayMK1Tile tile;
@@ -48,15 +50,16 @@ public class GUIRelayMK1 extends GuiContainer {
         this.drawTexturedModalRect(x, y, 0, 0, xSize, ySize);
 
         //Emc bar progress. Max is 102.
-        int progress = (int) ((double) container.emc / tile.getMaximumEmc() * 102);
+        int progress = new BigDecimal(container.emc).divide(new BigDecimal(tile.getMaximumEmc()))
+                .multiply(BigDecimal.valueOf(102)).intValue();
         this.drawTexturedModalRect(x + 64, y + 6, 30, 177, progress, 10);
 
         //Klein start bar progress. Max is 30.
-        progress = (int) (container.kleinChargeProgress * 30);
+        progress = container.kleinChargeProgress.multiply(java.math.BigDecimal.valueOf(30)).intValue();
         this.drawTexturedModalRect(x + 116, y + 67, 0, 177, progress, 10);
 
         //Burn Slot bar progress. Max is 30.
-        progress = (int) (container.inputBurnProgress * 30);
+        progress = container.inputBurnProgress.multiply(BigDecimal.valueOf(30)).intValue();
         drawTexturedModalRect(x + 64, y + 67, 0, 177, progress, 10);
     }
 }

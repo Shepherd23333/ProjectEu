@@ -20,6 +20,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
 import net.minecraftforge.fml.relauncher.Side;
 
+import java.math.BigInteger;
 import java.util.Arrays;
 
 /**
@@ -27,11 +28,11 @@ import java.util.Arrays;
  */
 @Mod.EventBusSubscriber(modid = ProjectEX.MOD_ID, value = Side.CLIENT)
 public class ProjectEXClientEventHandler {
-    private static long emc;
-    private static long lastEMC;
+    private static BigInteger emc = BigInteger.ZERO;
+    private static BigInteger lastEMC = BigInteger.ZERO;
     private static int timer;
-    private static long[] emcsa = new long[5];
-    public static long emcs = 0L;
+    private static BigInteger[] emcsa = new BigInteger[5];
+    public static BigInteger emcs = BigInteger.ZERO;
 
     private static void addModel(Item item, String variant) {
         ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), variant));
@@ -114,16 +115,17 @@ public class ProjectEXClientEventHandler {
 
             if (timer == 1) {
                 System.arraycopy(emcsa, 1, emcsa, 0, emcsa.length - 1);
-                emcsa[emcsa.length - 1] = emc - lastEMC;
+                emcsa[emcsa.length - 1] = emc.subtract(lastEMC);
                 lastEMC = emc;
 
-                emcs = 0L;
+                emcs = BigInteger.ZERO;
 
-                for (long d : emcsa) {
-                    emcs += d;
+                for (BigInteger d : emcsa) {
+                    if (d != null)
+                        emcs = emcs.add(d);
                 }
 
-                emcs /= emcsa.length;
+                emcs = emcs.divide(BigInteger.valueOf(emcsa.length));
                 timer = -1; //Should be -1 as this leaves the if it would increment. Toys0125
             }
 
@@ -133,19 +135,19 @@ public class ProjectEXClientEventHandler {
 
     @SubscribeEvent
     public static void clientDisconnectionFromServer(FMLNetworkEvent.ClientDisconnectionFromServerEvent event) {
-        emc = 0L;
+        emc = BigInteger.ZERO;
         timer = 0;
-        emcs = 0L;
-        Arrays.fill(emcsa, 0L);
+        emcs = BigInteger.ZERO;
+        Arrays.fill(emcsa, BigInteger.ZERO);
     }
 
     @SubscribeEvent
     public static void addInfoText(RenderGameOverlayEvent.Text event) {
-        if (ProjectEXClientConfig.general.emc_screen_position != EnumScreenPosition.DISABLED && emc > 0D) {
+        if (ProjectEXClientConfig.general.emc_screen_position != EnumScreenPosition.DISABLED && emc.compareTo(BigInteger.ZERO) > 0) {
             String s = EMCFormat.INSTANCE.format(emc);
 
-            if (emcs != 0L) {
-                s += (emcs > 0L ? (TextFormatting.GREEN + "+") : (TextFormatting.RED + "-")) + EMCFormat.INSTANCE.format(Math.abs(emcs)) + "/s";
+            if (!emcs.equals(BigInteger.ZERO)) {
+                s += (emcs.compareTo(BigInteger.ZERO) > 0 ? (TextFormatting.GREEN + "+") : (TextFormatting.RED + "-")) + EMCFormat.INSTANCE.format(emcs.abs()) + "/s";
             }
 
             (ProjectEXClientConfig.general.emc_screen_position == EnumScreenPosition.TOP_LEFT ? event.getLeft() : event.getRight()).add("EMC: " + s);

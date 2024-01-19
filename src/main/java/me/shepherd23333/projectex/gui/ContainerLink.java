@@ -13,6 +13,8 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.SlotItemHandler;
 
+import java.math.BigDecimal;
+
 /**
  * @author LatvianModder
  */
@@ -78,12 +80,16 @@ public class ContainerLink extends Container {
             ItemStack stack = slot.getStack();
             ItemStack oldStack = stack.copy();
 
-            double value = ProjectEAPI.getEMCProxy().getValue(stack);
+            BigDecimal value = new BigDecimal(ProjectEAPI.getEMCProxy().getValue(stack));
 
-            if (value > 0D) {
+            if (value.compareTo(BigDecimal.ZERO) > 0) {
                 PersonalEMC.get(player).addKnowledge(ProjectEXUtils.fixOutput(stack));
                 addItemToOutput(ProjectEXUtils.fixOutput(stack));
-                link.storedEMC += (double) stack.getCount() * value * ProjectEConfig.difficulty.covalenceLoss;
+                link.storedEMC = link.storedEMC.add(value
+                        .multiply(BigDecimal.valueOf(stack.getCount()))
+                        .multiply(BigDecimal.valueOf(ProjectEConfig.difficulty.covalenceLoss))
+                        .toBigInteger()
+                );
                 link.markDirty();
             } else {
                 return ItemStack.EMPTY;

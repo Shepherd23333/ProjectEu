@@ -21,6 +21,7 @@ import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.math.BigInteger;
 
 public class TransmutationContainer extends Container {
     public final TransmutationInventory transmutationInventory;
@@ -92,13 +93,13 @@ public class TransmutationContainer extends Container {
             return ItemStack.EMPTY;
         } else if (slotIndex >= 11 && slotIndex <= 26) // Output Slots
         {
-            long emc = EMCHelper.getEmcValue(newStack);
+            BigInteger emc = EMCHelper.getEmcValue(newStack);
 
             int stackSize = 0;
 
             IItemHandler inv = player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.UP);
 
-            while (transmutationInventory.getAvailableEMC() >= emc && stackSize < newStack.getMaxStackSize() && ItemHelper.hasSpace(player.inventory.mainInventory, newStack)) {
+            while (transmutationInventory.getAvailableEMC().compareTo(emc) >= 0 && stackSize < newStack.getMaxStackSize() && ItemHelper.hasSpace(player.inventory.mainInventory, newStack)) {
                 transmutationInventory.removeEmc(emc);
                 ItemHandlerHelper.insertItemStacked(inv, ItemHelper.getNormalizedStack(stack), false);
                 stackSize++;
@@ -106,22 +107,15 @@ public class TransmutationContainer extends Container {
 
             transmutationInventory.updateClientTargets();
         } else if (slotIndex > 26) {
-            long emc = EMCHelper.getEmcSellValue(stack);
+            BigInteger emc = EMCHelper.getEmcSellValue(stack);
 
-            if (emc == 0 && stack.getItem() != ObjHandler.tome) {
+            if (emc.equals(BigInteger.ZERO) && stack.getItem() != ObjHandler.tome) {
                 return ItemStack.EMPTY;
             }
 
-            while (!transmutationInventory.hasMaxedEmc() && stack.getCount() > 0) {
-                transmutationInventory.addEmc(emc);
-                stack.shrink(1);
-            }
-
+            transmutationInventory.addEmc(emc.multiply(BigInteger.valueOf(stack.getCount())));
             transmutationInventory.handleKnowledge(newStack);
-
-            if (stack.isEmpty()) {
-                slot.putStack(ItemStack.EMPTY);
-            }
+            slot.putStack(ItemStack.EMPTY);
         }
 
         return ItemStack.EMPTY;

@@ -3,12 +3,13 @@ package me.shepherd23333.projecte.emc.collector;
 import me.shepherd23333.projecte.emc.arithmetics.IValueArithmetic;
 import org.apache.commons.math3.fraction.BigFraction;
 
+import java.math.BigInteger;
 import java.util.Map;
 
-public class LongToBigFractionCollector<T, A extends IValueArithmetic> extends AbstractMappingCollector<T, Long, A> {
+public class BigIntegerToBigFractionCollector<T, A extends IValueArithmetic> extends AbstractMappingCollector<T, BigInteger, A> {
     private final IExtendedMappingCollector<T, BigFraction, A> inner;
 
-    public LongToBigFractionCollector(IExtendedMappingCollector<T, BigFraction, A> inner) {
+    public BigIntegerToBigFractionCollector(IExtendedMappingCollector<T, BigFraction, A> inner) {
         super(inner.getArithmetic());
         this.inner = inner;
     }
@@ -24,12 +25,12 @@ public class LongToBigFractionCollector<T, A extends IValueArithmetic> extends A
     }
 
     @Override
-    public void setValueBefore(T something, Long value) {
+    public void setValueBefore(T something, BigInteger value) {
         inner.setValueBefore(something, new BigFraction(value));
     }
 
     @Override
-    public void setValueAfter(T something, Long value) {
+    public void setValueAfter(T something, BigInteger value) {
         inner.setValueAfter(something, new BigFraction(value));
     }
 }

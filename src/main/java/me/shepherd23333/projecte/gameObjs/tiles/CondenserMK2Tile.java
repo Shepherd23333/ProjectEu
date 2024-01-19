@@ -10,6 +10,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 
 public class CondenserMK2Tile extends CondenserTile {
     protected IItemHandler createAutomationInventory() {
@@ -37,7 +38,7 @@ public class CondenserMK2Tile extends CondenserTile {
 
     @Override
     protected void condense() {
-        while (this.hasSpace() && this.getStoredEmc() >= requiredEmc) {
+        while (this.hasSpace() && this.getStoredEmc().compareTo(requiredEmc) >= 0) {
             pushStack();
             this.removeEMC(requiredEmc);
         }
@@ -50,7 +51,7 @@ public class CondenserMK2Tile extends CondenserTile {
                     continue;
                 }
 
-                this.addEMC(EMCHelper.getEmcSellValue(stack) * stack.getCount());
+                this.addEMC(EMCHelper.getEmcSellValue(stack).multiply(BigInteger.valueOf(stack.getCount())));
                 getInput().setStackInSlot(i, ItemStack.EMPTY);
                 break;
             }

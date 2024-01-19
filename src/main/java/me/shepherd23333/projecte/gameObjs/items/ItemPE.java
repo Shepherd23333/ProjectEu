@@ -8,9 +8,11 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.IItemPropertyGetter;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 
 public class ItemPE extends Item {
     public static final String TAG_ACTIVE = "Active";
@@ -44,39 +46,43 @@ public class ItemPE extends Item {
         return diffActive || diffMode;
     }
 
-    public static long getEmc(ItemStack stack) {
-        return ItemHelper.getOrCreateCompound(stack).getLong("StoredEMC");
+    public static BigInteger getEmc(ItemStack stack) {
+        NBTTagCompound nbt = ItemHelper.getOrCreateCompound(stack);
+        return nbt.hasKey("StoredEMC") ? new BigInteger(nbt.getString("StoredEMC")) : BigInteger.ZERO;
     }
 
-    public static void setEmc(ItemStack stack, long amount) {
-        ItemHelper.getOrCreateCompound(stack).setLong("StoredEMC", amount);
+    public static void setEmc(ItemStack stack, BigInteger amount) {
+        ItemHelper.getOrCreateCompound(stack).setString("StoredEMC", amount.toString());
     }
 
-    public static void addEmcToStack(ItemStack stack, long amount) {
-        setEmc(stack, getEmc(stack) + amount);
+    public static void addEmcToStack(ItemStack stack, BigInteger amount) {
+        setEmc(stack, getEmc(stack).add(amount));
     }
 
-    public static void removeEmc(ItemStack stack, long amount) {
-        long result = getEmc(stack) - amount;
+    public static void removeEmc(ItemStack stack, BigInteger amount) {
+        BigInteger result = getEmc(stack).subtract(amount);
 
-        if (result < 0) {
-            result = 0;
+        if (result.compareTo(BigInteger.ZERO) < 0) {
+            result = BigInteger.ZERO;
         }
 
         setEmc(stack, result);
     }
 
     public static boolean consumeFuel(EntityPlayer player, ItemStack stack, long amount, boolean shouldRemove) {
-        if (amount <= 0) {
+        return consumeFuel(player, stack, BigInteger.valueOf(amount), shouldRemove);
+    }
+
+    public static boolean consumeFuel(EntityPlayer player, ItemStack stack, BigInteger amount, boolean shouldRemove) {
+        if (amount.compareTo(BigInteger.ZERO) <= 0) {
             return true;
         }
+        BigInteger current = getEmc(stack);
 
-        long current = getEmc(stack);
+        if (current.compareTo(amount) < 0) {
+            BigInteger consume = EMCHelper.consumePlayerFuel(player, amount.subtract(current));
 
-        if (current < amount) {
-            long consume = EMCHelper.consumePlayerFuel(player, amount - current);
-
-            if (consume == -1) {
+            if (consume.equals(BigInteger.valueOf(-1))) {
                 return false;
             }
 

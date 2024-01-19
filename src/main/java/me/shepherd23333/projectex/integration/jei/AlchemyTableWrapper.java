@@ -7,6 +7,8 @@ import mezz.jei.api.ingredients.VanillaTypes;
 import mezz.jei.api.recipe.IRecipeWrapper;
 import net.minecraft.client.Minecraft;
 
+import java.math.BigInteger;
+
 /**
  * @author LatvianModder
  */
@@ -25,7 +27,7 @@ public class AlchemyTableWrapper implements IRecipeWrapper {
 
     @Override
     public void drawInfo(Minecraft mc, int recipeWidth, int recipeHeight, int mouseX, int mouseY) {
-        long emc = recipe.getTotalCost();
+        BigInteger emc = recipe.getTotalCost();
         String s = EMCFormat.INSTANCE.format(emc) + " EMC";
         mc.fontRenderer.drawString(s, (recipeWidth - mc.fontRenderer.getStringWidth(s)) / 2, 5, 0xFF222222);
     }

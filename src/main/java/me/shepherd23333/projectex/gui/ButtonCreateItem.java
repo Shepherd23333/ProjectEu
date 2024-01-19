@@ -8,6 +8,9 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.RenderItem;
 import net.minecraft.item.ItemStack;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 /**
  * @author LatvianModder
  */
@@ -34,15 +37,16 @@ public class ButtonCreateItem extends ButtonSlot {
                 renderItem.renderItemOverlayIntoGUI(mc.fontRenderer, type, x, y, null);
                 RenderHelper.disableStandardItemLighting();
 
-                double emc = ProjectEAPI.getEMCProxy().getValue(type);
+                BigDecimal emc = new BigDecimal(ProjectEAPI.getEMCProxy().getValue(type));
+                BigDecimal stored = new BigDecimal(table.playerData.getEmc());
                 String s;
 
-                double d = table.playerData.getEmc() / emc;
+                BigDecimal d = stored.divide(emc, 1, RoundingMode.HALF_DOWN);
 
-                if (d >= 1D) {
+                if (d.compareTo(BigDecimal.ONE) >= 0) {
                     s = EMCFormat.INSTANCE_IGNORE_SHIFT.format(d);
-                } else if (d >= 0.1D) {
-                    s = Double.toString(((int) (d * 10D)) / 10D);
+                } else if (d.compareTo(BigDecimal.valueOf(0.1)) >= 0) {
+                    s = d.toPlainString();
                 } else {
                     s = "";
                 }

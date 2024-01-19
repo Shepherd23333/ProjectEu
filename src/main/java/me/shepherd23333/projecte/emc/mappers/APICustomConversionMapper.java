@@ -5,10 +5,11 @@ import me.shepherd23333.projecte.emc.json.NormalizedSimpleStack;
 import me.shepherd23333.projecte.impl.ConversionProxyImpl;
 import net.minecraftforge.common.config.Configuration;
 
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
-public class APICustomConversionMapper implements IEMCMapper<NormalizedSimpleStack, Long> {
+public class APICustomConversionMapper implements IEMCMapper<NormalizedSimpleStack, BigInteger> {
     @Override
     public String getName() {
         return "APICustomConversionMapper";
@@ -25,7 +26,7 @@ public class APICustomConversionMapper implements IEMCMapper<NormalizedSimpleSta
     }
 
     @Override
-    public void addMappings(IMappingCollector<NormalizedSimpleStack, Long> mapper, Configuration config) {
+    public void addMappings(IMappingCollector<NormalizedSimpleStack, BigInteger> mapper, Configuration config) {
         for (Map.Entry<String, List<ConversionProxyImpl.APIConversion>> entry : ConversionProxyImpl.instance.storedConversions.entrySet()) {
             if (config.getBoolean(entry.getKey(), "allow", true,
                     String.format("Allow Mod %s to add its %d Recipes to the EMC Calculation", entry.getKey(), entry.getValue().size()))) {

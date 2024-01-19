@@ -7,6 +7,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.SlotItemHandler;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 
 public class SlotOutput extends SlotItemHandler {
     private final TransmutationInventory inv;
@@ -21,8 +22,8 @@ public class SlotOutput extends SlotItemHandler {
     public ItemStack decrStackSize(int amount) {
         ItemStack stack = getStack().copy();
         stack.setCount(amount);
-        long emcValue = amount * EMCHelper.getEmcValue(stack);
-        if (emcValue > inv.getAvailableEMC()) {
+        BigInteger emcValue = BigInteger.valueOf(amount).multiply(EMCHelper.getEmcValue(stack));
+        if (emcValue.compareTo(inv.getAvailableEMC()) > 0) {
             //Requesting more emc than available
             //Container expects stacksize=0-Itemstack for 'nothing'
             stack.setCount(0);
@@ -45,6 +46,6 @@ public class SlotOutput extends SlotItemHandler {
 
     @Override
     public boolean canTakeStack(EntityPlayer player) {
-        return !getHasStack() || EMCHelper.getEmcValue(getStack()) <= inv.getAvailableEMC();
+        return !getHasStack() || EMCHelper.getEmcValue(getStack()).compareTo(inv.getAvailableEMC()) <= 0;
     }
 }

@@ -12,6 +12,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.text.TextComponentTranslation;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 
 public class RemoveEmcCMD extends CommandBase {
     @Nonnull
@@ -60,7 +61,7 @@ public class RemoveEmcCMD extends CommandBase {
             }
         }
 
-        if (CustomEMCParser.addToFile(name, meta, 0)) {
+        if (CustomEMCParser.addToFile(name, meta, BigInteger.ZERO)) {
             sender.sendMessage(new TextComponentTranslation("pe.command.remove.success", name));
             sender.sendMessage(new TextComponentTranslation("pe.command.reload.notice"));
         } else {

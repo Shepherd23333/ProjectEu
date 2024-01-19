@@ -1,6 +1,6 @@
 package me.shepherd23333.projectex.integration;
 
-import it.unimi.dsi.fastutil.objects.Object2LongOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import me.shepherd23333.projecte.api.ProjectEAPI;
 import me.shepherd23333.projecte.api.capabilities.IKnowledgeProvider;
 import me.shepherd23333.projecte.impl.KnowledgeImpl;
@@ -23,6 +23,7 @@ import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -30,12 +31,13 @@ import java.util.*;
  */
 @Mod.EventBusSubscriber(modid = ProjectEX.MOD_ID)
 public class PersonalEMC {
+    private static final BigInteger no = BigInteger.valueOf(-1);
     private static final HashSet<UUID> LOGGED_IN_PLAYERS = new HashSet<>(); //Required because of a Forge bug https://github.com/MinecraftForge/MinecraftForge/issues/5696
     private static final Map<UUID, OfflineKnowledgeProvider> OFFLINE_MAP = new HashMap<>();
-    private static final Object2LongOpenHashMap<UUID> EMC_MAP = new Object2LongOpenHashMap<>();
+    private static final Object2ObjectOpenHashMap<UUID, BigInteger> EMC_MAP = new Object2ObjectOpenHashMap<>();
 
     static {
-        EMC_MAP.defaultReturnValue(-1L);
+        EMC_MAP.defaultReturnValue(no);
     }
 
     @Nullable
@@ -87,19 +89,15 @@ public class PersonalEMC {
         return Objects.requireNonNull(player.getCapability(ProjectEAPI.KNOWLEDGE_CAPABILITY, null));
     }
 
-    public static void add(IKnowledgeProvider knowledgeProvider, long add) {
-        long l = Math.min(add, Long.MAX_VALUE - knowledgeProvider.getEmc());
-
-        if (l > 0L) {
-            knowledgeProvider.setEmc(knowledgeProvider.getEmc() + l);
-        }
+    public static void add(IKnowledgeProvider knowledgeProvider, BigInteger add) {
+        knowledgeProvider.setEmc(knowledgeProvider.getEmc().add(add));
     }
 
-    public static void remove(IKnowledgeProvider knowledgeProvider, long remove) {
-        long l = Math.min(knowledgeProvider.getEmc(), remove);
+    public static void remove(IKnowledgeProvider knowledgeProvider, BigInteger remove) {
+        BigInteger l = knowledgeProvider.getEmc().min(remove);
 
-        if (l > 0L) {
-            knowledgeProvider.setEmc(knowledgeProvider.getEmc() - l);
+        if (l.compareTo(BigInteger.ZERO) > 0) {
+            knowledgeProvider.setEmc(knowledgeProvider.getEmc().subtract(l));
         }
     }
 
@@ -124,17 +122,17 @@ public class PersonalEMC {
             OfflineKnowledgeProvider knowledgeProvider = new OfflineKnowledgeProvider(event.player.getUniqueID());
             OfflineKnowledgeProvider.copy(provider, knowledgeProvider);
             OFFLINE_MAP.put(knowledgeProvider.playerId, knowledgeProvider);
-            EMC_MAP.removeLong(knowledgeProvider.playerId);
+            EMC_MAP.remove(knowledgeProvider.playerId);
         }
     }
 
     @SubscribeEvent
     public static void playerTick(TickEvent.PlayerTickEvent event) {
         if (event.player instanceof EntityPlayerMP) {
-            long prev = EMC_MAP.getLong(event.player.getUniqueID());
-            long emc = get(event.player).getEmc();
+            BigInteger prev = EMC_MAP.get(event.player.getUniqueID());
+            BigInteger emc = get(event.player).getEmc();
 
-            if (prev == -1L || prev != emc) {
+            if (prev.equals(no) || !prev.equals(emc)) {
                 EMC_MAP.put(event.player.getUniqueID(), emc);
                 MessageSyncEMC.sync(event.player, emc);
             }

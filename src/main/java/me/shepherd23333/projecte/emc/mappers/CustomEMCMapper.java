@@ -6,9 +6,11 @@ import me.shepherd23333.projecte.emc.collector.IMappingCollector;
 import me.shepherd23333.projecte.emc.json.NormalizedSimpleStack;
 import net.minecraftforge.common.config.Configuration;
 
-public class CustomEMCMapper implements IEMCMapper<NormalizedSimpleStack, Long> {
+import java.math.BigInteger;
+
+public class CustomEMCMapper implements IEMCMapper<NormalizedSimpleStack, BigInteger> {
     @Override
-    public void addMappings(IMappingCollector<NormalizedSimpleStack, Long> mapper, Configuration config) {
+    public void addMappings(IMappingCollector<NormalizedSimpleStack, BigInteger> mapper, Configuration config) {
         for (CustomEMCParser.CustomEMCEntry entry : CustomEMCParser.currentEntries.entries) {
             PECore.debugLog("Adding custom EMC value for {}: {}", entry.nss, entry.emc);
             mapper.setValueBefore(entry.nss, entry.emc);
