@@ -1,6 +1,6 @@
-package me.shepherd23333.projectex.gui;
+package me.shepherd23333.projecte.utils;
 
-import me.shepherd23333.projectex.ProjectEXConfig;
+import me.shepherd23333.projecte.config.ProjectEConfig;
 import net.minecraft.client.gui.GuiScreen;
 
 import javax.annotation.Nullable;
@@ -10,22 +10,18 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.FieldPosition;
 import java.text.NumberFormat;
-import java.util.Arrays;
 import java.util.Locale;
 
 /**
  * @author LatvianModder
  */
 public class EMCFormat extends DecimalFormat {
-    public static final EMCFormat INSTANCE = new EMCFormat(false);
-    public static final EMCFormat INSTANCE_IGNORE_SHIFT = new EMCFormat(true);
+    public static final EMCFormat INSTANCE = new EMCFormat();
+    private static final DecimalFormat decimalFormat = new DecimalFormat();
 
-    private final boolean ignoreShift;
-
-    private EMCFormat(boolean is) {
+    private EMCFormat() {
         super("#,###");
         setRoundingMode(RoundingMode.DOWN);
-        ignoreShift = is;
     }
 
     @Override
@@ -40,27 +36,47 @@ public class EMCFormat extends DecimalFormat {
         return new StringBuffer(formatted);
     }
 
-    public String format(BigInteger number) {
-        return format(new BigDecimal(number));
+    public static String format(BigInteger number) {
+        return format(new BigDecimal(number), IgnoreShiftType.NONE);
     }
 
-    public String format(BigDecimal number) {
-        if (ProjectEXConfig.general.override_emc_formatter && number.compareTo(BigDecimal.valueOf(1e6)) >= 0 && (ignoreShift || !GuiScreen.isShiftKeyDown())) {
+    public static String format(BigInteger value, IgnoreShiftType ignoreShiftType) {
+        return format(new BigDecimal(value), ignoreShiftType);
+    }
+
+    public static String format(BigDecimal value) {
+        return format(value, IgnoreShiftType.NONE);
+    }
+
+    public static boolean shouldFormat(BigDecimal value, IgnoreShiftType ignoreShiftType) {
+        return ProjectEConfig.misc.useEMCFormatter && ignoreShiftType != IgnoreShiftType.NO_FORMAT
+                && value.compareTo(new BigDecimal("1e6")) >= 0
+                && (ignoreShiftType == IgnoreShiftType.FORMAT || !GuiScreen.isShiftKeyDown());
+    }
+
+    public static String format(BigDecimal number, IgnoreShiftType ignoreShiftType) {
+        if (shouldFormat(number, ignoreShiftType)) {
             int suf = 0;
-            while (number.compareTo(BigDecimal.valueOf(1e63)) >= 0) {
-                number = number.divide(BigDecimal.valueOf(1e63), 2, RoundingMode.HALF_UP);
+            BigDecimal de = new BigDecimal("1e63");
+            while (number.compareTo(de) >= 0) {
+                number = number.divide(de, 2, RoundingMode.DOWN);
                 suf++;
             }
             String s = suf > 0 ? "De" + (suf > 1 ? suf : "") : "";
             NumberName n = NumberName.findName(number);
             if (n != null)
-                return number.divide(n.getValue(), 2, RoundingMode.HALF_UP).toPlainString() + n.getName() + s;
+                return number.divide(n.getValue(), 2, RoundingMode.DOWN).toPlainString() + n.getName() + s;
             else
                 return NumberFormat.getNumberInstance(Locale.US).format(number) + s;
         }
         return NumberFormat.getNumberInstance(Locale.US).format(number);
     }
 
+    public enum IgnoreShiftType {
+        NONE,
+        FORMAT,
+        NO_FORMAT
+    }
     public enum NumberName {
         MILLION(1e6, "M"),
         BILLION(1e9, "G"),
@@ -100,7 +116,9 @@ public class EMCFormat extends DecimalFormat {
         }
 
         static @Nullable NumberName findName(BigDecimal val) {
-            return Arrays.stream(VALUES).filter(v -> val.compareTo(v.getValue()) > -1).reduce((first, second) -> second).orElse(null);
+            int exp = val.precision() - val.scale() - 1;
+            return exp > 5 ? VALUES[exp / 3 - 2] : null;
+            //return Arrays.stream(VALUES).filter(v -> val.compareTo(v.getValue()) > -1).reduce((first, second) -> second).orElse(null);
         }
     }
 }

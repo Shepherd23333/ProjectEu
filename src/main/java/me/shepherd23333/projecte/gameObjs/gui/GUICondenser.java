@@ -4,6 +4,7 @@ import me.shepherd23333.projecte.PECore;
 import me.shepherd23333.projecte.gameObjs.container.CondenserContainer;
 import me.shepherd23333.projecte.gameObjs.tiles.CondenserTile;
 import me.shepherd23333.projecte.utils.Constants;
+import me.shepherd23333.projecte.utils.EMCFormat;
 import me.shepherd23333.projecte.utils.TransmutationEMCFormatter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -74,7 +75,8 @@ public class GUICondenser extends GuiContainer {
         int emcBottom = emcTop + 15;
 
         if (mouseX > emcLeft && mouseX < emcRight && mouseY > emcTop && mouseY < emcBottom) {
-            String emcAsString = I18n.format("pe.emc.emc_tooltip_prefix") + " " + Constants.EMC_FORMATTER.format(toDisplay);
+            String emcAsString = I18n.format("pe.emc.emc_tooltip_prefix") + " " +
+                    EMCFormat.format(toDisplay);
             drawHoveringText(Arrays.asList(emcAsString), mouseX, mouseY);
         } else {
             super.renderHoveredToolTip(mouseX, mouseY);

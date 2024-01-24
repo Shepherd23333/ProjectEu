@@ -1,20 +1,8 @@
 package me.shepherd23333.projecte.utils;
 
 import java.math.BigInteger;
-import java.text.NumberFormat;
 
 public final class Constants {
-    public static final NumberFormat EMC_FORMATTER = getFormatter();
-
-    private static NumberFormat getFormatter() {
-        NumberFormat format = NumberFormat.getInstance();
-        //Only ever use a single decimal point for our formatter,
-        // because the majority of the time we are a whole number
-        // except for when we are abbreviating
-        format.setMaximumFractionDigits(1);
-        return format;
-    }
-
     public static final BigInteger MAX_EXACT_TRANSMUTATION_DISPLAY = BigInteger.valueOf(1_000_000_000_000L);
     public static final BigInteger MAX_INTEGER = BigInteger.valueOf(Integer.MAX_VALUE);
     public static final BigInteger MULTIPLE = BigInteger.valueOf(4);

@@ -203,7 +203,7 @@ public class RelayMK1Tile extends TileEmc implements IEmcAcceptor, IEmcProvider 
         nbt = super.writeToNBT(nbt);
         nbt.setTag("Input", input.serializeNBT());
         nbt.setTag("Output", output.serializeNBT());
-        nbt.setString("BonusEMC", bonusEMC.toString());
+        nbt.setString("BonusEMC", bonusEMC != null ? bonusEMC.toString() : "0");
         return nbt;
     }
 

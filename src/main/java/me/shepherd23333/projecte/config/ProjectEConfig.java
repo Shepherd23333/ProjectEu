@@ -16,14 +16,14 @@ public final class ProjectEConfig {
 
         @Config.RangeDouble(min = 0, max = Integer.MAX_VALUE)
         @Config.Comment("Amount of damage Katar 'C' key deals")
-        public float katarDeathAura = 1000F;
+        public float katarDeathAura = 10000F;
 
         @Config.RangeDouble(min = 0.1, max = 1.0)
         @Config.Comment("Adjusting this ratio changes how much EMC is received when burning a item. For example setting this to 0.5 will return half of the EMC cost.")
         public double covalenceLoss = 1.0;
 
         @Config.Comment("How rounding occurs when Covalence Loss results in a burn value less than 1 EMC. If true the value will be rounded up to 1. If false the value will be rounded down to 0.")
-        public boolean covalenceLossRounding = true;
+        public boolean covalenceLossRounding = false;
     }
 
     public static Items items = new Items();
@@ -47,7 +47,7 @@ public final class ProjectEConfig {
     public static class Effects {
         @Config.RangeInt(min = 0, max = 256)
         @Config.Comment("Bonus ticks given by the Watch of Flowing Time while in the pedestal. 0 = effectively no bonus.")
-        public int timePedBonus = 18;
+        public int timePedBonus = 16;
 
         @Config.RangeDouble(min = 0, max = 1)
         @Config.Comment("Factor the Watch of Flowing Time slows down mobs by while in the pedestal. Set to 1.0 for no slowdown.")
@@ -77,6 +77,9 @@ public final class ProjectEConfig {
 
         @Config.Comment("Show the EMC value as a tooltip on items and blocks")
         public boolean emcToolTips = true;
+
+        @Config.Comment("Use the EMC Format of ProjectEX")
+        public boolean useEMCFormatter = true;
 
         @Config.Comment("Show stats as tooltips for various ProjectE blocks")
         public boolean statToolTips = true;

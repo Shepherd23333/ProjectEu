@@ -7,6 +7,7 @@ import me.shepherd23333.projecte.api.item.IPedestalItem;
 import me.shepherd23333.projecte.config.ProjectEConfig;
 import me.shepherd23333.projecte.gameObjs.tiles.DMPedestalTile;
 import me.shepherd23333.projecte.handlers.InternalTimers;
+import me.shepherd23333.projecte.utils.Constants;
 import me.shepherd23333.projecte.utils.ItemHelper;
 import me.shepherd23333.projecte.utils.MathUtils;
 import net.minecraft.client.resources.I18n;
@@ -51,7 +52,7 @@ public class BodyStone extends RingToggle implements IBauble, IPedestalItem {
         if (ItemHelper.getOrCreateCompound(stack).getBoolean(TAG_ACTIVE)) {
             BigInteger itemEmc = getEmc(stack);
 
-            if (itemEmc.compareTo(BigInteger.valueOf(64)) < 0 && !consumeFuel(player, stack, 64, false)) {
+            if (itemEmc.compareTo(Constants.cons1) < 0 && !consumeFuel(player, stack, 64, false)) {
                 stack.getTagCompound().setBoolean(TAG_ACTIVE, false);
             } else {
                 player.getCapability(InternalTimers.CAPABILITY, null).activateFeed();
@@ -59,7 +60,7 @@ public class BodyStone extends RingToggle implements IBauble, IPedestalItem {
                 if (player.getFoodStats().needFood() && player.getCapability(InternalTimers.CAPABILITY, null).canFeed()) {
                     world.playSound(null, player.posX, player.posY, player.posZ, PESounds.HEAL, SoundCategory.PLAYERS, 1.0F, 1.0F);
                     player.getFoodStats().addStats(2, 10);
-                    removeEmc(stack, BigInteger.valueOf(64));
+                    removeEmc(stack, Constants.cons1);
                 }
             }
         }

@@ -7,6 +7,7 @@ import me.shepherd23333.projecte.api.item.IPedestalItem;
 import me.shepherd23333.projecte.config.ProjectEConfig;
 import me.shepherd23333.projecte.gameObjs.ObjHandler;
 import me.shepherd23333.projecte.utils.Constants;
+import me.shepherd23333.projecte.utils.EMCFormat;
 import me.shepherd23333.projecte.utils.EMCHelper;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
@@ -58,24 +59,23 @@ public class ToolTipEvent {
             }
         }
 
-        if (ProjectEConfig.misc.emcToolTips) {
-            if (EMCHelper.doesItemHaveEmc(current)) {
-                BigInteger value = EMCHelper.getEmcValue(current);
+        if (ProjectEConfig.misc.emcToolTips && EMCHelper.doesItemHaveEmc(current)) {
+            BigInteger value = EMCHelper.getEmcValue(current);
 
-                event.getToolTip().add(TextFormatting.YELLOW +
-                        I18n.format("pe.emc.emc_tooltip_prefix") + " " + TextFormatting.WHITE + Constants.EMC_FORMATTER.format(value) + TextFormatting.BLUE + EMCHelper.getEmcSellString(current, 1));
+            event.getToolTip().add(TextFormatting.YELLOW + I18n.format("pe.emc.emc_tooltip_prefix") + " " +
+                    TextFormatting.WHITE +
+                    EMCFormat.format(value) +
+                    TextFormatting.BLUE + EMCHelper.getEmcSellString(current, 1));
 
-                if (current.getCount() > 1) {
-                    event.getToolTip().add(TextFormatting.YELLOW + I18n.format("pe.emc.stackemc_tooltip_prefix") + " " +
-                            TextFormatting.WHITE + Constants.EMC_FORMATTER.format(value.multiply(BigInteger.valueOf(current.getCount()))) +
-                            TextFormatting.BLUE + EMCHelper.getEmcSellString(current, current.getCount()));
-                }
+            if (current.getCount() > 1) {
+                event.getToolTip().add(TextFormatting.YELLOW + I18n.format("pe.emc.stackemc_tooltip_prefix") + " " +
+                        TextFormatting.WHITE + EMCFormat.format(value.multiply(BigInteger.valueOf(current.getCount()))) +
+                        TextFormatting.BLUE + EMCHelper.getEmcSellString(current, current.getCount()));
+            }
 
-                if (GuiScreen.isShiftKeyDown()
-                        && clientPlayer != null
-                        && clientPlayer.getCapability(ProjectEAPI.KNOWLEDGE_CAPABILITY, null).hasKnowledge(current)) {
-                    event.getToolTip().add(TextFormatting.YELLOW + I18n.format("pe.emc.has_knowledge"));
-                }
+            if (GuiScreen.isShiftKeyDown() && clientPlayer != null
+                    && clientPlayer.getCapability(ProjectEAPI.KNOWLEDGE_CAPABILITY, null).hasKnowledge(current)) {
+                event.getToolTip().add(TextFormatting.YELLOW + I18n.format("pe.emc.has_knowledge"));
             }
         }
 
@@ -153,7 +153,8 @@ public class ToolTipEvent {
                     value = ((IItemEmc) current.getItem()).getStoredEmc(current);
                 }
 
-                event.getToolTip().add(TextFormatting.YELLOW + I18n.format("pe.emc.storedemc_tooltip") + " " + TextFormatting.RESET + Constants.EMC_FORMATTER.format(value));
+                event.getToolTip().add(TextFormatting.YELLOW + I18n.format("pe.emc.storedemc_tooltip") + " " +
+                        TextFormatting.RESET + EMCFormat.format(value));
             }
         }
     }

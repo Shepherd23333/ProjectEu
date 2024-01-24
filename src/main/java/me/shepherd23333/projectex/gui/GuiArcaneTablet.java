@@ -1,5 +1,6 @@
 package me.shepherd23333.projectex.gui;
 
+import me.shepherd23333.projecte.utils.EMCFormat;
 import me.shepherd23333.projectex.ProjectEX;
 import me.shepherd23333.projectex.client.EnumSearchType;
 import me.shepherd23333.projectex.client.ProjectEXClientConfig;
@@ -90,7 +91,7 @@ public class GuiArcaneTablet extends GuiTableBase {
 
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
-        String s = EMCFormat.INSTANCE.format(PersonalEMC.get(mc.player).getEmc());
+        String s = EMCFormat.format(PersonalEMC.get(mc.player).getEmc());
         fontRenderer.drawStringWithShadow(s, (xSize - fontRenderer.getStringWidth(s)) / 2F, -9F, 0xFFB5B5B5);
     }
 

@@ -3,7 +3,7 @@ package me.shepherd23333.projecte.gameObjs.gui;
 import me.shepherd23333.projecte.PECore;
 import me.shepherd23333.projecte.gameObjs.container.RelayMK1Container;
 import me.shepherd23333.projecte.gameObjs.tiles.RelayMK1Tile;
-import me.shepherd23333.projecte.utils.Constants;
+import me.shepherd23333.projecte.utils.EMCFormat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -36,7 +36,7 @@ public class GUIRelayMK1 extends GuiContainer {
     @Override
     protected void drawGuiContainerForegroundLayer(int var1, int var2) {
         this.fontRenderer.drawString(I18n.format("pe.relay.mk1"), 10, 6, 4210752);
-        this.fontRenderer.drawString(Constants.EMC_FORMATTER.format(container.emc), 88, 24, 4210752);
+        this.fontRenderer.drawString(EMCFormat.format(container.emc), 88, 24, 4210752);
     }
 
     @Override

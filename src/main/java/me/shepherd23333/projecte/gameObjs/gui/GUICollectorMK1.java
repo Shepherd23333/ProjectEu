@@ -3,7 +3,7 @@ package me.shepherd23333.projecte.gameObjs.gui;
 import me.shepherd23333.projecte.PECore;
 import me.shepherd23333.projecte.gameObjs.container.CollectorMK1Container;
 import me.shepherd23333.projecte.gameObjs.tiles.CollectorMK1Tile;
-import me.shepherd23333.projecte.utils.Constants;
+import me.shepherd23333.projecte.utils.EMCFormat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -37,7 +37,7 @@ public class GUICollectorMK1 extends GuiContainer {
         BigInteger kleinCharge = container.kleinEmc;
 
         if (kleinCharge.compareTo(BigInteger.ZERO) > 0)
-            this.fontRenderer.drawString(Constants.EMC_FORMATTER.format(kleinCharge), 60, 44, 4210752);
+            this.fontRenderer.drawString(EMCFormat.format(kleinCharge), 60, 44, 4210752);
     }
 
     @Override

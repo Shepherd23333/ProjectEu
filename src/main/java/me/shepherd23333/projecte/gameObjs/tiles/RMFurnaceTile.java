@@ -4,6 +4,7 @@ import me.shepherd23333.projecte.api.item.IItemEmc;
 import me.shepherd23333.projecte.api.tile.IEmcAcceptor;
 import me.shepherd23333.projecte.gameObjs.blocks.MatterFurnace;
 import me.shepherd23333.projecte.gameObjs.container.slots.SlotPredicates;
+import me.shepherd23333.projecte.utils.Constants;
 import me.shepherd23333.projecte.utils.ItemHelper;
 import net.minecraft.block.Block;
 import net.minecraft.inventory.IInventory;
@@ -64,7 +65,7 @@ public class RMFurnaceTile extends TileEmc implements IEmcAcceptor {
     }
 
     protected RMFurnaceTile(int ticksBeforeSmelt, int efficiencyBonus) {
-        super(BigInteger.valueOf(64));
+        super(Constants.cons1);
         this.ticksBeforeSmelt = ticksBeforeSmelt;
         this.efficiencyBonus = efficiencyBonus;
     }

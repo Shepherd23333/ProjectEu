@@ -1,7 +1,7 @@
 package me.shepherd23333.projectex.block;
 
+import me.shepherd23333.projecte.utils.EMCFormat;
 import me.shepherd23333.projectex.ProjectEXConfig;
-import me.shepherd23333.projectex.gui.EMCFormat;
 import me.shepherd23333.projectex.tile.TileCollector;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -37,6 +37,8 @@ public class BlockCollector extends BlockTier {
     public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag flag) {
         ProjectEXConfig.BlockTier properties = EnumTier.byMeta(stack.getMetadata()).properties;
         tooltip.add(I18n.format("tile.projectex.collector.tooltip"));
-        tooltip.add(I18n.format("tile.projectex.collector.emc_produced", TextFormatting.GREEN + EMCFormat.INSTANCE.format(properties.collector_output)));
+        tooltip.add(I18n.format("tile.projectex.collector.emc_produced",
+                TextFormatting.GREEN + EMCFormat.INSTANCE.format(properties.collector_output)
+        ));
     }
 }

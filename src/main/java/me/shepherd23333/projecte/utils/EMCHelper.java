@@ -10,6 +10,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -260,7 +261,7 @@ public final class EMCHelper {
 
         BigInteger emc = EMCHelper.getEmcSellValue(stack);
 
-        return " (" + Constants.EMC_FORMATTER.format(emc.multiply(BigInteger.valueOf(stackSize))) + ")";
+        return " (" + EMCFormat.format(emc.multiply(BigInteger.valueOf(stackSize))) + ")";
     }
 
     public static BigInteger getKleinStarMaxEmc(ItemStack stack) {
@@ -301,7 +302,8 @@ public final class EMCHelper {
      * @return The amount of non fractional EMC no longer being stored in UnprocessedEMC.
      */
     public static BigInteger removeFractionalEMC(ItemStack stack, double amount) {
-        BigDecimal unprocessedEMC = new BigDecimal(ItemHelper.getOrCreateCompound(stack).getString("UnprocessedEMC"));
+        NBTTagCompound nbt = ItemHelper.getOrCreateCompound(stack);
+        BigDecimal unprocessedEMC = nbt.hasKey("UnprocessedEMC") ? new BigDecimal(nbt.getString("UnprocessedEMC")) : BigDecimal.ZERO;
         unprocessedEMC = unprocessedEMC.add(BigDecimal.valueOf(amount));
         BigInteger toRemove = unprocessedEMC.toBigInteger();
         unprocessedEMC = unprocessedEMC.subtract(new BigDecimal(toRemove));
