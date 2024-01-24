@@ -2,8 +2,6 @@ package me.shepherd23333.projectex;
 
 import me.shepherd23333.projecte.PECore;
 import me.shepherd23333.projecte.Tags;
-import me.shepherd23333.projecte.utils.Constants;
-import me.shepherd23333.projectex.gui.EMCFormat;
 import me.shepherd23333.projectex.gui.ProjectEXGuiHandler;
 import me.shepherd23333.projectex.item.ProjectEXItems;
 import me.shepherd23333.projectex.net.ProjectEXNetHandler;
@@ -19,9 +17,6 @@ import net.minecraftforge.fml.common.event.FMLInterModComms;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.relauncher.Side;
-
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 
 @Mod(
         modid = ProjectEX.MOD_ID,
@@ -56,7 +51,7 @@ public class ProjectEX {
     @Mod.EventHandler
     public void onInit(FMLInitializationEvent event) {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
-            try {
+            /*try {
                 Field field = Constants.class.getDeclaredField("EMC_FORMATTER");
                 field.setAccessible(true);
                 Field modifiersField = Field.class.getDeclaredField("modifiers");
@@ -65,7 +60,7 @@ public class ProjectEX {
                 field.set(null, EMCFormat.INSTANCE);
             } catch (Exception ex) {
                 ex.printStackTrace();
-            }
+            }*/
 
             ProjectEXKeyBindings.init();
         }

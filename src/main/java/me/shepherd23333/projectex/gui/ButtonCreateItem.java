@@ -1,6 +1,7 @@
 package me.shepherd23333.projectex.gui;
 
 import me.shepherd23333.projecte.api.ProjectEAPI;
+import me.shepherd23333.projecte.utils.EMCFormat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.OpenGlHelper;
@@ -44,7 +45,7 @@ public class ButtonCreateItem extends ButtonSlot {
                 BigDecimal d = stored.divide(emc, 1, RoundingMode.HALF_DOWN);
 
                 if (d.compareTo(BigDecimal.ONE) >= 0) {
-                    s = EMCFormat.INSTANCE_IGNORE_SHIFT.format(d);
+                    s = EMCFormat.format(d, EMCFormat.IgnoreShiftType.FORMAT);
                 } else if (d.compareTo(BigDecimal.valueOf(0.1)) >= 0) {
                     s = d.toPlainString();
                 } else {

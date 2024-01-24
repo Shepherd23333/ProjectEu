@@ -1,10 +1,10 @@
 package me.shepherd23333.projectex.client;
 
+import me.shepherd23333.projecte.utils.EMCFormat;
 import me.shepherd23333.projectex.ProjectEX;
 import me.shepherd23333.projectex.ProjectEXConfig;
 import me.shepherd23333.projectex.block.EnumMatter;
 import me.shepherd23333.projectex.block.EnumTier;
-import me.shepherd23333.projectex.gui.EMCFormat;
 import me.shepherd23333.projectex.integration.PersonalEMC;
 import me.shepherd23333.projectex.item.ProjectEXItems;
 import net.minecraft.client.Minecraft;
@@ -147,7 +147,8 @@ public class ProjectEXClientEventHandler {
             String s = EMCFormat.INSTANCE.format(emc);
 
             if (!emcs.equals(BigInteger.ZERO)) {
-                s += (emcs.compareTo(BigInteger.ZERO) > 0 ? (TextFormatting.GREEN + "+") : (TextFormatting.RED + "-")) + EMCFormat.INSTANCE.format(emcs.abs()) + "/s";
+                s += (emcs.compareTo(BigInteger.ZERO) > 0 ? (TextFormatting.GREEN + "+") : (TextFormatting.RED + "-")) +
+                        EMCFormat.INSTANCE.format(emcs.abs()) + "/s";
             }
 
             (ProjectEXClientConfig.general.emc_screen_position == EnumScreenPosition.TOP_LEFT ? event.getLeft() : event.getRight()).add("EMC: " + s);

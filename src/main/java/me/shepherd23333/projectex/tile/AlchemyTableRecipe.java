@@ -1,6 +1,7 @@
 package me.shepherd23333.projectex.tile;
 
 import me.shepherd23333.projecte.api.ProjectEAPI;
+import me.shepherd23333.projecte.utils.Constants;
 import net.minecraft.item.ItemStack;
 
 import java.math.BigInteger;
@@ -19,7 +20,10 @@ public class AlchemyTableRecipe {
             return emcOverride;
         }
 
-        return ProjectEAPI.getEMCProxy().getValue(input).add(ProjectEAPI.getEMCProxy().getValue(output)).multiply(BigInteger.valueOf(3)).max(BigInteger.valueOf(64));
+        return ProjectEAPI.getEMCProxy().getValue(input)
+                .add(ProjectEAPI.getEMCProxy().getValue(output))
+                .multiply(BigInteger.valueOf(3))
+                .max(Constants.cons1);
     }
 
     public int getTotalProgress() {

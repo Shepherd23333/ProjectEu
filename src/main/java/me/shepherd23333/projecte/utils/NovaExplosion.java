@@ -92,6 +92,7 @@ public class NovaExplosion extends Explosion {
             Field siz = Explosion.class.getDeclaredField("size");
             cachedExplosionSize = (float) siz.get(this);
         } catch (NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
         }
 
         double x = getPosition().x;

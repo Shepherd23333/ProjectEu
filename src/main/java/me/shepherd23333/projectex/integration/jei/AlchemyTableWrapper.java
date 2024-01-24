@@ -1,6 +1,6 @@
 package me.shepherd23333.projectex.integration.jei;
 
-import me.shepherd23333.projectex.gui.EMCFormat;
+import me.shepherd23333.projecte.utils.EMCFormat;
 import me.shepherd23333.projectex.tile.AlchemyTableRecipe;
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.ingredients.VanillaTypes;
@@ -28,7 +28,7 @@ public class AlchemyTableWrapper implements IRecipeWrapper {
     @Override
     public void drawInfo(Minecraft mc, int recipeWidth, int recipeHeight, int mouseX, int mouseY) {
         BigInteger emc = recipe.getTotalCost();
-        String s = EMCFormat.INSTANCE.format(emc) + " EMC";
+        String s = EMCFormat.format(emc) + " EMC";
         mc.fontRenderer.drawString(s, (recipeWidth - mc.fontRenderer.getStringWidth(s)) / 2, 5, 0xFF222222);
     }
 }

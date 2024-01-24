@@ -1,7 +1,7 @@
 package me.shepherd23333.projectex.block;
 
+import me.shepherd23333.projecte.utils.EMCFormat;
 import me.shepherd23333.projectex.ProjectEXConfig;
-import me.shepherd23333.projectex.gui.EMCFormat;
 import me.shepherd23333.projectex.tile.TileRelay;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.material.Material;
@@ -42,6 +42,8 @@ public class BlockRelay extends BlockTier {
             tooltip.add(I18n.format("tile.projectex.relay.max_transfer", TextFormatting.GREEN + EMCFormat.INSTANCE.format(properties.relay_transfer)));
         }*/
 
-        tooltip.add(I18n.format("tile.projectex.relay.relay_bonus", TextFormatting.GREEN + EMCFormat.INSTANCE.format(properties.relay_bonus)));
+        tooltip.add(I18n.format("tile.projectex.relay.relay_bonus",
+                TextFormatting.GREEN + EMCFormat.INSTANCE.format(properties.relay_bonus)
+        ));
     }
 }

@@ -1,5 +1,6 @@
 package me.shepherd23333.projectex.gui;
 
+import me.shepherd23333.projecte.utils.EMCFormat;
 import me.shepherd23333.projectex.ProjectEX;
 import me.shepherd23333.projectex.client.ProjectEXClientEventHandler;
 import me.shepherd23333.projectex.integration.PersonalEMC;
@@ -144,10 +145,11 @@ public class GuiLink extends GuiContainer {
 
         fontRenderer.drawString(container.link.name, 8, 6, 4210752);
 
-        String s = EMCFormat.INSTANCE.format(emc);
+        String s = EMCFormat.format(emc);
 
         if (!ProjectEXClientEventHandler.emcs.equals(BigInteger.ZERO)) {
-            s += (ProjectEXClientEventHandler.emcs.compareTo(BigInteger.ZERO) > 0 ? (TextFormatting.DARK_GREEN + "+") : (TextFormatting.RED + "-")) + EMCFormat.INSTANCE.format(ProjectEXClientEventHandler.emcs.abs()) + "/s";
+            s += (ProjectEXClientEventHandler.emcs.compareTo(BigInteger.ZERO) > 0 ? (TextFormatting.DARK_GREEN + "+") : (TextFormatting.RED + "-")) +
+                    EMCFormat.format(ProjectEXClientEventHandler.emcs.abs()) + "/s";
         }
 
         if (container.link instanceof TileLinkMK3) {
