@@ -3,6 +3,7 @@ package me.shepherd23333.projecte.emc.mappers.customConversions.json;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import me.shepherd23333.projecte.emc.json.NormalizedSimpleStack;
+import me.shepherd23333.projecte.utils.Constants;
 
 import java.lang.reflect.Type;
 import java.math.BigInteger;
@@ -16,15 +17,19 @@ public class FixedValuesDeserializer implements JsonDeserializer<FixedValues> {
         FixedValues fixed = new FixedValues();
         JsonObject o = json.getAsJsonObject();
         for (Map.Entry<String, JsonElement> entry : o.entrySet()) {
-            if (entry.getKey().equals("before")) {
-                fixed.setValueBefore = parseSetValueMap(entry.getValue().getAsJsonObject(), context);
-            } else if (entry.getKey().equals("after")) {
-                fixed.setValueAfter = parseSetValueMap(entry.getValue().getAsJsonObject(), context);
-            } else if (entry.getKey().equals("conversion")) {
-                fixed.conversion = context.deserialize(entry.getValue().getAsJsonArray(), new TypeToken<List<CustomConversion>>() {
-                }.getType());
-            } else {
-                throw new JsonParseException(String.format("Can not parse \"%s\":%s in fixedValues", entry.getKey(), entry.getValue()));
+            switch (entry.getKey()) {
+                case "before":
+                    fixed.setValueBefore = parseSetValueMap(entry.getValue().getAsJsonObject(), context);
+                    break;
+                case "after":
+                    fixed.setValueAfter = parseSetValueMap(entry.getValue().getAsJsonObject(), context);
+                    break;
+                case "conversion":
+                    fixed.conversion = context.deserialize(entry.getValue().getAsJsonArray(), new TypeToken<List<CustomConversion>>() {
+                    }.getType());
+                    break;
+                default:
+                    throw new JsonParseException(String.format("Can not parse \"%s\":%s in fixedValues", entry.getKey(), entry.getValue()));
             }
         }
         return fixed;
@@ -38,8 +43,8 @@ public class FixedValuesDeserializer implements JsonDeserializer<FixedValues> {
                 out.put(context.deserialize(new JsonPrimitive(entry.getKey()), NormalizedSimpleStack.class), primitive.getAsBigInteger());
                 continue;
             } else if (primitive.isString()) {
-                if (primitive.getAsString().toLowerCase().equals("free")) {
-                    out.put(context.deserialize(new JsonPrimitive(entry.getKey()), NormalizedSimpleStack.class), BigInteger.valueOf(Long.MIN_VALUE)); //TODO Get Value for 'free' from arithmetic?
+                if (primitive.getAsString().equalsIgnoreCase("free")) {
+                    out.put(context.deserialize(new JsonPrimitive(entry.getKey()), NormalizedSimpleStack.class), Constants.FREE); //TODO Get Value for 'free' from arithmetic?
                     continue;
                 }
             }

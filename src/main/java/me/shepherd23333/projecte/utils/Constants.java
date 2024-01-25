@@ -5,6 +5,7 @@ import java.math.BigInteger;
 public final class Constants {
     public static final BigInteger MAX_EXACT_TRANSMUTATION_DISPLAY = BigInteger.valueOf(1_000_000_000_000L);
     public static final BigInteger MAX_INTEGER = BigInteger.valueOf(Integer.MAX_VALUE);
+    public static final BigInteger FREE = BigInteger.valueOf(Long.MIN_VALUE);
     public static final BigInteger MULTIPLE = BigInteger.valueOf(4);
     public static final BigInteger cons1 = BigInteger.valueOf(64);
     public static final BigInteger MAX_KLEIN_EMC = BigInteger.valueOf(50000);

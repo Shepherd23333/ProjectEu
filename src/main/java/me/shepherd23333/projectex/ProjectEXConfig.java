@@ -57,9 +57,6 @@ public class ProjectEXConfig {
     }
 
     public static class General {
-        @Config.Comment("Overrides default EMC formatter from ProjectE with custom one.")
-        public boolean override_emc_formatter = true;
-
         @Config.Comment("With this enabled, Power Flowers will not be affected by Watch of Flowing Time.")
         public boolean blacklist_power_flower_from_watch = false;
 

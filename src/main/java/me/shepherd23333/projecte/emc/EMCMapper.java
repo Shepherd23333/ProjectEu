@@ -3,7 +3,7 @@ package me.shepherd23333.projecte.emc;
 import me.shepherd23333.projecte.PECore;
 import me.shepherd23333.projecte.api.event.EMCRemapEvent;
 import me.shepherd23333.projecte.config.ProjectEConfig;
-import me.shepherd23333.projecte.emc.arithmetics.HiddenBigFractionArithmetic;
+import me.shepherd23333.projecte.emc.arithmetics.FullBigFractionArithmetic;
 import me.shepherd23333.projecte.emc.arithmetics.IValueArithmetic;
 import me.shepherd23333.projecte.emc.collector.BigIntegerToBigFractionCollector;
 import me.shepherd23333.projecte.emc.collector.DumpToFileCollector;
@@ -43,11 +43,11 @@ public final class EMCMapper {
                 new CustomConversionMapper(),
                 new CustomEMCMapper(),
                 new CraftingMapper(),
-                new me.shepherd23333.projecte.emc.mappers.FluidMapper(),
+                new FluidMapper(),
                 new SmeltingMapper(),
                 new APICustomConversionMapper()
         );
-        SimpleGraphMapper<NormalizedSimpleStack, BigFraction, IValueArithmetic<BigFraction>> mapper = new SimpleGraphMapper<>(new HiddenBigFractionArithmetic());
+        SimpleGraphMapper<NormalizedSimpleStack, BigFraction, IValueArithmetic<BigFraction>> mapper = new SimpleGraphMapper<>(new FullBigFractionArithmetic());
         IValueGenerator<NormalizedSimpleStack, BigInteger> valueGenerator = new BigFractionToBigIntegerGenerator<>(mapper);
         IExtendedMappingCollector<NormalizedSimpleStack, BigInteger, IValueArithmetic<BigFraction>> mappingCollector = new BigIntegerToBigFractionCollector<>(mapper);
         mappingCollector = new WildcardSetValueFixCollector<>(mappingCollector);
@@ -66,8 +66,6 @@ public final class EMCMapper {
         if (shouldUsePregenerated && PECore.PREGENERATED_EMC_FILE.canRead() && PregeneratedEMC.tryRead(PECore.PREGENERATED_EMC_FILE, graphMapperValues = new HashMap<>())) {
             PECore.LOGGER.info(String.format("Loaded %d values from pregenerated EMC File", graphMapperValues.size()));
         } else {
-
-
             SimpleGraphMapper.setLogFoundExploits(config.getBoolean("logEMCExploits", "general", true,
                     "Log known EMC Exploits. This can not and will not find all possible exploits. " +
                             "This will only find exploits that result in fixed/custom emc values that the algorithm did not overwrite. " +

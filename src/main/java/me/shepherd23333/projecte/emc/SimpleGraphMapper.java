@@ -24,8 +24,8 @@ public class SimpleGraphMapper<T, V extends Comparable<V>, A extends IValueArith
         return (m.containsKey(key) && m.get(key).compareTo(value) <= 0);
     }
 
-    private static <K, V extends Comparable<V>> boolean hasSmaller(Map<K, V> m, K key, V value) {
-        return (m.containsKey(key) && m.get(key).compareTo(value) < 0);
+    private static <K, V extends Comparable<V>> boolean hasNoSmaller(Map<K, V> m, K key, V value) {
+        return (!m.containsKey(key) || m.get(key).compareTo(value) >= 0);
     }
 
     static void setLogFoundExploits(boolean log) {
@@ -33,7 +33,7 @@ public class SimpleGraphMapper<T, V extends Comparable<V>, A extends IValueArith
     }
 
     private static <K, V extends Comparable<V>> boolean updateMapWithMinimum(Map<K, V> m, K key, V value) {
-        if (!hasSmaller(m, key, value)) {
+        if (hasNoSmaller(m, key, value)) {
             //No Value or a value that is smaller than this
             m.put(key, value);
             return true;
@@ -42,7 +42,8 @@ public class SimpleGraphMapper<T, V extends Comparable<V>, A extends IValueArith
     }
 
     private boolean canOverride(T something, V value) {
-        if (OVERWRITE_FIXED_VALUES) return true;
+        if (OVERWRITE_FIXED_VALUES)
+            return true;
         if (fixValueBeforeInherit.containsKey(something)) {
             return fixValueBeforeInherit.get(something).compareTo(value) == 0;
         }
@@ -76,7 +77,7 @@ public class SimpleGraphMapper<T, V extends Comparable<V>, A extends IValueArith
                         //We have a new value for 'entry.getKey()' now we need to update everything that uses it as an ingredient.
                         for (Conversion conversion : getUsesFor(entry.getKey())) {
                             if (overwriteConversion.containsKey(conversion.output) && overwriteConversion.get(conversion.output) != conversion) {
-                                //There is a "SetValue-Conversion" for this item and its not this one, so we skip it.
+                                //There is a "SetValue-Conversion" for this item, but it's not this one, so we skip it.
                                 continue;
                             }
                             //Calculate how much the conversion-output costs with the new Value for entry.getKey
@@ -133,7 +134,7 @@ public class SimpleGraphMapper<T, V extends Comparable<V>, A extends IValueArith
                 }
                 if (minConversionValue == null || minConversionValue.equals(ZERO)) {
                     //we could not find any valid conversion
-                    if (values.containsKey(entry.getKey()) && !values.get(entry.getKey()).equals(ZERO) && canOverride(entry.getKey(), ZERO) && !hasSmaller(values, entry.getKey(), ZERO)) {
+                    if (values.containsKey(entry.getKey()) && !values.get(entry.getKey()).equals(ZERO) && canOverride(entry.getKey(), ZERO) && hasNoSmaller(values, entry.getKey(), ZERO)) {
                         //but the value for the conversion output is > 0, so we set it to 0.
                         debugFormat("Removing Value for {} because it does not have any nonzero-conversions anymore.", entry.getKey());
                         changedValues.put(entry.getKey(), ZERO);
@@ -143,9 +144,7 @@ public class SimpleGraphMapper<T, V extends Comparable<V>, A extends IValueArith
             }
         }
         debugPrintln("");
-        for (Map.Entry<T, V> fixedValueAfterInherit : fixValueAfterInherit.entrySet()) {
-            values.put(fixedValueAfterInherit.getKey(), fixedValueAfterInherit.getValue());
-        }
+        values.putAll(fixValueAfterInherit);
         //Remove all 'free' items from the output-values
         values.entrySet().removeIf(something -> arithmetic.isFree(something.getValue()));
         return values;
