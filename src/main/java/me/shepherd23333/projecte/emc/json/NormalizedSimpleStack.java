@@ -20,7 +20,7 @@ import java.util.Set;
 
 public interface NormalizedSimpleStack {
 
-    public static enum Serializer implements JsonSerializer<NormalizedSimpleStack>, JsonDeserializer<NormalizedSimpleStack> {
+    enum Serializer implements JsonSerializer<NormalizedSimpleStack>, JsonDeserializer<NormalizedSimpleStack> {
         INSTANCE;
 
         @Override
@@ -101,7 +101,7 @@ public interface NormalizedSimpleStack {
         return ret;
     }
 
-    public static <V extends Comparable<V>> void addMappings(IMappingCollector<NormalizedSimpleStack, V> mapper) {
+    static <V extends Comparable<V>> void addMappings(IMappingCollector<NormalizedSimpleStack, V> mapper) {
         // Add conversions for all variants -> wildcard variant
         for (String id : NSSItem.seenIds) {
             NormalizedSimpleStack stackWildcard = new NSSItem(id, OreDictionary.WILDCARD_VALUE);
@@ -121,7 +121,7 @@ public interface NormalizedSimpleStack {
     }
 
     @Override
-    public boolean equals(Object o);
+    boolean equals(Object o);
 
-    public String json();
+    String json();
 }

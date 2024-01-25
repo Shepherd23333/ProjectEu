@@ -19,8 +19,12 @@ import java.math.BigInteger;
 import java.util.*;
 
 public class CraftingMapper implements IEMCMapper<NormalizedSimpleStack, BigInteger> {
-
-    private final List<IRecipeMapper> recipeMappers = Arrays.asList(new VanillaRecipeMapper(), new PECustomRecipeMapper(), new CraftTweakerRecipeMapper(), new RecipeStagesRecipeMapper());
+    private final List<IRecipeMapper> recipeMappers = Arrays.asList(
+            new VanillaRecipeMapper(),
+            new PECustomRecipeMapper(),
+            new CraftTweakerRecipeMapper(),
+            new RecipeStagesRecipeMapper()
+    );
     private final Set<Class> canNotMap = new HashSet<>();
     private final Map<Class, Integer> recipeCount = new HashMap<>();
 
@@ -32,7 +36,8 @@ public class CraftingMapper implements IEMCMapper<NormalizedSimpleStack, BigInte
         for (IRecipe recipe : CraftingManager.REGISTRY) {
             boolean handled = false;
             ItemStack recipeOutput = recipe.getRecipeOutput();
-            if (recipeOutput.isEmpty()) continue;
+            if (recipeOutput.isEmpty())
+                continue;
             NormalizedSimpleStack recipeOutputNorm = NSSItem.create(recipeOutput);
             for (IRecipeMapper recipeMapper : recipeMappers) {
                 if (!config.getBoolean("enable" + recipeMapper.getName(), "IRecipeImplementations", true, recipeMapper.getDescription()))
@@ -42,7 +47,8 @@ public class CraftingMapper implements IEMCMapper<NormalizedSimpleStack, BigInte
                     for (CraftingIngredients variation : recipeMapper.getIngredientsFor(recipe)) {
                         IngredientMap<NormalizedSimpleStack> ingredientMap = new IngredientMap<>();
                         for (ItemStack stack : variation.fixedIngredients) {
-                            if (stack.isEmpty()) continue;
+                            if (stack.isEmpty())
+                                continue;
                             try {
                                 if (stack.getItemDamage() != OreDictionary.WILDCARD_VALUE && stack.getItem().hasContainerItem(stack)) {
                                     ingredientMap.addIngredient(NSSItem.create(stack.getItem().getContainerItem(stack)), -1);
@@ -58,7 +64,8 @@ public class CraftingMapper implements IEMCMapper<NormalizedSimpleStack, BigInte
                             NormalizedSimpleStack dummy = NSSFake.create(multiIngredient.toString());
                             ingredientMap.addIngredient(dummy, 1);
                             for (ItemStack stack : multiIngredient) {
-                                if (stack.isEmpty()) continue;
+                                if (stack.isEmpty())
+                                    continue;
                                 IngredientMap<NormalizedSimpleStack> groupIngredientMap = new IngredientMap<>();
                                 if (stack.getItem().hasContainerItem(stack)) {
                                     groupIngredientMap.addIngredient(NSSItem.create(stack.getItem().getContainerItem(stack)), -1);

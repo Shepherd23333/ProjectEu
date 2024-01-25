@@ -6,6 +6,7 @@ import me.shepherd23333.projecte.emc.arithmetics.FullBigFractionArithmetic;
 import me.shepherd23333.projecte.emc.collector.IExtendedMappingCollector;
 import me.shepherd23333.projecte.emc.collector.IMappingCollector;
 import me.shepherd23333.projecte.emc.json.*;
+import me.shepherd23333.projecte.utils.Constants;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
@@ -86,7 +87,7 @@ public class FluidMapper implements IEMCMapper<NormalizedSimpleStack, BigInteger
 
     @Override
     public void addMappings(IMappingCollector<NormalizedSimpleStack, BigInteger> mapper, Configuration config) {
-        mapper.setValueBefore(NSSFluid.create(FluidRegistry.WATER), BigInteger.valueOf(Long.MIN_VALUE)/*=Free. TODO: Use IntArithmetic*/);
+        mapper.setValueBefore(NSSFluid.create(FluidRegistry.WATER), Constants.FREE/*=Free. TODO: Use IntArithmetic*/);
         //1 Bucket of Lava = 1 Block of Obsidian
         mapper.addConversion(1000, NSSFluid.create(FluidRegistry.LAVA), Collections.singletonList(NSSItem.create(Blocks.OBSIDIAN)));
 

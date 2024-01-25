@@ -65,8 +65,8 @@ public final class EMCHelper {
                 }
             } else if (!metRequirement) {
                 if (FuelMapper.isStackFuel(stack)) {
-                    BigDecimal emc = new BigDecimal(getEmcValue(stack));
-                    BigDecimal t = new BigDecimal(minFuel.subtract(emcConsumed));
+                    BigDecimal emc = new BigDecimal(getEmcValue(stack)),
+                            t = new BigDecimal(minFuel.subtract(emcConsumed));
                     int toRemove = t.divide(emc, RoundingMode.CEILING).intValueExact();
 
                     if (stack.getCount() >= toRemove) {

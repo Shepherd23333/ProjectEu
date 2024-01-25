@@ -10,7 +10,6 @@ import java.util.stream.Collectors;
 
 public abstract class MappingCollector<T, V extends Comparable<V>, A extends IValueArithmetic<V>> extends AbstractMappingCollector<T, V, A> {
     private static final boolean DEBUG_GRAPHMAPPER = false;
-
     protected final A arithmetic;
 
     protected MappingCollector(A arithmetic) {
@@ -68,7 +67,8 @@ public abstract class MappingCollector<T, V extends Comparable<V>, A extends IVa
 
     @Override
     public void setValueBefore(T something, V value) {
-        if (something == null) return;
+        if (something == null)
+            return;
         if (fixValueBeforeInherit.containsKey(something))
             PECore.debugLog("Overwriting fixValueBeforeInherit for {}:{} to {}", something, fixValueBeforeInherit.get(something), value);
         fixValueBeforeInherit.put(something, value);
@@ -77,7 +77,8 @@ public abstract class MappingCollector<T, V extends Comparable<V>, A extends IVa
 
     @Override
     public void setValueAfter(T something, V value) {
-        if (something == null) return;
+        if (something == null)
+            return;
         if (fixValueAfterInherit.containsKey(something))
             PECore.debugLog("Overwriting fixValueAfterInherit for {}:{} to {}", something, fixValueAfterInherit.get(something), value);
         fixValueAfterInherit.put(something, value);
@@ -106,7 +107,6 @@ public abstract class MappingCollector<T, V extends Comparable<V>, A extends IVa
 
     protected class Conversion {
         public final T output;
-
         public final int outnumber;
         public final V value;
         public final Map<T, Integer> ingredientsWithAmount;
@@ -130,7 +130,8 @@ public abstract class MappingCollector<T, V extends Comparable<V>, A extends IVa
         }
 
         private String ingredientsToString() {
-            if (ingredientsWithAmount == null || ingredientsWithAmount.size() == 0) return "nothing";
+            if (ingredientsWithAmount == null || ingredientsWithAmount.isEmpty())
+                return "nothing";
             return ingredientsWithAmount.entrySet().stream()
                     .map(e -> e.getValue() + "*" + e.getKey())
                     .collect(Collectors.joining(" + "));

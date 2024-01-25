@@ -385,7 +385,7 @@ public class TileLink extends TileEntity implements IItemHandlerModifiable, ITic
 
     @Override
     public BigInteger getMaximumEmc() {
-        return BigInteger.valueOf(Long.MAX_VALUE);
+        return ProjectEXUtils.MAX_EMC;
     }
 
     public boolean setOutputStack(EntityPlayer player, int slot, ItemStack stack, boolean addKnowledge) {

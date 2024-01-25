@@ -2,6 +2,7 @@ package me.shepherd23333.projecte.emc.generators;
 
 import org.apache.commons.math3.fraction.BigFraction;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +26,7 @@ public class BigFractionToBigIntegerGenerator<T> implements IValueGenerator<T, B
         for (Map.Entry<T, BigFraction> entry : innerResult.entrySet()) {
             BigFraction value = entry.getValue();
             if (value.compareTo(BigFraction.ZERO) > 0) {
-                myResult.put(entry.getKey(), value.bigDecimalValue().toBigInteger());
+                myResult.put(entry.getKey(), value.bigDecimalValue(6, BigDecimal.ROUND_HALF_DOWN).toBigInteger());
             }
         }
         return myResult;
