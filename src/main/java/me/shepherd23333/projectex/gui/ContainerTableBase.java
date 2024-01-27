@@ -143,10 +143,10 @@ public class ContainerTableBase extends Container {
 
             int amount = type.getMaxStackSize();
 
-            long max = playerData.getEmc().divide(value).longValueExact();
+            BigInteger max = playerData.getEmc().divide(value);
 
-            if (amount > max) {
-                amount = (int) Math.min(amount, max);
+            if (max.compareTo(BigInteger.valueOf(amount)) < 0) {
+                amount = max.min(BigInteger.valueOf(amount)).intValue();
             }
 
             if (amount <= 0) {

@@ -24,6 +24,7 @@ import net.minecraftforge.items.wrapper.RangedWrapper;
 import javax.annotation.Nonnull;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.util.Map;
 
 public class CollectorMK1Tile extends TileEmc implements IEmcProvider, IEmcAcceptor {
@@ -55,8 +56,8 @@ public class CollectorMK1Tile extends TileEmc implements IEmcProvider, IEmcAccep
     private final BigInteger emcGen;
     private boolean hasChargeableItem;
     private boolean hasFuel;
-    private BigInteger storedFuelEmc;
-    private BigDecimal unprocessedEMC;
+    private BigInteger storedFuelEmc = BigInteger.ZERO;
+    private BigDecimal unprocessedEMC = BigDecimal.ZERO;
 
     public CollectorMK1Tile() {
         super(Constants.COLLECTOR_MK1_MAX);
@@ -268,7 +269,7 @@ public class CollectorMK1Tile extends TileEmc implements IEmcProvider, IEmcAccep
             return 1;
         }
 
-        return new BigDecimal(getStoredEmc()).divide(new BigDecimal(reqEmc)).doubleValue();
+        return new BigDecimal(getStoredEmc()).divide(new BigDecimal(reqEmc), 4, RoundingMode.HALF_DOWN).doubleValue();
     }
 
     @Override

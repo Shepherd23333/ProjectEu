@@ -13,8 +13,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.Explosion;
 import net.minecraft.world.World;
+import net.minecraftforge.event.ForgeEventFactory;
 
-import java.lang.reflect.Field;
 import java.util.*;
 
 public class NovaExplosion extends Explosion {
@@ -27,73 +27,60 @@ public class NovaExplosion extends Explosion {
 
     @Override
     public void doExplosionA() {
-        try {
-            Field siz = Explosion.class.getDeclaredField("size");
-            siz.setAccessible(true);
-            float initialSize = (float) siz.get(this);
+        float initialSize = size;
 
-            HashSet<BlockPos> hashset = Sets.newHashSet();
-            int j;
-            int k;
+        HashSet<BlockPos> hashset = Sets.newHashSet();
+        int j;
+        int k;
 
-            for (int i = 0; i < 16; ++i) {
-                for (j = 0; j < 16; ++j) {
-                    for (k = 0; k < 16; ++k) {
-                        if (i == 0 || i == 15 || j == 0 || j == 15 || k == 0 || k == 15) {
-                            double d0 = (double) ((float) i / 15.0F * 2.0F - 1.0F);
-                            double d1 = (double) ((float) j / 15.0F * 2.0F - 1.0F);
-                            double d2 = (double) ((float) k / 15.0F * 2.0F - 1.0F);
-                            double d3 = Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
-                            d0 /= d3;
-                            d1 /= d3;
-                            d2 /= d3;
-                            float f = initialSize * (0.7F + this.worldObj.rand.nextFloat() * 0.6F);
-                            double d4 = this.getPosition().x;
-                            double d6 = this.getPosition().y;
-                            double d8 = this.getPosition().z;
+        for (int i = 0; i < 16; ++i) {
+            for (j = 0; j < 16; ++j) {
+                for (k = 0; k < 16; ++k) {
+                    if (i == 0 || i == 15 || j == 0 || j == 15 || k == 0 || k == 15) {
+                        double d0 = (double) ((float) i / 15.0F * 2.0F - 1.0F);
+                        double d1 = (double) ((float) j / 15.0F * 2.0F - 1.0F);
+                        double d2 = (double) ((float) k / 15.0F * 2.0F - 1.0F);
+                        double d3 = Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
+                        d0 /= d3;
+                        d1 /= d3;
+                        d2 /= d3;
+                        float f = initialSize * (0.7F + this.worldObj.rand.nextFloat() * 0.6F);
+                        double d4 = this.getPosition().x;
+                        double d6 = this.getPosition().y;
+                        double d8 = this.getPosition().z;
 
-                            for (float f1 = 0.3F; f > 0.0F; f -= 0.22500001F) {
-                                BlockPos blockpos = new BlockPos(d4, d6, d8);
-                                IBlockState iblockstate = this.worldObj.getBlockState(blockpos);
+                        for (float f1 = 0.3F; f > 0.0F; f -= 0.22500001F) {
+                            BlockPos blockpos = new BlockPos(d4, d6, d8);
+                            IBlockState iblockstate = this.worldObj.getBlockState(blockpos);
 
-                                if (iblockstate.getMaterial() != Material.AIR) {
-                                    float f2 = this.getExplosivePlacedBy() != null ? this.getExplosivePlacedBy().getExplosionResistance(this, this.worldObj, blockpos, iblockstate) : iblockstate.getBlock().getExplosionResistance(worldObj, blockpos, null, this);
-                                    f -= (f2 + 0.3F) * 0.3F;
-                                }
-
-                                if (f > 0.0F && (this.getExplosivePlacedBy() == null || this.getExplosivePlacedBy().canExplosionDestroyBlock(this, this.worldObj, blockpos, iblockstate, f))) {
-                                    hashset.add(blockpos);
-                                }
-
-                                d4 += d0 * 0.30000001192092896D;
-                                d6 += d1 * 0.30000001192092896D;
-                                d8 += d2 * 0.30000001192092896D;
+                            if (iblockstate.getMaterial() != Material.AIR) {
+                                float f2 = this.getExplosivePlacedBy() != null ? this.getExplosivePlacedBy().getExplosionResistance(this, this.worldObj, blockpos, iblockstate) : iblockstate.getBlock().getExplosionResistance(worldObj, blockpos, null, this);
+                                f -= (f2 + 0.3F) * 0.3F;
                             }
+
+                            if (f > 0.0F && (this.getExplosivePlacedBy() == null || this.getExplosivePlacedBy().canExplosionDestroyBlock(this, this.worldObj, blockpos, iblockstate, f))) {
+                                hashset.add(blockpos);
+                            }
+
+                            d4 += d0 * 0.30000001192092896D;
+                            d6 += d1 * 0.30000001192092896D;
+                            d8 += d2 * 0.30000001192092896D;
                         }
                     }
                 }
             }
-
-            this.getAffectedBlockPositions().addAll(hashset);
-
-            siz.set(this, initialSize);
-
-            net.minecraftforge.event.ForgeEventFactory.onExplosionDetonate(this.worldObj, this, Collections.emptyList(), (float) siz.get(this));
-
-        } catch (NoSuchFieldException | IllegalAccessException e) {
         }
+
+        this.getAffectedBlockPositions().addAll(hashset);
+
+        size = initialSize;
+
+        ForgeEventFactory.onExplosionDetonate(this.worldObj, this, Collections.emptyList(), size);
     }
 
     @Override
     public void doExplosionB(boolean spawnParticles) {
-        float cachedExplosionSize = 1;
-
-        try {
-            Field siz = Explosion.class.getDeclaredField("size");
-            cachedExplosionSize = (float) siz.get(this);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
+        float cachedExplosionSize = size;
 
         double x = getPosition().x;
         double y = getPosition().y;

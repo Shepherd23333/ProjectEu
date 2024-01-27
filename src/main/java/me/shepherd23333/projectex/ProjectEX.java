@@ -51,16 +51,6 @@ public class ProjectEX {
     @Mod.EventHandler
     public void onInit(FMLInitializationEvent event) {
         if (FMLCommonHandler.instance().getSide() == Side.CLIENT) {
-            /*try {
-                Field field = Constants.class.getDeclaredField("EMC_FORMATTER");
-                field.setAccessible(true);
-                Field modifiersField = Field.class.getDeclaredField("modifiers");
-                modifiersField.setAccessible(true);
-                modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL);
-                field.set(null, EMCFormat.INSTANCE);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }*/
 
             ProjectEXKeyBindings.init();
         }
