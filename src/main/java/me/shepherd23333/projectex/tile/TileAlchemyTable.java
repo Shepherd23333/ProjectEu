@@ -40,7 +40,7 @@ public class TileAlchemyTable extends TileEntity implements ITickable, IEmcAccep
 
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
-        storedEMC = new BigInteger(nbt.getString("emc"));
+        storedEMC = nbt.hasKey("emc") ? new BigInteger(nbt.getString("emc")) : BigInteger.ZERO;
         progress = nbt.getInteger("progress");
 
         NBTTagCompound itemsTag = new NBTTagCompound();

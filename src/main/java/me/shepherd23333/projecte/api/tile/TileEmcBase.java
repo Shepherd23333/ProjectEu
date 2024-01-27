@@ -1,5 +1,6 @@
 package me.shepherd23333.projecte.api.tile;
 
+import me.shepherd23333.projecte.utils.Constants;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 
@@ -14,7 +15,7 @@ import java.math.BigInteger;
  * @author williewillus
  */
 public class TileEmcBase extends TileEntity implements IEmcStorage {
-    protected BigInteger maximumEMC;
+    protected BigInteger maximumEMC = Constants.TILE_MAX_EMC;
     protected BigInteger currentEMC = BigInteger.ZERO;
 
     protected TileEmcBase() {

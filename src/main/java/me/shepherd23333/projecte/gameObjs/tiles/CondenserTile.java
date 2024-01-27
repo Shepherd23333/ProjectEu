@@ -26,7 +26,7 @@ public class CondenserTile extends TileEmc implements IEmcAcceptor {
     private final ItemStackHandler lock = new StackHandler(1);
     private boolean isAcceptingEmc;
     private int ticksSinceSync;
-    public BigInteger displayEmc;
+    public BigInteger displayEmc = BigInteger.ZERO;
     public float lidAngle;
     public float prevLidAngle;
     public int numPlayersUsing;

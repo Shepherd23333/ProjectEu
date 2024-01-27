@@ -22,7 +22,7 @@ public class TilePowerFlower extends TileEntity implements ITickable {
     public void readFromNBT(NBTTagCompound nbt) {
         owner = nbt.getUniqueId("owner");
         name = nbt.getString("name");
-        storedEMC = new BigInteger(nbt.getString("emc"));
+        storedEMC = nbt.hasKey("emc") ? new BigInteger(nbt.getString("emc")) : BigInteger.ZERO;
         super.readFromNBT(nbt);
     }
 

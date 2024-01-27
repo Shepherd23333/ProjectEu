@@ -259,25 +259,28 @@ public class MercurialEye extends ItemMode implements IExtraFunction {
         }
         ItemStack klein = capability.getStackInSlot(0);
 
-        if (klein.isEmpty() || oldState == newState || ItemPE.getEmc(klein).compareTo(newEMC.subtract(oldEMC)) < 0 || player.getEntityWorld().getTileEntity(placePos) != null) {
+        if (klein.isEmpty() || oldState == newState || player.getEntityWorld().getTileEntity(placePos) != null) {
             return false;
         }
 
-        if (oldEMC.equals(BigInteger.ZERO) && oldState.getBlock().blockHardness == -1.0F) {
+        if (oldEMC.equals(BigInteger.ZERO) && oldState.getBlockHardness(player.getEntityWorld(), placePos) == -1.0F) {
             //Don't allow replacing unbreakable blocks (unless they have an EMC value)
             return false;
         }
 
         if (PlayerHelper.checkedReplaceBlock((EntityPlayerMP) player, placePos, newState)) {
             IItemEmc itemEMC = (IItemEmc) klein.getItem();
+            BigInteger result = newEMC.subtract(oldEMC);
+            if (itemEMC.getStoredEmc(klein).compareTo(result) < 0)
+                return false;
             if (oldEMC.equals(BigInteger.ZERO)) {
                 //Drop the block because it doesn't have an emc value
                 oldState.getBlock().getDrops(drops, player.getEntityWorld(), placePos, oldState, 0);
                 itemEMC.extractEmc(klein, newEMC);
             } else if (oldEMC.compareTo(newEMC) > 0) {
-                itemEMC.addEmc(klein, oldEMC.subtract(newEMC));
+                itemEMC.addEmc(klein, result.negate());
             } else if (oldEMC.compareTo(newEMC) < 0) {
-                itemEMC.extractEmc(klein, newEMC.subtract(oldEMC));
+                itemEMC.extractEmc(klein, result);
             }
             return true;
         }

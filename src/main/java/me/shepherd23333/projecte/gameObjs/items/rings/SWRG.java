@@ -52,6 +52,7 @@ public class SWRG extends ItemPE implements IBauble, IPedestalItem, IFlightProvi
     }
 
     private void tick(ItemStack stack, EntityPlayer player) {
+        player.fallDistance = 0;
         if (ItemHelper.getOrCreateCompound(stack).getInteger(TAG_MODE) > 1) {
             // Repel on both sides - smooth animation
             WorldHelper.repelEntitiesInAABBFromPoint(player.getEntityWorld(), player.getEntityBoundingBox().grow(5), player.posX, player.posY, player.posZ, true);
@@ -102,8 +103,6 @@ public class SWRG extends ItemPE implements IBauble, IPedestalItem, IFlightProvi
         }
 
         removeEmc(stack, EMCHelper.removeFractionalEMC(stack, toRemove));
-
-        playerMP.fallDistance = 0;
     }
 
     private boolean isFlyingEnabled(ItemStack stack) {
@@ -131,9 +130,6 @@ public class SWRG extends ItemPE implements IBauble, IPedestalItem, IFlightProvi
                     break;
                 case 1:
                     newMode = 3;
-                    break;
-                case 2:
-                    newMode = 0;
                     break;
                 case 3:
                     newMode = 1;
@@ -164,10 +160,10 @@ public class SWRG extends ItemPE implements IBauble, IPedestalItem, IFlightProvi
         }
         if (mode == 0 || oldMode == 3) {
             //At least one mode deactivated
-            player.getEntityWorld().playSound(null, player.posX, player.posY, player.posZ, PESounds.HEAL, SoundCategory.PLAYERS, 0.8F, 1.0F);
+            player.getEntityWorld().playSound(null, player.posX, player.posY, player.posZ, PESounds.UNCHARGE, SoundCategory.PLAYERS, 0.8F, 1.0F);
         } else if (oldMode == 0 || mode == 3) {
             //At least one mode activated
-            player.getEntityWorld().playSound(null, player.posX, player.posY, player.posZ, PESounds.UNCHARGE, SoundCategory.PLAYERS, 0.8F, 1.0F);
+            player.getEntityWorld().playSound(null, player.posX, player.posY, player.posZ, PESounds.HEAL, SoundCategory.PLAYERS, 0.8F, 1.0F);
         }
         //Doesn't handle going from mode 1 to 2 or 2 to 1
     }

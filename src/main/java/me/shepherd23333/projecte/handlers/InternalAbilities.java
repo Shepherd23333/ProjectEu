@@ -18,7 +18,6 @@ import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.lang.reflect.Field;
 
 public final class InternalAbilities {
     @CapabilityInject(InternalAbilities.class)
@@ -100,24 +99,14 @@ public final class InternalAbilities {
             wasFlying = player.capabilities.isFlying;
         }
 
-        try {
-            Field fr = player.getClass()    //EntityPlayerMP
-                    .getSuperclass()    //EntityPlayer
-                    .getSuperclass()    //EntityLivingBase
-                    .getSuperclass()    //Entity
-                    .getDeclaredField("isImmuneToFire");
-            fr.setAccessible(true);
-
-            if (!shouldPlayerResistFire()) {
-                if (player.isImmuneToFire()) {
-                    fr.set(player, false);
-                }
-            } else {
-                if (!player.isImmuneToFire()) {
-                    fr.set(player, true);
-                }
+        if (!shouldPlayerResistFire()) {
+            if (player.isImmuneToFire()) {
+                player.isImmuneToFire = false;
             }
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+        } else {
+            if (!player.isImmuneToFire()) {
+                player.isImmuneToFire = true;
+            }
         }
 
         if (!shouldPlayerStep()) {

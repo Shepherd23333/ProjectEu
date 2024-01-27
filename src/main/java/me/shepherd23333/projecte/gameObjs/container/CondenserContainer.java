@@ -23,11 +23,12 @@ import net.minecraftforge.items.IItemHandler;
 import javax.annotation.Nonnull;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 
 public class CondenserContainer extends BigIntegerContainer {
     protected final CondenserTile tile;
-    public BigInteger displayEmc;
-    public BigInteger requiredEmc;
+    public BigInteger displayEmc = BigInteger.ZERO;
+    public BigInteger requiredEmc = BigInteger.ZERO;
 
     public CondenserContainer(InventoryPlayer invPlayer, CondenserTile condenser) {
         tile = condenser;
@@ -170,7 +171,7 @@ public class CondenserContainer extends BigIntegerContainer {
             return Constants.MAX_CONDENSER_PROGRESS;
         }
 
-        return new BigDecimal(displayEmc).divide(new BigDecimal(requiredEmc))
+        return new BigDecimal(displayEmc).divide(new BigDecimal(requiredEmc), 4, RoundingMode.HALF_DOWN)
                 .multiply(BigDecimal.valueOf(Constants.MAX_CONDENSER_PROGRESS)).intValueExact();
     }
 }

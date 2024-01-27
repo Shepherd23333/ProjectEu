@@ -5,6 +5,7 @@ import me.shepherd23333.projecte.config.ProjectEConfig;
 import me.shepherd23333.projecte.gameObjs.ObjHandler;
 import me.shepherd23333.projecte.gameObjs.items.ItemMode;
 import me.shepherd23333.projecte.gameObjs.items.PhilosophersStone;
+import me.shepherd23333.projecte.utils.ItemHelper;
 import me.shepherd23333.projecte.utils.WorldTransmutations;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -12,6 +13,7 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -61,8 +63,8 @@ public class TransmutationRenderingEvent {
                 } else {
                     RenderHelper.enableStandardItemLighting();
 
-                    //IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getModelForState(transmutationResult);
-                    //Minecraft.getMinecraft().getRenderItem().renderItemModelIntoGUI(ItemHelper.stateToDroppedStack(transmutationResult, 1), 0, 0, model);
+                    IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getModelForState(transmutationResult);
+                    Minecraft.getMinecraft().getRenderItem().renderItemModelIntoGUI(ItemHelper.stateToDroppedStack(transmutationResult, 1), 0, 0, model);
 
                     RenderHelper.disableStandardItemLighting();
                 }
