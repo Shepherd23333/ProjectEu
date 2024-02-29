@@ -1,6 +1,7 @@
 package me.shepherd23333.projecte.emc.json;
 
 import net.minecraftforge.fluids.Fluid;
+import net.minecraftforge.fluids.FluidStack;
 
 import javax.annotation.Nonnull;
 
@@ -9,6 +10,10 @@ public class NSSFluid implements NormalizedSimpleStack {
 
     private NSSFluid(Fluid f) {
         this.name = f.getName();
+    }
+
+    public static NormalizedSimpleStack create(FluidStack stack) {
+        return create(stack.getFluid());
     }
 
     @Nonnull

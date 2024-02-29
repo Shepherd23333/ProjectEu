@@ -3,13 +3,13 @@ package me.shepherd23333.projecte.emc;
 import me.shepherd23333.projecte.PECore;
 import me.shepherd23333.projecte.api.event.EMCRemapEvent;
 import me.shepherd23333.projecte.config.ProjectEConfig;
-import me.shepherd23333.projecte.emc.arithmetics.FullBigFractionArithmetic;
+import me.shepherd23333.projecte.emc.arithmetics.FullBigFracArithmetic;
 import me.shepherd23333.projecte.emc.arithmetics.IValueArithmetic;
-import me.shepherd23333.projecte.emc.collector.BigIntegerToBigFractionCollector;
+import me.shepherd23333.projecte.emc.collector.BigIntToBigFracCollector;
 import me.shepherd23333.projecte.emc.collector.DumpToFileCollector;
 import me.shepherd23333.projecte.emc.collector.IExtendedMappingCollector;
 import me.shepherd23333.projecte.emc.collector.WildcardSetValueFixCollector;
-import me.shepherd23333.projecte.emc.generators.BigFractionToBigIntegerGenerator;
+import me.shepherd23333.projecte.emc.generators.BigFracToBigIntGenerator;
 import me.shepherd23333.projecte.emc.generators.IValueGenerator;
 import me.shepherd23333.projecte.emc.json.NSSItem;
 import me.shepherd23333.projecte.emc.json.NormalizedSimpleStack;
@@ -47,9 +47,9 @@ public final class EMCMapper {
                 new SmeltingMapper(),
                 new APICustomConversionMapper()
         );
-        SimpleGraphMapper<NormalizedSimpleStack, BigFraction, IValueArithmetic<BigFraction>> mapper = new SimpleGraphMapper<>(new FullBigFractionArithmetic());
-        IValueGenerator<NormalizedSimpleStack, BigInteger> valueGenerator = new BigFractionToBigIntegerGenerator<>(mapper);
-        IExtendedMappingCollector<NormalizedSimpleStack, BigInteger, IValueArithmetic<BigFraction>> mappingCollector = new BigIntegerToBigFractionCollector<>(mapper);
+        SimpleGraphMapper<NormalizedSimpleStack, BigFraction, IValueArithmetic<BigFraction>> mapper = new SimpleGraphMapper<>(new FullBigFracArithmetic());
+        IValueGenerator<NormalizedSimpleStack, BigInteger> valueGenerator = new BigFracToBigIntGenerator<>(mapper);
+        IExtendedMappingCollector<NormalizedSimpleStack, BigInteger, IValueArithmetic<BigFraction>> mappingCollector = new BigIntToBigFracCollector<>(mapper);
         mappingCollector = new WildcardSetValueFixCollector<>(mappingCollector);
 
         Configuration config = new Configuration(new File(PECore.CONFIG_DIR, "mapping.cfg"));

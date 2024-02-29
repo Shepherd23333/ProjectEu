@@ -42,7 +42,7 @@ public class ManualFontRenderer extends FontRenderer {
     /*
      * Copy of some fontrenderer methods because they are private in the superclass
      */
-    private int sizeStringToWidth(String p_78259_1_, int p_78259_2_) {
+    public int sizeStringToWidth(String p_78259_1_, int p_78259_2_) {
         int j = p_78259_1_.length();
         int k = 0;
         int l = 0;

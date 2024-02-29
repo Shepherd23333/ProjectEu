@@ -8,6 +8,7 @@ import me.shepherd23333.projecte.emc.json.*;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
@@ -19,10 +20,9 @@ import java.util.List;
 import java.util.Map;
 
 public class ConversionProxyImpl implements IConversionProxy {
-
     public static final ConversionProxyImpl instance = new ConversionProxyImpl();
-
     final Map<Object, NormalizedSimpleStack> fakes = new HashMap<>();
+    public final Map<String, List<APIConversion>> storedConversions = new HashMap<>();
 
     @Override
     public void addConversion(int amount, @Nonnull Object output, @Nonnull Map<Object, Integer> ingredients) {
@@ -43,24 +43,22 @@ public class ConversionProxyImpl implements IConversionProxy {
         conversionsFromMod.add(new APIConversion(amount, nssOut, ImmutableMap.copyOf(ingredientMap.getMap())));
     }
 
-    public final Map<String, List<APIConversion>> storedConversions = new HashMap<>();
-
     public NormalizedSimpleStack objectToNSS(Object object) {
-        if (object instanceof Block) {
-            return objectToNSS(new ItemStack((Block) object));
+        if (object instanceof Ingredient) {
+            return NSSItem.create((Ingredient) object);
+        } else if (object instanceof Block) {
+            return NSSItem.create((Block) object);
         } else if (object instanceof Item) {
-            return objectToNSS(new ItemStack((Item) object));
-        }
-
-        if (object instanceof ItemStack) {
+            return NSSItem.create((Item) object);
+        } else if (object instanceof ItemStack) {
             return NSSItem.create((ItemStack) object);
         } else if (object instanceof FluidStack) {
-            return NSSFluid.create(((FluidStack) object).getFluid());
+            return NSSFluid.create((FluidStack) object);
         } else if (object instanceof String) {
             return NSSOreDictionary.create((String) object);
         } else if (object != null && object.getClass().equals(Object.class)) {
-            if (fakes.containsKey(object)) return fakes.get(object);
-
+            if (fakes.containsKey(object))
+                return fakes.get(object);
             NormalizedSimpleStack nss = NSSFake.create("" + fakes.size() + " by " + getActiveMod());
             fakes.put(object, nss);
             return nss;

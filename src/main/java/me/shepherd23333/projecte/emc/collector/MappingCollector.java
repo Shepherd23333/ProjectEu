@@ -9,7 +9,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class MappingCollector<T, V extends Comparable<V>, A extends IValueArithmetic<V>> extends AbstractMappingCollector<T, V, A> {
-    private static final boolean DEBUG_GRAPHMAPPER = false;
+    private static final boolean DEBUG_GRAPHMAPPER = true;
     protected final A arithmetic;
 
     protected MappingCollector(A arithmetic) {
@@ -42,10 +42,9 @@ public abstract class MappingCollector<T, V extends Comparable<V>, A extends IVa
 
     private void addConversionToIngredientUsages(Conversion conversion) {
         for (Map.Entry<T, Integer> ingredient : conversion.ingredientsWithAmount.entrySet()) {
-            Set<Conversion> usesForIngredient = getUsesFor(ingredient.getKey());
             if (ingredient.getValue() == null)
                 throw new IllegalArgumentException("ingredient amount value has to be != null");
-            usesForIngredient.add(conversion);
+            getUsesFor(ingredient.getKey()).add(conversion);
         }
     }
 

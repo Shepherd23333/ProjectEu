@@ -4,15 +4,16 @@ import me.shepherd23333.projecte.PECore;
 import me.shepherd23333.projecte.emc.arithmetics.IValueArithmetic;
 import me.shepherd23333.projecte.emc.collector.MappingCollector;
 import me.shepherd23333.projecte.emc.generators.IValueGenerator;
+import me.shepherd23333.projecte.utils.Constants;
+import org.apache.commons.math3.fraction.BigFraction;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class SimpleGraphMapper<T, V extends Comparable<V>, A extends IValueArithmetic<V>> extends MappingCollector<T, V, A> implements IValueGenerator<T, V> {
+public class SimpleGraphMapper<T, V extends Number & Comparable<V>, A extends IValueArithmetic<V>> extends MappingCollector<T, V, A> implements IValueGenerator<T, V> {
     private static final boolean OVERWRITE_FIXED_VALUES = false;
     private final V ZERO;
-
     private static boolean logFoundExploits = true;
 
     public SimpleGraphMapper(A arithmetic) {
@@ -20,19 +21,27 @@ public class SimpleGraphMapper<T, V extends Comparable<V>, A extends IValueArith
         ZERO = arithmetic.getZero();
     }
 
-    private static <K, V extends Comparable<V>> boolean hasSmallerOrEqual(Map<K, V> m, K key, V value) {
-        return (m.containsKey(key) && m.get(key).compareTo(value) <= 0);
+    private static <K, V extends Number & Comparable<V>> boolean hasSmallerOrEqual(Map<K, V> m, K key, V value) {
+        if (m.containsKey(key)) {
+            BigFraction v = (BigFraction) m.get(key), t = (BigFraction) value;
+            return v.subtract(Constants.eps).compareTo(t) <= 0;
+        }
+        return false;
     }
 
-    private static <K, V extends Comparable<V>> boolean hasNoSmaller(Map<K, V> m, K key, V value) {
-        return (!m.containsKey(key) || m.get(key).compareTo(value) >= 0);
+    private static <K, V extends Number & Comparable<V>> boolean hasNoSmaller(Map<K, V> m, K key, V value) {
+        if (m.containsKey(key)) {
+            BigFraction v = (BigFraction) m.get(key), t = (BigFraction) value;
+            return v.subtract(Constants.eps).compareTo(t) >= 0;
+        }
+        return true;
     }
 
     static void setLogFoundExploits(boolean log) {
         logFoundExploits = log;
     }
 
-    private static <K, V extends Comparable<V>> boolean updateMapWithMinimum(Map<K, V> m, K key, V value) {
+    private static <K, V extends Number & Comparable<V>> boolean updateMapWithMinimum(Map<K, V> m, K key, V value) {
         if (hasNoSmaller(m, key, value)) {
             //No Value or a value that is smaller than this
             m.put(key, value);
@@ -44,9 +53,8 @@ public class SimpleGraphMapper<T, V extends Comparable<V>, A extends IValueArith
     private boolean canOverride(T something, V value) {
         if (OVERWRITE_FIXED_VALUES)
             return true;
-        if (fixValueBeforeInherit.containsKey(something)) {
+        if (fixValueBeforeInherit.containsKey(something))
             return fixValueBeforeInherit.get(something).compareTo(value) == 0;
-        }
         return true;
     }
 
@@ -64,34 +72,32 @@ public class SimpleGraphMapper<T, V extends Comparable<V>, A extends IValueArith
             reasonForChange.put(entry.getKey(), "fixValueBefore");
         }
 
-        while (!changedValues.isEmpty()) {
-            while (!changedValues.isEmpty()) {
+        for (int x = Constants.loopTimes; !changedValues.isEmpty() && 0 <= x; x--) {
+            for (int y = 0; !changedValues.isEmpty() && y < x; y++) {
                 // Changes that happened when processing current changes
                 Map<T, V> nextChangedValues = new HashMap<>();
 
                 debugPrintln("Loop");
                 for (Map.Entry<T, V> entry : changedValues.entrySet()) {
-                    if (canOverride(entry.getKey(), entry.getValue()) && updateMapWithMinimum(values, entry.getKey(), entry.getValue())) {
+                    T key = entry.getKey();
+                    V value = entry.getValue();
+                    if (canOverride(key, value) && updateMapWithMinimum(values, key, value)) {
                         //The new Value is now set in 'values'
-                        debugFormat("Set Value for {} to {} because {}", entry.getKey(), entry.getValue(), reasonForChange.get(entry.getKey()));
+                        debugFormat("Set Value for {} to {} because {}", key, value, reasonForChange.get(key));
                         //We have a new value for 'entry.getKey()' now we need to update everything that uses it as an ingredient.
-                        for (Conversion conversion : getUsesFor(entry.getKey())) {
-                            if (overwriteConversion.containsKey(conversion.output) && overwriteConversion.get(conversion.output) != conversion) {
+                        for (Conversion conversion : getUsesFor(key)) {
+                            if (overwriteConversion.containsKey(conversion.output) && overwriteConversion.get(conversion.output) != conversion)
                                 //There is a "SetValue-Conversion" for this item, but it's not this one, so we skip it.
                                 continue;
-                            }
                             //Calculate how much the conversion-output costs with the new Value for entry.getKey
                             V conversionValue = conversion.arithmeticForConversion.div(valueForConversion(values, conversion), conversion.outnumber);
-                            if (conversionValue.compareTo(ZERO) > 0 || conversion.arithmeticForConversion.isFree(conversionValue)) {
+                            if (conversionValue.compareTo(ZERO) > 0 || conversion.arithmeticForConversion.isFree(conversionValue))
                                 //We could calculate a valid value for the conversion
-                                if (!hasSmallerOrEqual(values, conversion.output, conversionValue)) {
+                                if (!hasSmallerOrEqual(values, conversion.output, conversionValue))
                                     //And there is no smaller value for that conversion output yet
-                                    if (updateMapWithMinimum(nextChangedValues, conversion.output, conversionValue)) {
+                                    if (updateMapWithMinimum(nextChangedValues, conversion.output, conversionValue))
                                         //So we mark that new value to set it in the next iteration.
-                                        reasonForChange.put(conversion.output, entry.getKey());
-                                    }
-                                }
-                            }
+                                        reasonForChange.put(conversion.output, key);
                         }
                     }
                 }
@@ -112,11 +118,9 @@ public class SimpleGraphMapper<T, V extends Comparable<V>, A extends IValueArith
                     V resultValueActual = values.getOrDefault(entry.getKey(), ZERO);
 
                     //Find the smallest EMC value for the conversion.output
-                    if (resultValueConversion.compareTo(ZERO) > 0 || conversion.arithmeticForConversion.isFree(resultValueConversion)) {
-                        if (minConversionValue == null || minConversionValue.compareTo(resultValueConversion) > 0) {
+                    if (resultValueConversion.compareTo(ZERO) > 0 || conversion.arithmeticForConversion.isFree(resultValueConversion))
+                        if (minConversionValue == null || minConversionValue.compareTo(resultValueConversion) > 0)
                             minConversionValue = resultValueConversion;
-                        }
-                    }
                     //the cost for the ingredients is greater zero, but smaller than the value that the output has.
                     //This is a Loophole. We remove it by setting the value to 0.
                     if (ZERO.compareTo(ingredientValue) < 0 && resultValueConversion.compareTo(resultValueActual) < 0) {
@@ -127,12 +131,11 @@ public class SimpleGraphMapper<T, V extends Comparable<V>, A extends IValueArith
                             debugFormat("Setting {} to 0 because result ({}) > cost ({}): {}", entry.getKey(), resultValueActual, ingredientValue, conversion);
                             changedValues.put(conversion.output, ZERO);
                             reasonForChange.put(conversion.output, "exploit recipe");
-                        } else if (logFoundExploits) {
+                        } else if (logFoundExploits)
                             PECore.LOGGER.warn("EMC Exploit: ingredients ({}) cost {} but output value is {}", conversion, ingredientValue, resultValueActual);
-                        }
                     }
                 }
-                if (minConversionValue == null || minConversionValue.equals(ZERO)) {
+                if (minConversionValue == null || minConversionValue.equals(ZERO))
                     //we could not find any valid conversion
                     if (values.containsKey(entry.getKey()) && !values.get(entry.getKey()).equals(ZERO) && canOverride(entry.getKey(), ZERO) && hasNoSmaller(values, entry.getKey(), ZERO)) {
                         //but the value for the conversion output is > 0, so we set it to 0.
@@ -140,7 +143,6 @@ public class SimpleGraphMapper<T, V extends Comparable<V>, A extends IValueArith
                         changedValues.put(entry.getKey(), ZERO);
                         reasonForChange.put(entry.getKey(), "all conversions dead");
                     }
-                }
             }
         }
         debugPrintln("");

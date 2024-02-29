@@ -144,7 +144,7 @@ public class APICustomEMCMapper implements IEMCMapper<NormalizedSimpleStack, Big
             itemName = "IntermediateFakeItemsUsedInRecipes:";
         }
         String modForItem = itemName.substring(0, itemName.indexOf(':'));
-        String permission = config.getString(modForItem, "permissions." + modId, "both", String.format("Allow '%s' to set and or remove values for '%s'. Options: [both, set, remove, none]", modId, modForItem), new String[]{"both", "set", "remove", "none"});
+        String permission = config.getString(modForItem, "permissions." + modId, "set", String.format("Allow '%s' to set and or remove values for '%s'. Options: [both, set, remove, none]", modId, modForItem), new String[]{"both", "set", "remove", "none"});
         if (permission.equals("both")) {
             return true;
         }

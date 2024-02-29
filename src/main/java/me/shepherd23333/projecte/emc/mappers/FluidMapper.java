@@ -2,7 +2,7 @@ package me.shepherd23333.projecte.emc.mappers;
 
 import com.google.common.collect.ImmutableMap;
 import me.shepherd23333.projecte.PECore;
-import me.shepherd23333.projecte.emc.arithmetics.FullBigFractionArithmetic;
+import me.shepherd23333.projecte.emc.arithmetics.FullBigFracArithmetic;
 import me.shepherd23333.projecte.emc.collector.IExtendedMappingCollector;
 import me.shepherd23333.projecte.emc.collector.IMappingCollector;
 import me.shepherd23333.projecte.emc.json.*;
@@ -104,7 +104,7 @@ public class FluidMapper implements IEMCMapper<NormalizedSimpleStack, BigInteger
         if (!(mapper instanceof IExtendedMappingCollector))
             throw new RuntimeException("Cannot add Extended Fluid Mappings to mapper!");
         IExtendedMappingCollector emapper = (IExtendedMappingCollector) mapper;
-        FullBigFractionArithmetic fluidArithmetic = new FullBigFractionArithmetic();
+        FullBigFracArithmetic fluidArithmetic = new FullBigFracArithmetic();
 
         for (Pair<NormalizedSimpleStack, FluidStack> pair : melting) {
             emapper.addConversion(pair.getValue().amount, NSSFluid.create(pair.getValue().getFluid()), Collections.singletonList(pair.getKey()), fluidArithmetic);

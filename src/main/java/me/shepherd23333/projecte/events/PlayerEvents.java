@@ -11,7 +11,6 @@ import me.shepherd23333.projecte.impl.AlchBagImpl;
 import me.shepherd23333.projecte.impl.KnowledgeImpl;
 import me.shepherd23333.projecte.impl.TransmutationOffline;
 import me.shepherd23333.projecte.network.PacketHandler;
-import me.shepherd23333.projecte.network.packets.CheckUpdatePKT;
 import me.shepherd23333.projecte.network.packets.SyncCovalencePKT;
 import me.shepherd23333.projecte.utils.PlayerHelper;
 import net.minecraft.entity.Entity;
@@ -84,7 +83,7 @@ public class PlayerEvents {
         EntityPlayerMP player = (EntityPlayerMP) event.player;
         PacketHandler.sendFragmentedEmcPacket(player);
 
-        PacketHandler.sendTo(new CheckUpdatePKT(), player);
+        //PacketHandler.sendTo(new CheckUpdatePKT(), player);
 
         IKnowledgeProvider knowledge = player.getCapability(ProjectEAPI.KNOWLEDGE_CAPABILITY, null);
         knowledge.sync(player);
