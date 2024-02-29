@@ -1,5 +1,6 @@
 package me.shepherd23333.projecte.emc.mappers;
 
+import com.google.common.collect.Lists;
 import me.shepherd23333.projecte.PECore;
 import me.shepherd23333.projecte.emc.IngredientMap;
 import me.shepherd23333.projecte.emc.collector.IMappingCollector;
@@ -19,7 +20,7 @@ import java.math.BigInteger;
 import java.util.*;
 
 public class CraftingMapper implements IEMCMapper<NormalizedSimpleStack, BigInteger> {
-    private final List<IRecipeMapper> recipeMappers = Arrays.asList(
+    public static final List<IRecipeMapper> recipeMappers = Lists.newArrayList(
             new VanillaRecipeMapper(),
             new PECustomRecipeMapper(),
             new CraftTweakerRecipeMapper(),
@@ -50,9 +51,8 @@ public class CraftingMapper implements IEMCMapper<NormalizedSimpleStack, BigInte
                             if (stack.isEmpty())
                                 continue;
                             try {
-                                if (stack.getItemDamage() != OreDictionary.WILDCARD_VALUE && stack.getItem().hasContainerItem(stack)) {
+                                if (stack.getItemDamage() != OreDictionary.WILDCARD_VALUE && stack.getItem().hasContainerItem(stack))
                                     ingredientMap.addIngredient(NSSItem.create(stack.getItem().getContainerItem(stack)), -1);
-                                }
                                 ingredientMap.addIngredient(NSSItem.create(stack), 1);
                             } catch (Exception e) {
                                 PECore.LOGGER.fatal("Exception in CraftingMapper when parsing Recipe Ingredients: RecipeType: {}, Ingredient: {}", recipe.getClass().getName(), stack.toString());
@@ -67,9 +67,8 @@ public class CraftingMapper implements IEMCMapper<NormalizedSimpleStack, BigInte
                                 if (stack.isEmpty())
                                     continue;
                                 IngredientMap<NormalizedSimpleStack> groupIngredientMap = new IngredientMap<>();
-                                if (stack.getItem().hasContainerItem(stack)) {
+                                if (stack.getItem().hasContainerItem(stack))
                                     groupIngredientMap.addIngredient(NSSItem.create(stack.getItem().getContainerItem(stack)), -1);
-                                }
                                 groupIngredientMap.addIngredient(NSSItem.create(stack), 1);
                                 mapper.addConversion(1, dummy, groupIngredientMap.getMap());
                             }
@@ -80,23 +79,19 @@ public class CraftingMapper implements IEMCMapper<NormalizedSimpleStack, BigInte
                 }
             }
             if (!handled) {
-                if (canNotMap.add(recipe.getClass())) {
+                if (canNotMap.add(recipe.getClass()))
                     PECore.debugLog("Can not map Crafting Recipes with Type: {}", recipe.getClass().getName());
-                }
             } else {
                 int count = 0;
-                if (recipeCount.containsKey(recipe.getClass())) {
+                if (recipeCount.containsKey(recipe.getClass()))
                     count = recipeCount.get(recipe.getClass());
-                }
-                count += 1;
-                recipeCount.put(recipe.getClass(), count);
+                recipeCount.put(recipe.getClass(), ++count);
             }
         }
 
         PECore.debugLog("CraftingMapper Statistics:");
-        for (Map.Entry<Class, Integer> entry : recipeCount.entrySet()) {
+        for (Map.Entry<Class, Integer> entry : recipeCount.entrySet())
             PECore.debugLog("Found {} Recipes of Type {}", entry.getValue(), entry.getKey());
-        }
     }
 
     @Override
@@ -126,13 +121,12 @@ public class CraftingMapper implements IEMCMapper<NormalizedSimpleStack, BigInte
             List<ItemStack> fixedInputs = new ArrayList<>();
             for (Ingredient recipeItem : recipe.getIngredients()) {
                 ItemStack[] matches = recipeItem.getMatchingStacks();
-                if (matches.length == 1) {
+                if (matches.length == 1)
                     fixedInputs.add(matches[0].copy());
-                } else if (matches.length > 0) {
+                else if (matches.length > 0) {
                     List<ItemStack> recipeItemOptions = new LinkedList<>();
-                    for (ItemStack option : matches) {
+                    for (ItemStack option : matches)
                         recipeItemOptions.add(option.copy());
-                    }
                     variableInputs.add(recipeItemOptions);
                 }
             }
@@ -140,7 +134,7 @@ public class CraftingMapper implements IEMCMapper<NormalizedSimpleStack, BigInte
         }
     }
 
-    private static class CraftingIngredients {
+    public static class CraftingIngredients {
         public final Iterable<ItemStack> fixedIngredients;
         public final Iterable<Iterable<ItemStack>> multiIngredients;
 

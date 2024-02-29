@@ -15,19 +15,19 @@ import java.util.Set;
 public class OreDictionaryMapper implements IEMCMapper<NormalizedSimpleStack, BigInteger> {
 
     private static final Set<String> BLACKLIST_EXCEPTIONS = Sets.newHashSet(
-            "dustPlastic"
+
     );
 
     @Override
     public void addMappings(IMappingCollector<NormalizedSimpleStack, BigInteger> mapper, Configuration config) {
-        if (config.getBoolean("blacklistOresAndDusts", "", true, "Set EMC=0 for everything that has an OD Name that starts with `ore`, `dust` or `crushed` besides `dustPlastic`")) {
+        if (config.getBoolean("blacklistOres", "", true, "Set EMC=0 for everything that has an OD Name that starts with `ore` or `crushed`")) {
             //Black-list all ores/dusts
             for (String s : OreDictionary.getOreNames()) {
                 if (s == null) {
                     continue;
                 }
 
-                if (s.startsWith("ore") || s.startsWith("dust") || s.startsWith("crushed")) {
+                if (s.startsWith("ore") || s.startsWith("crushed")) {
                     //Some exceptions in the black-listing
                     if (BLACKLIST_EXCEPTIONS.contains(s)) {
                         continue;

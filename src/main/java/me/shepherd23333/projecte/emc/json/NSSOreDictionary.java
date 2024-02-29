@@ -6,7 +6,6 @@ import java.util.Map;
 
 public class NSSOreDictionary implements NormalizedSimpleStack {
     static final Map<String, NormalizedSimpleStack> oreDictStacks = new HashMap<>();
-
     public final String od;
 
     private NSSOreDictionary(String od) {

@@ -4,6 +4,7 @@ import me.shepherd23333.projecte.PECore;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.oredict.OreDictionary;
 
@@ -29,8 +30,16 @@ public class NSSItem implements NormalizedSimpleStack {
         return create(block.getRegistryName(), meta);
     }
 
+    public static NormalizedSimpleStack create(Ingredient ingredient) {
+        for (ItemStack stack : ingredient.getMatchingStacks())
+            if (!stack.isEmpty())
+                return create(stack);
+        return null;
+    }
+
     public static NormalizedSimpleStack create(ItemStack stack) {
-        if (stack.isEmpty()) return null;
+        if (stack.isEmpty())
+            return null;
         return create(stack.getItem(), stack.getItemDamage());
     }
 
@@ -39,12 +48,12 @@ public class NSSItem implements NormalizedSimpleStack {
     }
 
     private static NormalizedSimpleStack create(Item item, int meta) {
-
         return create(item.getRegistryName(), meta);
     }
 
     private static NormalizedSimpleStack create(ResourceLocation uniqueIdentifier, int damage) {
-        if (uniqueIdentifier == null) return null;
+        if (uniqueIdentifier == null)
+            return null;
         return create(uniqueIdentifier.toString(), damage);
     }
 
@@ -69,10 +78,8 @@ public class NSSItem implements NormalizedSimpleStack {
     public boolean equals(Object obj) {
         if (obj instanceof NSSItem) {
             NSSItem other = (NSSItem) obj;
-
             return this.itemName.equals(other.itemName) && this.damage == other.damage;
         }
-
         return false;
     }
 
