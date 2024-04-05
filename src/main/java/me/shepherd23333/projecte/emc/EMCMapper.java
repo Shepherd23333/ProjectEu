@@ -32,7 +32,6 @@ import java.util.*;
 
 public final class EMCMapper {
     public static final Map<SimpleStack, BigInteger> emc = new LinkedHashMap<>();
-
     public static double covalenceLoss = ProjectEConfig.difficulty.covalenceLoss;
     public static boolean covalenceLossRounding = ProjectEConfig.difficulty.covalenceLossRounding;
 

@@ -15,7 +15,7 @@ public final class Constants {
     public static final BigInteger RELAY_KLEIN_CHARGE_RATE = BigInteger.valueOf(16);
     public static final float[] COLLECTOR_LIGHT_VALS = new float[]{0.4375F, 0.6875F, 1.0F};
     public static final BigInteger TILE_MAX_EMC = BigInteger.valueOf(Long.MAX_VALUE);
-    public static final int loopTimes = 1 << 6;
+    public static final int loopTimes = 1 << 5;
 
     public static final float[] EXPLOSIVE_LENS_RADIUS = new float[]{4.0F, 8.0F, 12.0F, 16.0F, 16.0F, 16.0F, 16.0F, 16.0F};
     public static final long[] EXPLOSIVE_LENS_COST = new long[]{384, 768, 1536, 2304, 2304, 2304, 2304, 2304};

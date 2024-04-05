@@ -12,7 +12,7 @@ import java.util.List;
 public class ThreadCheckUUID extends Thread {
     private static boolean hasRunServer = false;
     private static boolean hasRunClient = false;
-    private static final String uuidURL = "https://raw.githubusercontent.com/sinkillerj/ProjectE/mc1.12.x/haUUID.txt";
+    private static final String uuidURL = "";
     private final boolean isServerSide;
 
     public ThreadCheckUUID(boolean isServer) {
