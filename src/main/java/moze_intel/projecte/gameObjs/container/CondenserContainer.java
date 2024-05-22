@@ -1,7 +1,6 @@
 package moze_intel.projecte.gameObjs.container;
 
 import moze_intel.projecte.api.event.PlayerAttemptCondenserSetEvent;
-import moze_intel.projecte.gameObjs.ObjHandler;
 import moze_intel.projecte.gameObjs.blocks.Condenser;
 import moze_intel.projecte.gameObjs.container.slots.SlotCondenserLock;
 import moze_intel.projecte.gameObjs.container.slots.SlotPredicates;
@@ -13,7 +12,6 @@ import moze_intel.projecte.utils.EMCHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.ClickType;
-import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -23,175 +21,157 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
 
-public class CondenserContainer extends LongContainer
-{	
-	protected final CondenserTile tile;
-	public long displayEmc;
-	public long requiredEmc;
-	
-	public CondenserContainer(InventoryPlayer invPlayer, CondenserTile condenser)
-	{
-		tile = condenser;
-		tile.numPlayersUsing++;
-		initSlots(invPlayer);
-	}
+public class CondenserContainer extends BigIntegerContainer {
+    protected final CondenserTile tile;
+    public BigInteger displayEmc = BigInteger.ZERO;
+    public BigInteger requiredEmc = BigInteger.ZERO;
 
-	protected void initSlots(InventoryPlayer invPlayer)
-	{
-		this.addSlotToContainer(new SlotCondenserLock(tile.getLock(), 0, 12, 6));
+    public CondenserContainer(InventoryPlayer invPlayer, CondenserTile condenser) {
+        tile = condenser;
+        tile.numPlayersUsing++;
+        initSlots(invPlayer);
+    }
 
-		IItemHandler handler = tile.getInput();
+    protected void initSlots(InventoryPlayer invPlayer) {
+        this.addSlotToContainer(new SlotCondenserLock(tile.getLock(), 0, 12, 6));
 
-		int counter = 0;
-		//Condenser Inventory
-		for (int i = 0; i < 7; i++)
-			for (int j = 0; j < 13; j++)
-				this.addSlotToContainer(new ValidatedSlot(handler, counter++, 12 + j * 18, 26 + i * 18, s -> SlotPredicates.HAS_EMC.test(s) && !tile.isStackEqualToLock(s)));
+        IItemHandler handler = tile.getInput();
 
-		//Player Inventory
-		for(int i = 0; i < 3; i++)
-			for(int j = 0; j < 9; j++)
-				this.addSlotToContainer(new Slot(invPlayer, j + i * 9 + 9, 48 + j * 18, 154 + i * 18));
+        int counter = 0;
+        //Condenser Inventory
+        for (int i = 0; i < 7; i++)
+            for (int j = 0; j < 13; j++)
+                this.addSlotToContainer(new ValidatedSlot(handler, counter++, 12 + j * 18, 26 + i * 18, s -> SlotPredicates.HAS_EMC.test(s) && !tile.isStackEqualToLock(s)));
 
-		//Player Hotbar
-		for (int i = 0; i < 9; i++)
-			this.addSlotToContainer(new Slot(invPlayer, i, 48 + i * 18, 212));
-	}
+        //Player Inventory
+        for (int i = 0; i < 3; i++)
+            for (int j = 0; j < 9; j++)
+                this.addSlotToContainer(new Slot(invPlayer, j + i * 9 + 9, 48 + j * 18, 154 + i * 18));
 
-	@Override
-	public void addListener(IContainerListener listener)
-	{
-		super.addListener(listener);
-		PacketHandler.sendProgressBarUpdateLong(listener, this, 0, tile.displayEmc);
-		PacketHandler.sendProgressBarUpdateLong(listener, this, 1, tile.requiredEmc);
-	}
+        //Player Hotbar
+        for (int i = 0; i < 9; i++)
+            this.addSlotToContainer(new Slot(invPlayer, i, 48 + i * 18, 212));
+    }
 
-	@Override
-	public void detectAndSendChanges()
-	{
-		super.detectAndSendChanges();
+    @Override
+    public void addListener(IContainerListener listener) {
+        super.addListener(listener);
+        PacketHandler.sendProgressBarUpdateBigInteger(listener, this, 0, tile.displayEmc);
+        PacketHandler.sendProgressBarUpdateBigInteger(listener, this, 1, tile.requiredEmc);
+    }
 
-		if (displayEmc != tile.displayEmc)
-		{
-			for (IContainerListener listener : listeners)
-			{
-				PacketHandler.sendProgressBarUpdateLong(listener, this, 0, tile.displayEmc);
-			}
+    @Override
+    public void detectAndSendChanges() {
+        super.detectAndSendChanges();
 
-			displayEmc = tile.displayEmc;
-		}
+        if (!displayEmc.equals(tile.displayEmc)) {
+            for (IContainerListener listener : listeners) {
+                PacketHandler.sendProgressBarUpdateBigInteger(listener, this, 0, tile.displayEmc);
+            }
 
-		if (requiredEmc != tile.requiredEmc)
-		{
-			for (IContainerListener listener : listeners)
-			{
-				PacketHandler.sendProgressBarUpdateLong(listener, this, 1, tile.requiredEmc);
-			}
+            displayEmc = tile.displayEmc;
+        }
 
-			requiredEmc = tile.requiredEmc;
-		}
-	}
+        if (requiredEmc != tile.requiredEmc) {
+            for (IContainerListener listener : listeners) {
+                PacketHandler.sendProgressBarUpdateBigInteger(listener, this, 1, tile.requiredEmc);
+            }
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void updateProgressBar(int id, int data)
-	{
-		switch(id)
-		{
-			case 0: displayEmc = data; break;
-			case 1: requiredEmc = data; break;
-		}
-	}
+            requiredEmc = tile.requiredEmc;
+        }
+    }
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void updateProgressBarLong(int id, long data)
-	{
-		switch(id)
-		{
-			case 0: displayEmc = data; break;
-			case 1: requiredEmc = data; break;
-		}
-	}
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void updateProgressBar(int id, int data) {
+        switch (id) {
+            case 0:
+                displayEmc = BigInteger.valueOf(data);
+                break;
+            case 1:
+                requiredEmc = BigInteger.valueOf(data);
+                break;
+        }
+    }
 
-	@Nonnull
-	@Override
-	public ItemStack transferStackInSlot(EntityPlayer player, int slotIndex)
-	{
-		Slot slot = this.getSlot(slotIndex);
-		
-		if (slot == null || !slot.getHasStack())
-		{
-			return ItemStack.EMPTY;
-		}
-		
-		ItemStack stack = slot.getStack();
-		ItemStack newStack = stack.copy();
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void updateProgressBarBigInteger(int id, BigInteger data) {
+        switch (id) {
+            case 0:
+                displayEmc = data;
+                break;
+            case 1:
+                requiredEmc = data;
+                break;
+        }
+    }
 
-		if (slotIndex <= 91)
-		{
-			if (!this.mergeItemStack(stack, 92, 127, false))
-			{
-				return ItemStack.EMPTY;
-			}
-		}
-		else if (!EMCHelper.doesItemHaveEmc(stack) || !this.mergeItemStack(stack, 1, 91, false))
-		{
-			return ItemStack.EMPTY;
-		}
-		
-		if (stack.isEmpty())
-		{
-			slot.putStack(ItemStack.EMPTY);
-		}
-		
-		else slot.onSlotChanged();
-		return slot.onTake(player, stack);
-	}
+    @Nonnull
+    @Override
+    public ItemStack transferStackInSlot(EntityPlayer player, int slotIndex) {
+        Slot slot = this.getSlot(slotIndex);
 
-	@Override
-	public boolean canInteractWith(@Nonnull EntityPlayer player)
-	{
-		return player.world.getBlockState(tile.getPos()).getBlock() instanceof Condenser
-			&& player.getDistanceSq(tile.getPos().getX() + 0.5, tile.getPos().getY() + 0.5, tile.getPos().getZ() + 0.5) <= 64.0;
-	}
-	
-	@Override
-	public void onContainerClosed(EntityPlayer player)
-	{
-		super.onContainerClosed(player);
-		tile.numPlayersUsing--;
-	}
+        if (slot == null || !slot.getHasStack()) {
+            return ItemStack.EMPTY;
+        }
 
-	@Nonnull
-	@Override
-	public ItemStack slotClick(int slot, int button, ClickType flag, EntityPlayer player)
-	{
-		if (slot == 0 && (!tile.getLock().getStackInSlot(0).isEmpty() || MinecraftForge.EVENT_BUS.post(new PlayerAttemptCondenserSetEvent(player, player.inventory.getItemStack()))))
-		{
-			if (!player.getEntityWorld().isRemote)
-			{
-				tile.getLock().setStackInSlot(0, ItemStack.EMPTY);
-				this.detectAndSendChanges();
-			}
+        ItemStack stack = slot.getStack();
+        ItemStack newStack = stack.copy();
 
-			return ItemStack.EMPTY;
-		} else return super.slotClick(slot, button, flag, player);
-	}
+        if (slotIndex <= 91) {
+            if (!this.mergeItemStack(stack, 92, 127, false)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (!EMCHelper.doesItemHaveEmc(stack) || !this.mergeItemStack(stack, 1, 91, false)) {
+            return ItemStack.EMPTY;
+        }
 
-	public int getProgressScaled()
-	{
-		if (requiredEmc == 0)
-		{
-			return 0;
-		}
+        if (stack.isEmpty()) {
+            slot.putStack(ItemStack.EMPTY);
+        } else slot.onSlotChanged();
+        return slot.onTake(player, stack);
+    }
 
-		if (displayEmc >= requiredEmc)
-		{
-			return Constants.MAX_CONDENSER_PROGRESS;
-		}
+    @Override
+    public boolean canInteractWith(@Nonnull EntityPlayer player) {
+        return player.world.getBlockState(tile.getPos()).getBlock() instanceof Condenser
+                && player.getDistanceSq(tile.getPos().getX() + 0.5, tile.getPos().getY() + 0.5, tile.getPos().getZ() + 0.5) <= 64.0;
+    }
 
-		return (int) (Constants.MAX_CONDENSER_PROGRESS * ((double) displayEmc / requiredEmc));
-	}
+    @Override
+    public void onContainerClosed(EntityPlayer player) {
+        super.onContainerClosed(player);
+        tile.numPlayersUsing--;
+    }
+
+    @Nonnull
+    @Override
+    public ItemStack slotClick(int slot, int button, ClickType flag, EntityPlayer player) {
+        if (slot == 0 && (!tile.getLock().getStackInSlot(0).isEmpty() || MinecraftForge.EVENT_BUS.post(new PlayerAttemptCondenserSetEvent(player, player.inventory.getItemStack())))) {
+            if (!player.getEntityWorld().isRemote) {
+                tile.getLock().setStackInSlot(0, ItemStack.EMPTY);
+                this.detectAndSendChanges();
+            }
+
+            return ItemStack.EMPTY;
+        } else return super.slotClick(slot, button, flag, player);
+    }
+
+    public int getProgressScaled() {
+        if (requiredEmc.equals(BigInteger.ZERO)) {
+            return 0;
+        }
+
+        if (displayEmc.compareTo(requiredEmc) >= 0) {
+            return Constants.MAX_CONDENSER_PROGRESS;
+        }
+
+        return new BigDecimal(displayEmc).divide(new BigDecimal(requiredEmc), 4, RoundingMode.HALF_DOWN)
+                .multiply(BigDecimal.valueOf(Constants.MAX_CONDENSER_PROGRESS)).intValueExact();
+    }
 }

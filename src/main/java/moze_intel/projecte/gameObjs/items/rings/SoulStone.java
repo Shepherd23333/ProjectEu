@@ -2,12 +2,12 @@ package moze_intel.projecte.gameObjs.items.rings;
 
 import baubles.api.BaubleType;
 import baubles.api.IBauble;
-import com.google.common.collect.Lists;
 import moze_intel.projecte.api.PESounds;
 import moze_intel.projecte.api.item.IPedestalItem;
 import moze_intel.projecte.config.ProjectEConfig;
 import moze_intel.projecte.gameObjs.tiles.DMPedestalTile;
 import moze_intel.projecte.handlers.InternalTimers;
+import moze_intel.projecte.utils.Constants;
 import moze_intel.projecte.utils.ItemHelper;
 import moze_intel.projecte.utils.MathUtils;
 import net.minecraft.client.resources.I18n;
@@ -32,134 +32,112 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Optional.Interface(iface = "baubles.api.IBauble", modid = "baubles")
-public class SoulStone extends RingToggle implements IBauble, IPedestalItem
-{
-	public SoulStone()
-	{
-		super("soul_stone");
-	}
-	
-	@Override
-	public void onUpdate(ItemStack stack, World world, Entity entity, int par4, boolean par5)
-	{
-		if (world.isRemote || par4 > 8 || !(entity instanceof EntityPlayer)) 
-		{
-			return;
-		}
-		
-		super.onUpdate(stack, world, entity, par4, par5);
-		
-		EntityPlayer player = (EntityPlayer) entity;
-		
-		if (ItemHelper.getOrCreateCompound(stack).getBoolean(TAG_ACTIVE))
-		{
-			if (getEmc(stack) < 64 && !consumeFuel(player, stack, 64, false))
-			{
-				stack.getTagCompound().setBoolean(TAG_ACTIVE, false);
-			}
-			else
-			{
-				player.getCapability(InternalTimers.CAPABILITY, null).activateHeal();
+public class SoulStone extends RingToggle implements IBauble, IPedestalItem {
+    public SoulStone() {
+        super("soul_stone");
+    }
 
-				if (player.getHealth() < player.getMaxHealth() && player.getCapability(InternalTimers.CAPABILITY, null).canHeal())
-				{
-					world.playSound(null, player.posX, player.posY, player.posZ, PESounds.HEAL, SoundCategory.PLAYERS, 1.0F, 1.0F);
-					player.heal(2.0F);
-					removeEmc(stack, 64);
-				}
-			}
-		}
-	}
-	
-	@Override
-	public boolean changeMode(@Nonnull EntityPlayer player, @Nonnull ItemStack stack, EnumHand hand)
-	{
-		NBTTagCompound tag = ItemHelper.getOrCreateCompound(stack);
-		tag.setBoolean(TAG_ACTIVE, !tag.getBoolean(TAG_ACTIVE));
-		return true;
-	}
-	
-	@Override
-	@Optional.Method(modid = "baubles")
-	public baubles.api.BaubleType getBaubleType(ItemStack itemstack)
-	{
-		return BaubleType.AMULET;
-	}
+    @Override
+    public void onUpdate(ItemStack stack, World world, Entity entity, int par4, boolean par5) {
+        if (world.isRemote || par4 > 8 || !(entity instanceof EntityPlayer)) {
+            return;
+        }
 
-	@Override
-	@Optional.Method(modid = "baubles")
-	public void onWornTick(ItemStack stack, EntityLivingBase player) 
-	{
-		this.onUpdate(stack, player.getEntityWorld(), player, 0, false);
-	}
+        super.onUpdate(stack, world, entity, par4, par5);
 
-	@Override
-	@Optional.Method(modid = "baubles")
-	public void onEquipped(ItemStack itemstack, EntityLivingBase player) {}
+        EntityPlayer player = (EntityPlayer) entity;
 
-	@Override
-	@Optional.Method(modid = "baubles")
-	public void onUnequipped(ItemStack itemstack, EntityLivingBase player) {}
+        if (ItemHelper.getOrCreateCompound(stack).getBoolean(TAG_ACTIVE)) {
+            if (getEmc(stack).compareTo(Constants.cons1) < 0 && !consumeFuel(player, stack, 64, false)) {
+                stack.getTagCompound().setBoolean(TAG_ACTIVE, false);
+            } else {
+                player.getCapability(InternalTimers.CAPABILITY, null).activateHeal();
 
-	@Override
-	@Optional.Method(modid = "baubles")
-	public boolean canEquip(ItemStack itemstack, EntityLivingBase player) 
-	{
-		return true;
-	}
+                if (player.getHealth() < player.getMaxHealth() && player.getCapability(InternalTimers.CAPABILITY, null).canHeal()) {
+                    world.playSound(null, player.posX, player.posY, player.posZ, PESounds.HEAL, SoundCategory.PLAYERS, 1.0F, 1.0F);
+                    player.heal(2.0F);
+                    removeEmc(stack, Constants.cons1);
+                }
+            }
+        }
+    }
 
-	@Override
-	@Optional.Method(modid = "baubles")
-	public boolean canUnequip(ItemStack itemstack, EntityLivingBase player) 
-	{
-		return true;
-	}
+    @Override
+    public boolean changeMode(@Nonnull EntityPlayer player, @Nonnull ItemStack stack, EnumHand hand) {
+        NBTTagCompound tag = ItemHelper.getOrCreateCompound(stack);
+        tag.setBoolean(TAG_ACTIVE, !tag.getBoolean(TAG_ACTIVE));
+        return true;
+    }
 
-	@Override
-	public void updateInPedestal(@Nonnull World world, @Nonnull BlockPos pos)
-	{
-		if (!world.isRemote && ProjectEConfig.pedestalCooldown.soulPedCooldown != -1)
-		{
-			TileEntity te = world.getTileEntity(pos);
-			if(!(te instanceof DMPedestalTile))
-			{
-				return;
-			}
-			DMPedestalTile tile = (DMPedestalTile) te;
-			if (tile.getActivityCooldown() == 0)
-			{
-				List<EntityPlayerMP> players = world.getEntitiesWithinAABB(EntityPlayerMP.class, tile.getEffectBounds());
+    @Override
+    @Optional.Method(modid = "baubles")
+    public baubles.api.BaubleType getBaubleType(ItemStack itemstack) {
+        return BaubleType.AMULET;
+    }
 
-				for (EntityPlayerMP player : players)
-				{
-					if (player.getHealth() < player.getMaxHealth())
-					{
-						world.playSound(null, player.posX, player.posY, player.posZ, PESounds.HEAL, SoundCategory.BLOCKS, 1.0F, 1.0F);
-						player.heal(1.0F); // 1/2 heart
-					}
-				}
+    @Override
+    @Optional.Method(modid = "baubles")
+    public void onWornTick(ItemStack stack, EntityLivingBase player) {
+        this.onUpdate(stack, player.getEntityWorld(), player, 0, false);
+    }
 
-				tile.setActivityCooldown(ProjectEConfig.pedestalCooldown.soulPedCooldown);
-			}
-			else
-			{
-				tile.decrementActivityCooldown();
-			}
-		}
-	}
+    @Override
+    @Optional.Method(modid = "baubles")
+    public void onEquipped(ItemStack itemstack, EntityLivingBase player) {
+    }
 
-	@Nonnull
-	@SideOnly(Side.CLIENT)
-	@Override
-	public List<String> getPedestalDescription()
-	{
-		List<String> list = new ArrayList<>();
-		if (ProjectEConfig.pedestalCooldown.soulPedCooldown != -1)
-		{
-			list.add(TextFormatting.BLUE + I18n.format("pe.soul.pedestal1"));
-			list.add(TextFormatting.BLUE +
-					I18n.format("pe.soul.pedestal2", MathUtils.tickToSecFormatted(ProjectEConfig.pedestalCooldown.soulPedCooldown)));
-		}
-		return list;
-	}
+    @Override
+    @Optional.Method(modid = "baubles")
+    public void onUnequipped(ItemStack itemstack, EntityLivingBase player) {
+    }
+
+    @Override
+    @Optional.Method(modid = "baubles")
+    public boolean canEquip(ItemStack itemstack, EntityLivingBase player) {
+        return true;
+    }
+
+    @Override
+    @Optional.Method(modid = "baubles")
+    public boolean canUnequip(ItemStack itemstack, EntityLivingBase player) {
+        return true;
+    }
+
+    @Override
+    public void updateInPedestal(@Nonnull World world, @Nonnull BlockPos pos) {
+        if (!world.isRemote && ProjectEConfig.pedestalCooldown.soulPedCooldown != -1) {
+            TileEntity te = world.getTileEntity(pos);
+            if (!(te instanceof DMPedestalTile)) {
+                return;
+            }
+            DMPedestalTile tile = (DMPedestalTile) te;
+            if (tile.getActivityCooldown() == 0) {
+                List<EntityPlayerMP> players = world.getEntitiesWithinAABB(EntityPlayerMP.class, tile.getEffectBounds());
+
+                for (EntityPlayerMP player : players) {
+                    if (player.getHealth() < player.getMaxHealth()) {
+                        world.playSound(null, player.posX, player.posY, player.posZ, PESounds.HEAL, SoundCategory.BLOCKS, 1.0F, 1.0F);
+                        player.heal(1.0F); // 1/2 heart
+                    }
+                }
+
+                tile.setActivityCooldown(ProjectEConfig.pedestalCooldown.soulPedCooldown);
+            } else {
+                tile.decrementActivityCooldown();
+            }
+        }
+    }
+
+    @Nonnull
+    @SideOnly(Side.CLIENT)
+    @Override
+    public List<String> getPedestalDescription() {
+        List<String> list = new ArrayList<>();
+        if (ProjectEConfig.pedestalCooldown.soulPedCooldown != -1) {
+            list.add(TextFormatting.BLUE + I18n.format("pe.soul.pedestal1"));
+            list.add(TextFormatting.BLUE +
+                    I18n.format("pe.soul.pedestal2", MathUtils.tickToSecFormatted(ProjectEConfig.pedestalCooldown.soulPedCooldown)));
+        }
+        return list;
+    }
 }

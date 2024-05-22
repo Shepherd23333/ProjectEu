@@ -13,97 +13,82 @@ import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 
-public class EternalDensityInventory implements IItemHandlerModifiable
-{
-	private final IItemHandlerModifiable inventory = new ItemStackHandler(9);
-	private boolean isInWhitelist;
-	public final ItemStack invItem;
+public class EternalDensityInventory implements IItemHandlerModifiable {
+    private final IItemHandlerModifiable inventory = new ItemStackHandler(9);
+    private boolean isInWhitelist;
+    public final ItemStack invItem;
 
-	public EternalDensityInventory(ItemStack stack, EntityPlayer player)
-	{
-		this.invItem = stack;
-		readFromNBT(ItemHelper.getOrCreateCompound(stack));
-	}
+    public EternalDensityInventory(ItemStack stack, EntityPlayer player) {
+        this.invItem = stack;
+        readFromNBT(ItemHelper.getOrCreateCompound(stack));
+    }
 
-	@Override
-	public int getSlots()
-	{
-		return inventory.getSlots();
-	}
+    @Override
+    public int getSlots() {
+        return inventory.getSlots();
+    }
 
-	@Nonnull
-	@Override
-	public ItemStack getStackInSlot(int slot) 
-	{
-		return inventory.getStackInSlot(slot);
-	}
+    @Nonnull
+    @Override
+    public ItemStack getStackInSlot(int slot) {
+        return inventory.getStackInSlot(slot);
+    }
 
-	@Nonnull
-	@Override
-	public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate)
-	{
-		ItemStack ret = inventory.insertItem(slot, stack, simulate);
-		writeBack();
-		return ret;
-	}
+    @Nonnull
+    @Override
+    public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate) {
+        ItemStack ret = inventory.insertItem(slot, stack, simulate);
+        writeBack();
+        return ret;
+    }
 
-	@Nonnull
-	@Override
-	public ItemStack extractItem(int slot, int amount, boolean simulate)
-	{
-		ItemStack ret = inventory.extractItem(slot, amount, simulate);
-		writeBack();
-		return ret;
-	}
+    @Nonnull
+    @Override
+    public ItemStack extractItem(int slot, int amount, boolean simulate) {
+        ItemStack ret = inventory.extractItem(slot, amount, simulate);
+        writeBack();
+        return ret;
+    }
 
-	@Override
-	public int getSlotLimit(int slot)
-	{
-		return 1;
-	}
+    @Override
+    public int getSlotLimit(int slot) {
+        return 1;
+    }
 
-	@Override
-	public void setStackInSlot(int slot, @Nonnull ItemStack stack)
-	{
-		inventory.setStackInSlot(slot, stack);
-		writeBack();
-	}
+    @Override
+    public void setStackInSlot(int slot, @Nonnull ItemStack stack) {
+        inventory.setStackInSlot(slot, stack);
+        writeBack();
+    }
 
-	private void writeBack()
-	{
-		for (int i = 0; i < inventory.getSlots(); ++i)
-		{
-			if (inventory.getStackInSlot(i).isEmpty())
-			{
-				inventory.setStackInSlot(i, ItemStack.EMPTY);
-			}
-		}
+    private void writeBack() {
+        for (int i = 0; i < inventory.getSlots(); ++i) {
+            if (inventory.getStackInSlot(i).isEmpty()) {
+                inventory.setStackInSlot(i, ItemStack.EMPTY);
+            }
+        }
 
-		writeToNBT(invItem.getTagCompound());
-	}
+        writeToNBT(invItem.getTagCompound());
+    }
 
-	public void readFromNBT(NBTTagCompound nbt)
-	{
-		isInWhitelist = nbt.getBoolean("Whitelist");
-		CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.readNBT(inventory, null, nbt.getTagList("Items", Constants.NBT.TAG_COMPOUND));
-	}
-	
-	public void writeToNBT(NBTTagCompound nbt)
-	{
-		nbt.setBoolean("Whitelist", isInWhitelist);
-		nbt.setTag("Items", CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.writeNBT(inventory, null));
-	}
-	
-	public void changeMode()
-	{
-		isInWhitelist = !isInWhitelist;
-		writeBack();
-		
-		PacketHandler.sendToServer(new UpdateGemModePKT(isInWhitelist));
-	}
-	
-	public boolean isWhitelistMode()
-	{
-		return isInWhitelist;
-	}
+    public void readFromNBT(NBTTagCompound nbt) {
+        isInWhitelist = nbt.getBoolean("Whitelist");
+        CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.readNBT(inventory, null, nbt.getTagList("Items", Constants.NBT.TAG_COMPOUND));
+    }
+
+    public void writeToNBT(NBTTagCompound nbt) {
+        nbt.setBoolean("Whitelist", isInWhitelist);
+        nbt.setTag("Items", CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.writeNBT(inventory, null));
+    }
+
+    public void changeMode() {
+        isInWhitelist = !isInWhitelist;
+        writeBack();
+
+        PacketHandler.sendToServer(new UpdateGemModePKT(isInWhitelist));
+    }
+
+    public boolean isWhitelistMode() {
+        return isInWhitelist;
+    }
 }

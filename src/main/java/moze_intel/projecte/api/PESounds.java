@@ -4,8 +4,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
-public final class PESounds
-{
+public final class PESounds {
 
     public static final SoundEvent WIND = ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation("projecte", "item.pewindmagic"));
     public static final SoundEvent WATER = ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation("projecte", "item.pewatermagic"));
@@ -16,6 +15,7 @@ public final class PESounds
     public static final SoundEvent UNCHARGE = ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation("projecte", "item.peuncharge"));
     public static final SoundEvent TRANSMUTE = ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation("projecte", "item.petransmute"));
 
-    private PESounds() {}
+    private PESounds() {
+    }
 
 }

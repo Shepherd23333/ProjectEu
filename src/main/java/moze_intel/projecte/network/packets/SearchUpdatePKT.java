@@ -9,48 +9,43 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 
-public class SearchUpdatePKT implements IMessage
-{
-	public SearchUpdatePKT() {}
+public class SearchUpdatePKT implements IMessage {
+    public SearchUpdatePKT() {
+    }
 
-	public int slot;
-	public ItemStack itemStack;
-	public SearchUpdatePKT(int slot, ItemStack itemStack)
-	{
-		this.slot = slot;
-		this.itemStack = itemStack.copy();
-	}
+    public int slot;
+    public ItemStack itemStack;
 
-	@Override
-	public void fromBytes(ByteBuf buf)
-	{
-		slot = buf.readInt();
-		itemStack = ByteBufUtils.readItemStack(buf);
-	}
+    public SearchUpdatePKT(int slot, ItemStack itemStack) {
+        this.slot = slot;
+        this.itemStack = itemStack.copy();
+    }
 
-	@Override
-	public void toBytes(ByteBuf buf)
-	{
-		buf.writeInt(slot);
-		ByteBufUtils.writeItemStack(buf, itemStack);
-	}
+    @Override
+    public void fromBytes(ByteBuf buf) {
+        slot = buf.readInt();
+        itemStack = ByteBufUtils.readItemStack(buf);
+    }
 
-	public static class Handler implements IMessageHandler<SearchUpdatePKT, IMessage>
-	{
-		@Override
-		public IMessage onMessage(final SearchUpdatePKT pkt, final MessageContext ctx)
-		{
-			ctx.getServerHandler().player.server.addScheduledTask(new Runnable() {
-				@Override
-				public void run() {
-					if (ctx.getServerHandler().player.openContainer instanceof TransmutationContainer)
-					{
-						TransmutationContainer container = ((TransmutationContainer) ctx.getServerHandler().player.openContainer);
-						container.transmutationInventory.writeIntoOutputSlot(pkt.slot, pkt.itemStack);
-					}
-				}
-			});
-			return null;
-		}
-	}
+    @Override
+    public void toBytes(ByteBuf buf) {
+        buf.writeInt(slot);
+        ByteBufUtils.writeItemStack(buf, itemStack);
+    }
+
+    public static class Handler implements IMessageHandler<SearchUpdatePKT, IMessage> {
+        @Override
+        public IMessage onMessage(final SearchUpdatePKT pkt, final MessageContext ctx) {
+            ctx.getServerHandler().player.server.addScheduledTask(new Runnable() {
+                @Override
+                public void run() {
+                    if (ctx.getServerHandler().player.openContainer instanceof TransmutationContainer) {
+                        TransmutationContainer container = ((TransmutationContainer) ctx.getServerHandler().player.openContainer);
+                        container.transmutationInventory.writeIntoOutputSlot(pkt.slot, pkt.itemStack);
+                    }
+                }
+            });
+            return null;
+        }
+    }
 }

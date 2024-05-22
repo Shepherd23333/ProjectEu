@@ -17,18 +17,19 @@ import java.util.List;
  */
 public interface IPedestalItem {
 
-	@SideOnly(Side.CLIENT)
-	String TOOLTIPDISABLED = TextFormatting.RED + I18n.format("pe.pedestal.item_disabled");
+    @SideOnly(Side.CLIENT)
+    String TOOLTIPDISABLED = TextFormatting.RED + I18n.format("pe.pedestal.item_disabled");
 
-	/***
-	 * Called on both client and server each time an active DMPedestalTile ticks with this item inside
-	 */
+    /***
+     * Called on both client and server each time an active DMPedestalTile ticks with this item inside
+     */
     void updateInPedestal(@Nonnull World world, @Nonnull BlockPos pos);
 
-	/***
-	 * Called clientside when inside the pedestal gui to add special function descriptions
-	 * @return Brief strings describing the item's function in an activated pedestal
-	 */
-	@SideOnly(Side.CLIENT)
-	@Nonnull List<String> getPedestalDescription();
+    /***
+     * Called clientside when inside the pedestal gui to add special function descriptions
+     * @return Brief strings describing the item's function in an activated pedestal
+     */
+    @SideOnly(Side.CLIENT)
+    @Nonnull
+    List<String> getPedestalDescription();
 }

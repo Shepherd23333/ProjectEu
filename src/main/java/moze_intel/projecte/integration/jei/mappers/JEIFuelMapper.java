@@ -7,21 +7,16 @@ import moze_intel.projecte.integration.jei.collectors.FuelUpgradeRecipe;
 import moze_intel.projecte.utils.EMCHelper;
 import net.minecraft.item.ItemStack;
 
-public class JEIFuelMapper extends JEICompatMapper<FuelUpgradeRecipe>
-{
-    public JEIFuelMapper()
-    {
+public class JEIFuelMapper extends JEICompatMapper<FuelUpgradeRecipe> {
+    public JEIFuelMapper() {
         super(CollectorRecipeCategory.UID);
     }
 
-    public void refresh()
-    {
+    public void refresh() {
         clear();
-        for(SimpleStack stack : FuelMapper.getFuelMap())
-        {
+        for (SimpleStack stack : FuelMapper.getFuelMap()) {
             ItemStack fuelUpgrade = FuelMapper.getFuelUpgrade(stack.toItemStack());
-            if (EMCHelper.getEmcValue(stack.toItemStack()) <= EMCHelper.getEmcValue(fuelUpgrade))
-            {
+            if (EMCHelper.getEmcValue(stack.toItemStack()).compareTo(EMCHelper.getEmcValue(fuelUpgrade)) <= 0) {
                 addRecipe(new FuelUpgradeRecipe(stack.toItemStack(), fuelUpgrade));
             }
         }

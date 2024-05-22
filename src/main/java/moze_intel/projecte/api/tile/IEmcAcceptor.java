@@ -3,6 +3,7 @@ package moze_intel.projecte.api.tile;
 import net.minecraft.util.EnumFacing;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 
 /**
  * Implement this interface to specify that "EMC can be given to this Tile Entity from an external source"
@@ -12,25 +13,14 @@ import javax.annotation.Nonnull;
  *
  * @author williewillus
  */
-public interface IEmcAcceptor extends IEmcStorage
-{
-	/**
-	 * Accept, at most, the given amount of EMC from the given side
-	 * @param side The side to accept EMC from
-	 * @param toAccept The maximum amount to accept
-	 * @return The amount actually accepted
-	 */
-	long acceptEMC(@Nonnull EnumFacing side, long toAccept);
+public interface IEmcAcceptor extends IEmcStorage {
+    /**
+     * Accept, at most, the given amount of EMC from the given side
+     *
+     * @param side     The side to accept EMC from
+     * @param toAccept The maximum amount to accept
+     * @return The amount actually accepted
+     */
+    BigInteger acceptEMC(@Nonnull EnumFacing side, BigInteger toAccept);
 
-	/**
-	 * Accept, at most, the given amount of EMC from the given side
-	 * @param side The side to accept EMC from
-	 * @param toAccept The maximum amount to accept
-	 * @return The amount actually accepted
-	 * @deprecated Since ProjectE API version 1.2.0
-	 */
-	@Deprecated
-	default double acceptEMC(@Nonnull EnumFacing side, double toAccept) {
-		return acceptEMC(side, (long) toAccept);
-	}
 }

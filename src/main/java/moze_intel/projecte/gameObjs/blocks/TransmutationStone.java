@@ -18,50 +18,43 @@ import net.minecraft.world.World;
 import javax.annotation.Nonnull;
 import java.util.Random;
 
-public class TransmutationStone extends Block
-{
-	private static final AxisAlignedBB AABB = new AxisAlignedBB(0, 0, 0, 1, 0.25, 1);
+public class TransmutationStone extends Block {
+    private static final AxisAlignedBB AABB = new AxisAlignedBB(0, 0, 0, 1, 0.25, 1);
 
-	public TransmutationStone() 
-	{
-		super(Material.ROCK);
-		this.setCreativeTab(ObjHandler.cTab);
-		this.setTranslationKey("pe_transmutation_stone");
-		this.setHardness(10.0f);
-	}
+    public TransmutationStone() {
+        super(Material.ROCK);
+        this.setCreativeTab(ObjHandler.cTab);
+        this.setTranslationKey("pe_transmutation_stone");
+        this.setHardness(10.0f);
+    }
 
-	@Nonnull
-	@Override
-	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
-		return AABB;
-	}
-	
-	@Nonnull
-	@Override
-	public Item getItemDropped(IBlockState state, Random random, int par2)
-	{
-		return Item.getItemFromBlock(ObjHandler.transmuteStone);
-	}
-	
-	@Override
-	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
-	{
-		if (!world.isRemote)
-		{
-			player.openGui(PECore.instance, Constants.TRANSMUTE_STONE_GUI, world, pos.getX(), pos.getY(), pos.getZ());
-		}
-		return true;
-	}
-	
-	@Override
-	public boolean isOpaqueCube(IBlockState state)
-	{
-		return false;
-	}
-	
-	@Override
-	public boolean isFullCube(IBlockState state)
-	{
-		return false;
-	}
+    @Nonnull
+    @Override
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
+        return AABB;
+    }
+
+    @Nonnull
+    @Override
+    public Item getItemDropped(IBlockState state, Random random, int par2) {
+        return Item.getItemFromBlock(ObjHandler.transmuteStone);
+    }
+
+    @Override
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+        if (!world.isRemote) {
+            player.openGui(PECore.instance, Constants.TRANSMUTE_STONE_GUI, world, pos.getX(), pos.getY(), pos.getZ());
+        }
+        return true;
+    }
+
+    @Override
+    public boolean isOpaqueCube(IBlockState state) {
+        return false;
+    }
+
+    @Override
+    public boolean isFullCube(IBlockState state) {
+        return false;
+    }
 }

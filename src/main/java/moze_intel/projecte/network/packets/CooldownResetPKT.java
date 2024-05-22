@@ -8,27 +8,25 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class CooldownResetPKT implements IMessage {
 
-	@Override
-	public void fromBytes(ByteBuf buf) {}
+    @Override
+    public void fromBytes(ByteBuf buf) {
+    }
 
-	@Override
-	public void toBytes(ByteBuf buf) {}
+    @Override
+    public void toBytes(ByteBuf buf) {
+    }
 
-	public static class Handler implements IMessageHandler<CooldownResetPKT, IMessage>
-	{
-		@Override
-		public IMessage onMessage(CooldownResetPKT message, MessageContext ctx)
-		{
-			Minecraft.getMinecraft().addScheduledTask(new Runnable()
-			{
-				@Override
-				public void run()
-				{
-					Minecraft.getMinecraft().player.resetCooldown();
-				}
-			});
-			return null;
-		}
-	}
+    public static class Handler implements IMessageHandler<CooldownResetPKT, IMessage> {
+        @Override
+        public IMessage onMessage(CooldownResetPKT message, MessageContext ctx) {
+            Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+                @Override
+                public void run() {
+                    Minecraft.getMinecraft().player.resetCooldown();
+                }
+            });
+            return null;
+        }
+    }
 
 }

@@ -13,100 +13,78 @@ import net.minecraft.util.math.RayTraceResult.Type;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.WorldInfo;
 
-public class EntityWaterProjectile extends PEProjectile
-{
-	public EntityWaterProjectile(World world)
-	{
-		super(world);
-	}
+public class EntityWaterProjectile extends PEProjectile {
+    public EntityWaterProjectile(World world) {
+        super(world);
+    }
 
-	public EntityWaterProjectile(World world, EntityPlayer entity)
-	{
-		super(world, entity);
-	}
+    public EntityWaterProjectile(World world, EntityPlayer entity) {
+        super(world, entity);
+    }
 
-	public EntityWaterProjectile(World world, double x, double y, double z)
-	{
-		super(world, x, y, z);
-	}
+    public EntityWaterProjectile(World world, double x, double y, double z) {
+        super(world, x, y, z);
+    }
 
-	@Override
-	public void onUpdate()
-	{
-		super.onUpdate();
+    @Override
+    public void onUpdate() {
+        super.onUpdate();
 
-		if (!this.getEntityWorld().isRemote)
-		{
-			if (ticksExisted > 400 || !this.getEntityWorld().isBlockLoaded(new BlockPos(this)))
-			{
-				this.setDead();
-				return;
-			}
+        if (!this.getEntityWorld().isRemote) {
+            if (ticksExisted > 400 || !this.getEntityWorld().isBlockLoaded(new BlockPos(this))) {
+                this.setDead();
+                return;
+            }
 
-			if (getThrower() instanceof EntityPlayerMP) {
-				EntityPlayerMP player = ((EntityPlayerMP) getThrower());
+            if (getThrower() instanceof EntityPlayerMP) {
+                EntityPlayerMP player = ((EntityPlayerMP) getThrower());
 
-				for (BlockPos pos : BlockPos.getAllInBox(this.getPosition().add(-3, -3, -3), this.getPosition().add(3, 3, 3)))
-                {
+                for (BlockPos pos : BlockPos.getAllInBox(this.getPosition().add(-3, -3, -3), this.getPosition().add(3, 3, 3))) {
                     Block block = this.getEntityWorld().getBlockState(pos).getBlock();
 
-                    if (block == Blocks.LAVA)
-                    {
+                    if (block == Blocks.LAVA) {
                         PlayerHelper.checkedReplaceBlock(player, pos, Blocks.OBSIDIAN.getDefaultState());
-                    }
-                    else if (block == Blocks.FLOWING_LAVA)
-                    {
+                    } else if (block == Blocks.FLOWING_LAVA) {
                         PlayerHelper.checkedReplaceBlock(player, pos, Blocks.COBBLESTONE.getDefaultState());
-                    }
-                    else
-                    {
+                    } else {
                         continue;
                     }
 
                     playSound(SoundEvents.ENTITY_GENERIC_BURN, 0.5F, 2.6F + (this.getEntityWorld().rand.nextFloat() - this.getEntityWorld().rand.nextFloat()) * 0.8F);
                 }
-			}
+            }
 
-			if (this.isInWater())
-			{
-				this.setDead();
-			}
-			
-			if (this.posY > 128)
-			{
-				WorldInfo worldInfo = this.getEntityWorld().getWorldInfo();
-				worldInfo.setRaining(true);
-				this.setDead();
-			}
-		}
-	}
+            if (this.isInWater()) {
+                this.setDead();
+            }
 
-	@Override
-	protected void apply(RayTraceResult mop)
-	{
-		if (this.getEntityWorld().isRemote)
-		{
-			return;
-		}
+            if (this.posY > 128) {
+                WorldInfo worldInfo = this.getEntityWorld().getWorldInfo();
+                worldInfo.setRaining(true);
+                this.setDead();
+            }
+        }
+    }
 
-		if (mop.typeOfHit == Type.BLOCK)
-		{
-			BlockPos pos = mop.getBlockPos().offset(mop.sideHit);
-			if (world.isAirBlock(pos))
-			{
-				PlayerHelper.checkedPlaceBlock(((EntityPlayerMP) getThrower()), pos, Blocks.FLOWING_WATER.getDefaultState());
-			}
-		}
-		else if (mop.typeOfHit == Type.ENTITY)
-		{
-			Entity ent = mop.entityHit;
+    @Override
+    protected void apply(RayTraceResult mop) {
+        if (this.getEntityWorld().isRemote) {
+            return;
+        }
 
-			if (ent.isBurning())
-			{
-				ent.extinguish();
-			}
+        if (mop.typeOfHit == Type.BLOCK) {
+            BlockPos pos = mop.getBlockPos().offset(mop.sideHit);
+            if (world.isAirBlock(pos)) {
+                PlayerHelper.checkedPlaceBlock(((EntityPlayerMP) getThrower()), pos, Blocks.FLOWING_WATER.getDefaultState());
+            }
+        } else if (mop.typeOfHit == Type.ENTITY) {
+            Entity ent = mop.entityHit;
 
-			ent.addVelocity(this.motionX * 2, this.motionY * 2, this.motionZ * 2);
-		}
-	}
+            if (ent.isBurning()) {
+                ent.extinguish();
+            }
+
+            ent.addVelocity(this.motionX * 2, this.motionY * 2, this.motionZ * 2);
+        }
+    }
 }

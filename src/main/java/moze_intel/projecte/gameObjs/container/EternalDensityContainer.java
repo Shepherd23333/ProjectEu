@@ -13,73 +13,61 @@ import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 
-public class EternalDensityContainer extends Container
-{
-	private final EternalDensityInventory inventory;
-	
-	public EternalDensityContainer(InventoryPlayer invPlayer, EternalDensityInventory gemInv)
-	{
-		inventory = gemInv;
-		
-		 for (int i = 0; i < 3; ++i)
-			for (int j = 0; j < 3; ++j)
-			{
-				this.addSlotToContainer(new SlotGhost(gemInv, j + i * 3, 62 + j * 18, 26 + i * 18, SlotPredicates.HAS_EMC));
-			}
+public class EternalDensityContainer extends Container {
+    private final EternalDensityInventory inventory;
 
-		for (int i = 0; i < 3; ++i)
-			for (int j = 0; j < 9; ++j)
-			{
-				this.addSlotToContainer(new Slot(invPlayer, j + i * 9 + 9, 8 + j * 18, 93 + i * 18));
-			}
+    public EternalDensityContainer(InventoryPlayer invPlayer, EternalDensityInventory gemInv) {
+        inventory = gemInv;
 
-		for (int i = 0; i < 9; ++i)
-		{
-			this.addSlotToContainer(new Slot(invPlayer, i, 8 + i * 18, 151));
-		}
+        for (int i = 0; i < 3; ++i)
+            for (int j = 0; j < 3; ++j) {
+                this.addSlotToContainer(new SlotGhost(gemInv, j + i * 3, 62 + j * 18, 26 + i * 18, SlotPredicates.HAS_EMC));
+            }
 
-	}
+        for (int i = 0; i < 3; ++i)
+            for (int j = 0; j < 9; ++j) {
+                this.addSlotToContainer(new Slot(invPlayer, j + i * 9 + 9, 8 + j * 18, 93 + i * 18));
+            }
 
-	@Nonnull
-	@Override
-	public ItemStack transferStackInSlot(EntityPlayer player, int slotIndex)
-	{
-		Slot slot = getSlot(slotIndex);
-		if (slotIndex > 8)
-		{
-			ItemStack toSet = slot.getStack().copy();
-			toSet.setCount(1);
-			ItemHandlerHelper.insertItem(inventory, toSet, false);
-		}
-		return ItemStack.EMPTY;
-	}
+        for (int i = 0; i < 9; ++i) {
+            this.addSlotToContainer(new Slot(invPlayer, i, 8 + i * 18, 151));
+        }
 
-	@Override
-	public boolean canInteractWith(@Nonnull EntityPlayer player)
-	{
-		return true;
-	}
+    }
 
-	@Nonnull
-	@Override
-	public ItemStack slotClick(int slot, int button, ClickType flag, EntityPlayer player)
-	{
-		if (slot >= 0 && getSlot(slot).getStack() == inventory.invItem)
-		{
-			return ItemStack.EMPTY;
-		}
-		
-		if (slot >= 0 && slot < 9)
-		{
-			inventory.setStackInSlot(slot, ItemStack.EMPTY);
-		}
-		
-		return super.slotClick(slot, button, flag, player);
-	}
-	
-	@Override
-	public boolean canDragIntoSlot(Slot slot) 
-	{
-		return false;
-	}
+    @Nonnull
+    @Override
+    public ItemStack transferStackInSlot(EntityPlayer player, int slotIndex) {
+        Slot slot = getSlot(slotIndex);
+        if (slotIndex > 8) {
+            ItemStack toSet = slot.getStack().copy();
+            toSet.setCount(1);
+            ItemHandlerHelper.insertItem(inventory, toSet, false);
+        }
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public boolean canInteractWith(@Nonnull EntityPlayer player) {
+        return true;
+    }
+
+    @Nonnull
+    @Override
+    public ItemStack slotClick(int slot, int button, ClickType flag, EntityPlayer player) {
+        if (slot >= 0 && getSlot(slot).getStack() == inventory.invItem) {
+            return ItemStack.EMPTY;
+        }
+
+        if (slot >= 0 && slot < 9) {
+            inventory.setStackInSlot(slot, ItemStack.EMPTY);
+        }
+
+        return super.slotClick(slot, button, flag, player);
+    }
+
+    @Override
+    public boolean canDragIntoSlot(Slot slot) {
+        return false;
+    }
 }

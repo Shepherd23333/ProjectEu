@@ -16,24 +16,20 @@ import net.minecraftforge.fml.relauncher.Side;
 import javax.annotation.Nonnull;
 import java.util.UUID;
 
-public class TransmutationProxyImpl implements ITransmutationProxy
-{
+public class TransmutationProxyImpl implements ITransmutationProxy {
     public static final ITransmutationProxy instance = new TransmutationProxyImpl();
 
-    private TransmutationProxyImpl() {}
+    private TransmutationProxyImpl() {
+    }
 
     @Override
-    public boolean registerWorldTransmutation(@Nonnull IBlockState origin, @Nonnull IBlockState result1, IBlockState result2)
-    {
+    public boolean registerWorldTransmutation(@Nonnull IBlockState origin, @Nonnull IBlockState result1, IBlockState result2) {
         Preconditions.checkNotNull(origin);
         Preconditions.checkNotNull(result1);
         Preconditions.checkState(Loader.instance().isInState(LoaderState.POSTINITIALIZATION), String.format("Mod %s tried to register world transmutation at an invalid time!", Loader.instance().activeModContainer().getModId()));
-        if (WorldTransmutations.getWorldTransmutation(origin, false) != null)
-        {
+        if (WorldTransmutations.getWorldTransmutation(origin, false) != null) {
             return false;
-        }
-        else
-        {
+        } else {
             WorldTransmutations.register(origin, result1, result2);
             return true;
         }
@@ -41,35 +37,25 @@ public class TransmutationProxyImpl implements ITransmutationProxy
 
     @Nonnull
     @Override
-    public IKnowledgeProvider getKnowledgeProviderFor(@Nonnull UUID playerUUID)
-    {
-        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
-        {
+    public IKnowledgeProvider getKnowledgeProviderFor(@Nonnull UUID playerUUID) {
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
             Preconditions.checkState(PECore.proxy.getClientPlayer() != null, "Client player doesn't exist!");
             return PECore.proxy.getClientTransmutationProps();
-        }
-        else
-        {
+        } else {
             Preconditions.checkNotNull(playerUUID);
             Preconditions.checkState(Loader.instance().hasReachedState(LoaderState.SERVER_STARTED), "Server must be running to query knowledge!");
             EntityPlayer player = findOnlinePlayer(playerUUID);
-            if (player != null)
-            {
+            if (player != null) {
                 return player.getCapability(ProjectEAPI.KNOWLEDGE_CAPABILITY, null);
-            }
-            else
-            {
+            } else {
                 return TransmutationOffline.forPlayer(playerUUID);
             }
         }
     }
 
-    private EntityPlayer findOnlinePlayer(UUID playerUUID)
-    {
-        for (EntityPlayer player : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers())
-        {
-            if (player.getUniqueID().equals(playerUUID))
-            {
+    private EntityPlayer findOnlinePlayer(UUID playerUUID) {
+        for (EntityPlayer player : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers()) {
+            if (player.getUniqueID().equals(playerUUID)) {
                 return player;
             }
         }

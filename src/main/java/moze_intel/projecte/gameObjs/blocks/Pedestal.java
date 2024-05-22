@@ -4,7 +4,6 @@ package moze_intel.projecte.gameObjs.blocks;
 import moze_intel.projecte.api.item.IPedestalItem;
 import moze_intel.projecte.gameObjs.ObjHandler;
 import moze_intel.projecte.gameObjs.tiles.DMPedestalTile;
-import moze_intel.projecte.utils.WorldHelper;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -27,13 +26,11 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class Pedestal extends Block
-{
+public class Pedestal extends Block {
 
     private static final AxisAlignedBB AABB = new AxisAlignedBB(0.1875, 0, 0.1875, 0.8125, 0.75, 0.8125);
 
-    public Pedestal()
-    {
+    public Pedestal() {
         super(Material.ROCK);
         this.setCreativeTab(ObjHandler.cTab);
         this.setHardness(1.0F);
@@ -42,20 +39,16 @@ public class Pedestal extends Block
 
     @Nonnull
     @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos)
-    {
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
         return AABB;
     }
 
-    private void dropItem(World world, BlockPos pos)
-    {
+    private void dropItem(World world, BlockPos pos) {
         TileEntity te = world.getTileEntity(pos);
-        if (te instanceof DMPedestalTile)
-        {
+        if (te instanceof DMPedestalTile) {
             DMPedestalTile tile = (DMPedestalTile) te;
             ItemStack stack = tile.getInventory().getStackInSlot(0);
-            if (!stack.isEmpty())
-            {
+            if (!stack.isEmpty()) {
                 tile.getInventory().setStackInSlot(0, ItemStack.EMPTY);
                 EntityItem ent = new EntityItem(world, pos.getX(), pos.getY() + 0.8, pos.getZ());
                 ent.setItem(stack);
@@ -65,17 +58,14 @@ public class Pedestal extends Block
     }
 
     @Override
-    public void breakBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBlockState state)
-    {
+    public void breakBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBlockState state) {
         dropItem(world, pos);
         super.breakBlock(world, pos, state);
     }
 
     @Override
-    public void onBlockClicked(World world, BlockPos pos, EntityPlayer player)
-    {
-        if (!world.isRemote)
-        {
+    public void onBlockClicked(World world, BlockPos pos, EntityPlayer player) {
+        if (!world.isRemote) {
             dropItem(world, pos);
             IBlockState state = world.getBlockState(pos);
             world.notifyBlockUpdate(pos, state, state, 8);
@@ -83,13 +73,10 @@ public class Pedestal extends Block
     }
 
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
-    {
-        if (!world.isRemote)
-        {
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+        if (!world.isRemote) {
             TileEntity te = world.getTileEntity(pos);
-            if (!(te instanceof DMPedestalTile))
-            {
+            if (!(te instanceof DMPedestalTile)) {
                 return true;
             }
 
@@ -99,15 +86,12 @@ public class Pedestal extends Block
 
             if (stack.isEmpty()
                     && !item.isEmpty()
-                    && item.getItem() instanceof IPedestalItem)
-            {
+                    && item.getItem() instanceof IPedestalItem) {
                 tile.setActive(!tile.getActive());
                 world.notifyBlockUpdate(pos, state, state, 8);
-            } else if (!stack.isEmpty() && item.isEmpty())
-            {
+            } else if (!stack.isEmpty() && item.isEmpty()) {
                 tile.getInventory().setStackInSlot(0, stack.splitStack(1));
-                if (stack.getCount() <= 0)
-                {
+                if (stack.getCount() <= 0) {
                     player.setHeldItem(hand, ItemStack.EMPTY);
                 }
                 world.notifyBlockUpdate(pos, state, state, 8);
@@ -118,20 +102,16 @@ public class Pedestal extends Block
 
     // [VanillaCopy] Adapted from BlockNote
     @Override
-    public void neighborChanged(IBlockState state, World world, BlockPos pos, Block neighbor, BlockPos neighborPos)
-    {
+    public void neighborChanged(IBlockState state, World world, BlockPos pos, Block neighbor, BlockPos neighborPos) {
         boolean flag = world.isBlockPowered(pos);
         TileEntity te = world.getTileEntity(pos);
 
-        if (te instanceof DMPedestalTile)
-        {
+        if (te instanceof DMPedestalTile) {
             DMPedestalTile ped = ((DMPedestalTile) te);
 
-            if (ped.previousRedstoneState != flag)
-            {
+            if (ped.previousRedstoneState != flag) {
                 if (flag && !ped.getInventory().getStackInSlot(0).isEmpty()
-                        && ped.getInventory().getStackInSlot(0).getItem() instanceof IPedestalItem)
-                {
+                        && ped.getInventory().getStackInSlot(0).getItem() instanceof IPedestalItem) {
                     ped.setActive(!ped.getActive());
                     world.notifyBlockUpdate(pos, state, state, 11);
                 }
@@ -141,27 +121,23 @@ public class Pedestal extends Block
         }
     }
 
-	@Override
-    public boolean isFullCube(IBlockState state)
-    {
+    @Override
+    public boolean isFullCube(IBlockState state) {
         return false;
     }
 
     @Override
-    public boolean isOpaqueCube(IBlockState state)
-    {
+    public boolean isOpaqueCube(IBlockState state) {
         return false;
     }
 
     @Override
-    public int getLightValue(@Nonnull IBlockState state, IBlockAccess world, @Nonnull BlockPos pos)
-    {
+    public int getLightValue(@Nonnull IBlockState state, IBlockAccess world, @Nonnull BlockPos pos) {
         return 12;
     }
 
     @Override
-    public boolean hasTileEntity(IBlockState state)
-    {
+    public boolean hasTileEntity(IBlockState state) {
         return true;
     }
 
@@ -173,8 +149,7 @@ public class Pedestal extends Block
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag flags)
-    {
+    public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag flags) {
         tooltip.add(I18n.format("pe.pedestal.tooltip1"));
         tooltip.add(I18n.format("pe.pedestal.tooltip2"));
     }

@@ -29,6 +29,7 @@ import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -36,8 +37,7 @@ import java.util.List;
 
 public final class KnowledgeImpl {
 
-    public static void init()
-    {
+    public static void init() {
         CapabilityManager.INSTANCE.register(IKnowledgeProvider.class, new Capability.IStorage<IKnowledgeProvider>() {
             @Override
             public NBTTagCompound writeNBT(Capability<IKnowledgeProvider> capability, IKnowledgeProvider instance, EnumFacing side) {
@@ -53,47 +53,40 @@ public final class KnowledgeImpl {
         }, () -> new DefaultImpl(null));
     }
 
-    private static class DefaultImpl implements IKnowledgeProvider
-    {
+    private static class DefaultImpl implements IKnowledgeProvider {
         @Nullable
         private final EntityPlayer player;
         private final List<ItemStack> knowledge = new ArrayList<>();
         private final IItemHandlerModifiable inputLocks = new ItemStackHandler(9);
-        private long emc = 0;
+        private BigInteger emc = BigInteger.ZERO;
         private boolean fullKnowledge = false;
 
         private DefaultImpl(EntityPlayer player) {
             this.player = player;
         }
 
-        private void fireChangedEvent()
-        {
-            if (player != null && !player.world.isRemote)
-            {
+        private void fireChangedEvent() {
+            if (player != null && !player.world.isRemote) {
                 MinecraftForge.EVENT_BUS.post(new PlayerKnowledgeChangeEvent(player));
             }
         }
 
         @Override
-        public boolean hasFullKnowledge()
-        {
+        public boolean hasFullKnowledge() {
             return fullKnowledge;
         }
 
         @Override
-        public void setFullKnowledge(boolean fullKnowledge)
-        {
+        public void setFullKnowledge(boolean fullKnowledge) {
             boolean changed = this.fullKnowledge != fullKnowledge;
             this.fullKnowledge = fullKnowledge;
-            if (changed)
-            {
+            if (changed) {
                 fireChangedEvent();
             }
         }
 
         @Override
-        public void clearKnowledge()
-        {
+        public void clearKnowledge() {
             knowledge.clear();
             fullKnowledge = false;
             fireChangedEvent();
@@ -101,20 +94,16 @@ public final class KnowledgeImpl {
 
         @Override
         public boolean hasKnowledge(@Nonnull ItemStack stack) {
-            if (stack.isEmpty())
-            {
+            if (stack.isEmpty()) {
                 return false;
             }
 
-            if (fullKnowledge)
-            {
+            if (fullKnowledge) {
                 return true;
             }
 
-            for (ItemStack s : knowledge)
-            {
-                if (ItemHelper.basicAreStacksEqual(s, stack))
-                {
+            for (ItemStack s : knowledge) {
+                if (ItemHelper.basicAreStacksEqual(s, stack)) {
                     return true;
                 }
             }
@@ -123,15 +112,12 @@ public final class KnowledgeImpl {
 
         @Override
         public boolean addKnowledge(@Nonnull ItemStack stack) {
-            if (fullKnowledge)
-            {
+            if (fullKnowledge) {
                 return false;
             }
 
-            if (stack.getItem() == ObjHandler.tome)
-            {
-                if (!hasKnowledge(stack))
-                {
+            if (stack.getItem() == ObjHandler.tome) {
+                if (!hasKnowledge(stack)) {
                     knowledge.add(stack);
                 }
                 fullKnowledge = true;
@@ -139,8 +125,7 @@ public final class KnowledgeImpl {
                 return true;
             }
 
-            if (!hasKnowledge(stack))
-            {
+            if (!hasKnowledge(stack)) {
                 knowledge.add(stack);
                 fireChangedEvent();
                 return true;
@@ -153,30 +138,25 @@ public final class KnowledgeImpl {
         public boolean removeKnowledge(@Nonnull ItemStack stack) {
             boolean removed = false;
 
-            if (stack.getItem() == ObjHandler.tome)
-            {
+            if (stack.getItem() == ObjHandler.tome) {
                 fullKnowledge = false;
                 removed = true;
             }
 
-            if (fullKnowledge)
-            {
+            if (fullKnowledge) {
                 return false;
             }
 
             Iterator<ItemStack> iter = knowledge.iterator();
 
-            while (iter.hasNext())
-            {
-                if (ItemHelper.basicAreStacksEqual(stack, iter.next()))
-                {
+            while (iter.hasNext()) {
+                if (ItemHelper.basicAreStacksEqual(stack, iter.next())) {
                     iter.remove();
                     removed = true;
                 }
             }
 
-            if (removed)
-            {
+            if (removed) {
                 fireChangedEvent();
             }
             return removed;
@@ -193,30 +173,27 @@ public final class KnowledgeImpl {
         }
 
         @Override
-        public long getEmc() {
+        public BigInteger getEMC() {
             return emc;
         }
 
         @Override
-        public void setEmc(long emc) {
+        public void setEmc(BigInteger emc) {
             this.emc = emc;
         }
 
         @Override
-        public void sync(@Nonnull EntityPlayerMP player)
-        {
+        public void sync(@Nonnull EntityPlayerMP player) {
             PacketHandler.sendTo(new KnowledgeSyncPKT(serializeNBT()), player);
         }
 
         @Override
-        public NBTTagCompound serializeNBT()
-        {
+        public NBTTagCompound serializeNBT() {
             NBTTagCompound properties = new NBTTagCompound();
-            properties.setLong("transmutationEmc", emc);
+            properties.setString("transmutationEmc", emc.toString());
 
             NBTTagList knowledgeWrite = new NBTTagList();
-            for (ItemStack i : knowledge)
-            {
+            for (ItemStack i : knowledge) {
                 NBTTagCompound tag = i.writeToNBT(new NBTTagCompound());
                 knowledgeWrite.appendTag(tag);
             }
@@ -228,16 +205,14 @@ public final class KnowledgeImpl {
         }
 
         @Override
-        public void deserializeNBT(NBTTagCompound properties)
-        {
-            emc = properties.getLong("transmutationEmc");
+        public void deserializeNBT(NBTTagCompound properties) {
+            String transmutationEmc = properties.getString("transmutationEmc");
+            emc = transmutationEmc.isEmpty() ? BigInteger.ZERO : new BigInteger(transmutationEmc);
 
             NBTTagList list = properties.getTagList("knowledge", Constants.NBT.TAG_COMPOUND);
-            for (int i = 0; i < list.tagCount(); i++)
-            {
+            for (int i = 0; i < list.tagCount(); i++) {
                 ItemStack item = new ItemStack(list.getCompoundTagAt(i));
-                if (!item.isEmpty())
-                {
+                if (!item.isEmpty()) {
                     knowledge.add(item);
                 }
             }
@@ -245,8 +220,7 @@ public final class KnowledgeImpl {
             pruneStaleKnowledge();
             pruneDuplicateKnowledge();
 
-            for (int i = 0; i < inputLocks.getSlots(); i++)
-            {
+            for (int i = 0; i < inputLocks.getSlots(); i++) {
                 inputLocks.setStackInSlot(i, ItemStack.EMPTY);
             }
 
@@ -254,34 +228,28 @@ public final class KnowledgeImpl {
             fullKnowledge = properties.getBoolean("fullknowledge");
         }
 
-        private void pruneDuplicateKnowledge()
-        {
+        private void pruneDuplicateKnowledge() {
             ItemHelper.removeEmptyTags(knowledge);
             ItemHelper.compactItemListNoStacksize(knowledge);
-            for (ItemStack s : knowledge)
-            {
-                if (s.getCount() > 1)
-                {
+            for (ItemStack s : knowledge) {
+                if (s.getCount() > 1) {
                     s.setCount(1);
                 }
             }
         }
 
-        private void pruneStaleKnowledge()
-        {
+        private void pruneStaleKnowledge() {
             knowledge.removeIf(stack -> !EMCHelper.doesItemHaveEmc(stack));
         }
 
     }
 
-    public static class Provider implements ICapabilitySerializable<NBTTagCompound>
-    {
+    public static class Provider implements ICapabilitySerializable<NBTTagCompound> {
         public static final ResourceLocation NAME = new ResourceLocation(PECore.MODID, "knowledge");
 
         private final DefaultImpl knowledge;
 
-        public Provider(EntityPlayer player)
-        {
+        public Provider(EntityPlayer player) {
             knowledge = new DefaultImpl(player);
         }
 
@@ -292,27 +260,25 @@ public final class KnowledgeImpl {
 
         @Override
         public <T> T getCapability(@Nonnull Capability<T> capability, EnumFacing facing) {
-            if (capability == ProjectEAPI.KNOWLEDGE_CAPABILITY)
-            {
+            if (capability == ProjectEAPI.KNOWLEDGE_CAPABILITY) {
                 return ProjectEAPI.KNOWLEDGE_CAPABILITY.cast(knowledge);
             }
             return null;
         }
 
         @Override
-        public NBTTagCompound serializeNBT()
-        {
+        public NBTTagCompound serializeNBT() {
             return knowledge.serializeNBT();
         }
 
         @Override
-        public void deserializeNBT(NBTTagCompound nbt)
-        {
+        public void deserializeNBT(NBTTagCompound nbt) {
             knowledge.deserializeNBT(nbt);
         }
 
     }
 
-    private KnowledgeImpl() {}
+    private KnowledgeImpl() {
+    }
 
 }

@@ -3,7 +3,6 @@ package moze_intel.projecte.gameObjs.items;
 import baubles.api.BaubleType;
 import baubles.api.BaublesApi;
 import baubles.api.IBauble;
-import com.google.common.collect.Lists;
 import moze_intel.projecte.api.item.IAlchBagItem;
 import moze_intel.projecte.api.item.IAlchChestItem;
 import moze_intel.projecte.api.item.IModeChanger;
@@ -22,7 +21,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
@@ -39,247 +37,203 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Optional.Interface(iface = "baubles.api.IBauble", modid = "baubles")
-public class RepairTalisman extends ItemPE implements IAlchBagItem, IAlchChestItem, IBauble, IPedestalItem
-{
-	public RepairTalisman()
-	{
-		this.setTranslationKey("repair_talisman");
-		this.setMaxStackSize(1);
-	}
+public class RepairTalisman extends ItemPE implements IAlchBagItem, IAlchChestItem, IBauble, IPedestalItem {
+    public RepairTalisman() {
+        this.setTranslationKey("repair_talisman");
+        this.setMaxStackSize(1);
+    }
 
-	@Override
-	public void onUpdate(ItemStack stack, World world, Entity entity, int par4, boolean par5) 
-	{
-		if (world.isRemote || !(entity instanceof EntityPlayer))
-		{
-			return;
-		}
-		
-		EntityPlayer player = (EntityPlayer) entity;
+    @Override
+    public void onUpdate(ItemStack stack, World world, Entity entity, int par4, boolean par5) {
+        if (world.isRemote || !(entity instanceof EntityPlayer)) {
+            return;
+        }
 
-		player.getCapability(InternalTimers.CAPABILITY, null).activateRepair();
+        EntityPlayer player = (EntityPlayer) entity;
 
-		if (player.getCapability(InternalTimers.CAPABILITY, null).canRepair())
-		{
-			repairAllItems(player);
-		}
-	}
+        player.getCapability(InternalTimers.CAPABILITY, null).activateRepair();
 
-	private void repairAllItems(EntityPlayer player)
-	{
-		IItemHandler inv = player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+        if (player.getCapability(InternalTimers.CAPABILITY, null).canRepair()) {
+            repairAllItems(player);
+        }
+    }
 
-		for (int i = 0; i < inv.getSlots(); i++)
-		{
-			ItemStack invStack = inv.getStackInSlot(i);
+    private void repairAllItems(EntityPlayer player) {
+        IItemHandler inv = player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
 
-			if (invStack.isEmpty() || invStack.getItem() instanceof IModeChanger || !invStack.getItem().isRepairable())
-			{
-				continue;
-			}
+        for (int i = 0; i < inv.getSlots(); i++) {
+            ItemStack invStack = inv.getStackInSlot(i);
 
-			if (invStack == player.getItemStackFromSlot(EntityEquipmentSlot.MAINHAND) && player.isSwingInProgress)
-			{
-				//Don't repair item that is currently used by the player.
-				continue;
-			}
+            if (invStack.isEmpty() || invStack.getItem() instanceof IModeChanger || !invStack.getItem().isRepairable()) {
+                continue;
+            }
 
-			if (ItemHelper.isDamageable(invStack) && invStack.getItemDamage() > 0)
-			{
-				invStack.setItemDamage(invStack.getItemDamage() - 1);
-			}
-		}
+            if (invStack == player.getItemStackFromSlot(EntityEquipmentSlot.MAINHAND) && player.isSwingInProgress) {
+                //Don't repair item that is currently used by the player.
+                continue;
+            }
 
-		if (Loader.isModLoaded("baubles")) baubleRepair(player);
-	}
+            if (ItemHelper.isDamageable(invStack) && invStack.getItemDamage() > 0) {
+                invStack.setItemDamage(invStack.getItemDamage() - 1);
+            }
+        }
 
-	@Optional.Method(modid = "baubles")
-	public void baubleRepair(EntityPlayer player)
-	{
-		IItemHandler bInv = BaublesApi.getBaublesHandler(player);
+        if (Loader.isModLoaded("baubles")) baubleRepair(player);
+    }
 
-		for (int i = 0; i < bInv.getSlots(); i++)
-		{
-			ItemStack bInvStack = bInv.getStackInSlot(i);
-			if (bInvStack.isEmpty() || bInvStack.getItem() instanceof IModeChanger || !bInvStack.getItem().isRepairable())
-			{
-				continue;
-			}
+    @Optional.Method(modid = "baubles")
+    public void baubleRepair(EntityPlayer player) {
+        IItemHandler bInv = BaublesApi.getBaublesHandler(player);
 
-			if (ItemHelper.isDamageable(bInvStack) && bInvStack.getItemDamage() > 0)
-			{
-				bInvStack.setItemDamage(bInvStack.getItemDamage() - 1);
-			}
-		}
-	}
+        for (int i = 0; i < bInv.getSlots(); i++) {
+            ItemStack bInvStack = bInv.getStackInSlot(i);
+            if (bInvStack.isEmpty() || bInvStack.getItem() instanceof IModeChanger || !bInvStack.getItem().isRepairable()) {
+                continue;
+            }
 
-	@Override
-	@Optional.Method(modid = "baubles")
-	public baubles.api.BaubleType getBaubleType(ItemStack itemstack)
-	{
-		return BaubleType.BELT;
-	}
+            if (ItemHelper.isDamageable(bInvStack) && bInvStack.getItemDamage() > 0) {
+                bInvStack.setItemDamage(bInvStack.getItemDamage() - 1);
+            }
+        }
+    }
 
-	@Override
-	@Optional.Method(modid = "baubles")
-	public void onWornTick(ItemStack stack, EntityLivingBase player) 
-	{
-		this.onUpdate(stack, player.getEntityWorld(), player, 0, false);
-	}
+    @Override
+    @Optional.Method(modid = "baubles")
+    public baubles.api.BaubleType getBaubleType(ItemStack itemstack) {
+        return BaubleType.BELT;
+    }
 
-	@Override
-	@Optional.Method(modid = "baubles")
-	public void onEquipped(ItemStack itemstack, EntityLivingBase player) {}
+    @Override
+    @Optional.Method(modid = "baubles")
+    public void onWornTick(ItemStack stack, EntityLivingBase player) {
+        this.onUpdate(stack, player.getEntityWorld(), player, 0, false);
+    }
 
-	@Override
-	@Optional.Method(modid = "baubles")
-	public void onUnequipped(ItemStack itemstack, EntityLivingBase player) {}
+    @Override
+    @Optional.Method(modid = "baubles")
+    public void onEquipped(ItemStack itemstack, EntityLivingBase player) {
+    }
 
-	@Override
-	@Optional.Method(modid = "baubles")
-	public boolean canEquip(ItemStack itemstack, EntityLivingBase player) 
-	{
-		return true;
-	}
+    @Override
+    @Optional.Method(modid = "baubles")
+    public void onUnequipped(ItemStack itemstack, EntityLivingBase player) {
+    }
 
-	@Override
-	@Optional.Method(modid = "baubles")
-	public boolean canUnequip(ItemStack itemstack, EntityLivingBase player) 
-	{
-		return true;
-	}
+    @Override
+    @Optional.Method(modid = "baubles")
+    public boolean canEquip(ItemStack itemstack, EntityLivingBase player) {
+        return true;
+    }
 
-	@Override
-	public void updateInPedestal(@Nonnull World world, @Nonnull BlockPos pos)
-	{
-		if (!world.isRemote && ProjectEConfig.pedestalCooldown.repairPedCooldown != -1)
-		{
-			TileEntity te = world.getTileEntity(pos);
-			DMPedestalTile tile = ((DMPedestalTile) world.getTileEntity(pos));
-			if (tile.getActivityCooldown() == 0)
-			{
-				world.getEntitiesWithinAABB(EntityPlayerMP.class, tile.getEffectBounds()).forEach(this::repairAllItems);
-				tile.setActivityCooldown(ProjectEConfig.pedestalCooldown.repairPedCooldown);
-			}
-			else
-			{
-				tile.decrementActivityCooldown();
-			}
-		}
-	}
+    @Override
+    @Optional.Method(modid = "baubles")
+    public boolean canUnequip(ItemStack itemstack, EntityLivingBase player) {
+        return true;
+    }
 
-	@Nonnull
-	@SideOnly(Side.CLIENT)
-	@Override
-	public List<String> getPedestalDescription()
-	{
-		List<String> list = new ArrayList<>();
-		if (ProjectEConfig.pedestalCooldown.repairPedCooldown != -1)
-		{
-			list.add(TextFormatting.BLUE + I18n.format("pe.repairtalisman.pedestal1"));
-			list.add(TextFormatting.BLUE + I18n.format("pe.repairtalisman.pedestal2", MathUtils.tickToSecFormatted(ProjectEConfig.pedestalCooldown.repairPedCooldown)));
-		}
-		return list;
-	}
+    @Override
+    public void updateInPedestal(@Nonnull World world, @Nonnull BlockPos pos) {
+        if (!world.isRemote && ProjectEConfig.pedestalCooldown.repairPedCooldown != -1) {
+            TileEntity te = world.getTileEntity(pos);
+            DMPedestalTile tile = ((DMPedestalTile) world.getTileEntity(pos));
+            if (tile.getActivityCooldown() == 0) {
+                world.getEntitiesWithinAABB(EntityPlayerMP.class, tile.getEffectBounds()).forEach(this::repairAllItems);
+                tile.setActivityCooldown(ProjectEConfig.pedestalCooldown.repairPedCooldown);
+            } else {
+                tile.decrementActivityCooldown();
+            }
+        }
+    }
 
-	@Override
-	public void updateInAlchChest(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull ItemStack stack)
-	{
-		if (world.isRemote)
-		{
-			return;
-		}
+    @Nonnull
+    @SideOnly(Side.CLIENT)
+    @Override
+    public List<String> getPedestalDescription() {
+        List<String> list = new ArrayList<>();
+        if (ProjectEConfig.pedestalCooldown.repairPedCooldown != -1) {
+            list.add(TextFormatting.BLUE + I18n.format("pe.repairtalisman.pedestal1"));
+            list.add(TextFormatting.BLUE + I18n.format("pe.repairtalisman.pedestal2", MathUtils.tickToSecFormatted(ProjectEConfig.pedestalCooldown.repairPedCooldown)));
+        }
+        return list;
+    }
 
-		TileEntity te = world.getTileEntity(pos);
-		if (!(te instanceof AlchChestTile))
-		{
-			return;
-		}
-		AlchChestTile tile = ((AlchChestTile) te);
+    @Override
+    public void updateInAlchChest(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull ItemStack stack) {
+        if (world.isRemote) {
+            return;
+        }
 
-		byte coolDown = ItemHelper.getOrCreateCompound(stack).getByte("Cooldown");
+        TileEntity te = world.getTileEntity(pos);
+        if (!(te instanceof AlchChestTile)) {
+            return;
+        }
+        AlchChestTile tile = ((AlchChestTile) te);
 
-		if (coolDown > 0)
-		{
-			stack.getTagCompound().setByte("Cooldown", (byte) (coolDown - 1));
-		}
-		else
-		{
-			boolean hasAction = false;
+        byte coolDown = ItemHelper.getOrCreateCompound(stack).getByte("Cooldown");
 
-			IItemHandler inv = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-			for (int i = 0; i < inv.getSlots(); i++)
-			{
-				ItemStack invStack = inv.getStackInSlot(i);
+        if (coolDown > 0) {
+            stack.getTagCompound().setByte("Cooldown", (byte) (coolDown - 1));
+        } else {
+            boolean hasAction = false;
 
-				if (invStack.isEmpty() || invStack.getItem() instanceof RingToggle || !invStack.getItem().isRepairable())
-				{
-					continue;
-				}
+            IItemHandler inv = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+            for (int i = 0; i < inv.getSlots(); i++) {
+                ItemStack invStack = inv.getStackInSlot(i);
 
-				if (ItemHelper.isDamageable(invStack) && invStack.getItemDamage() > 0)
-				{
-					invStack.setItemDamage(invStack.getItemDamage() - 1);
+                if (invStack.isEmpty() || invStack.getItem() instanceof RingToggle || !invStack.getItem().isRepairable()) {
+                    continue;
+                }
 
-					if (!hasAction)
-					{
-						hasAction = true;
-					}
-				}
-			}
+                if (ItemHelper.isDamageable(invStack) && invStack.getItemDamage() > 0) {
+                    invStack.setItemDamage(invStack.getItemDamage() - 1);
 
-			if (hasAction)
-			{
-				stack.getTagCompound().setByte("Cooldown", (byte) 19);
-				tile.markDirty();
-			}
-		}
-	}
+                    if (!hasAction) {
+                        hasAction = true;
+                    }
+                }
+            }
 
-	@Override
-	public boolean updateInAlchBag(@Nonnull IItemHandler inv, @Nonnull EntityPlayer player, @Nonnull ItemStack stack)
-	{
-		if (player.getEntityWorld().isRemote)
-		{
-			return false;
-		}
+            if (hasAction) {
+                stack.getTagCompound().setByte("Cooldown", (byte) 19);
+                tile.markDirty();
+            }
+        }
+    }
 
-		byte coolDown = ItemHelper.getOrCreateCompound(stack).getByte("Cooldown");
+    @Override
+    public boolean updateInAlchBag(@Nonnull IItemHandler inv, @Nonnull EntityPlayer player, @Nonnull ItemStack stack) {
+        if (player.getEntityWorld().isRemote) {
+            return false;
+        }
 
-		if (coolDown > 0)
-		{
-			stack.getTagCompound().setByte("Cooldown", (byte) (coolDown - 1));
-		}
-		else
-		{
-			boolean hasAction = false;
+        byte coolDown = ItemHelper.getOrCreateCompound(stack).getByte("Cooldown");
 
-			for (int i = 0; i < inv.getSlots(); i++)
-			{
-				ItemStack invStack = inv.getStackInSlot(i);
+        if (coolDown > 0) {
+            stack.getTagCompound().setByte("Cooldown", (byte) (coolDown - 1));
+        } else {
+            boolean hasAction = false;
 
-				if (invStack.isEmpty() || invStack.getItem() instanceof RingToggle || !invStack.getItem().isRepairable())
-				{
-					continue;
-				}
+            for (int i = 0; i < inv.getSlots(); i++) {
+                ItemStack invStack = inv.getStackInSlot(i);
 
-				if (ItemHelper.isDamageable(invStack) && invStack.getItemDamage() > 0)
-				{
-					invStack.setItemDamage(invStack.getItemDamage() - 1);
+                if (invStack.isEmpty() || invStack.getItem() instanceof RingToggle || !invStack.getItem().isRepairable()) {
+                    continue;
+                }
 
-					if (!hasAction)
-					{
-						hasAction = true;
-					}
-				}
-			}
+                if (ItemHelper.isDamageable(invStack) && invStack.getItemDamage() > 0) {
+                    invStack.setItemDamage(invStack.getItemDamage() - 1);
 
-			if (hasAction)
-			{
-				stack.getTagCompound().setByte("Cooldown", (byte) 19);
-				return true;
-			}
-		}
-		return false;
-	}
+                    if (!hasAction) {
+                        hasAction = true;
+                    }
+                }
+            }
+
+            if (hasAction) {
+                stack.getTagCompound().setByte("Cooldown", (byte) 19);
+                return true;
+            }
+        }
+        return false;
+    }
 }

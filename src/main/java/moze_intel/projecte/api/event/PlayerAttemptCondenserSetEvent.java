@@ -13,13 +13,11 @@ import javax.annotation.Nonnull;
  * This event is fired on MinecraftForge#EVENT_BUS
  */
 @Cancelable
-public class PlayerAttemptCondenserSetEvent extends Event
-{
+public class PlayerAttemptCondenserSetEvent extends Event {
     private final EntityPlayer player;
     private final ItemStack stack;
 
-    public PlayerAttemptCondenserSetEvent(@Nonnull EntityPlayer entityPlayer, @Nonnull ItemStack stack)
-    {
+    public PlayerAttemptCondenserSetEvent(@Nonnull EntityPlayer entityPlayer, @Nonnull ItemStack stack) {
         player = entityPlayer;
         this.stack = stack;
     }
@@ -28,8 +26,7 @@ public class PlayerAttemptCondenserSetEvent extends Event
      * @return The player who is attempting to put in the condenser slot.
      */
     @Nonnull
-    public EntityPlayer getPlayer()
-    {
+    public EntityPlayer getPlayer() {
         return player;
     }
 
@@ -37,8 +34,7 @@ public class PlayerAttemptCondenserSetEvent extends Event
      * @return The stack that the player is trying to learn.
      */
     @Nonnull
-    public ItemStack getStack()
-    {
+    public ItemStack getStack() {
         return stack;
     }
 }

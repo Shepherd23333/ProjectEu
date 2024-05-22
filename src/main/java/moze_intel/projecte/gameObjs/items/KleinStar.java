@@ -15,120 +15,107 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 
-public class KleinStar extends ItemPE implements IItemEmc
-{
-	public KleinStar()
-	{
-		this.setTranslationKey("klein_star");
-		this.setMaxDamage(0);
-		this.setHasSubtypes(true);
-		this.setMaxStackSize(1);
-		this.setNoRepair();
-	}
-	
-	@Override
-	public boolean showDurabilityBar(ItemStack stack)
-	{
-		return stack.hasTagCompound();
-	}
-	
-	@Override
-	public double getDurabilityForDisplay(ItemStack stack)
-	{
-		long starEmc = getEmc(stack);
-		
-		if (starEmc == 0)
-		{
-			return 1.0D;
-		}
-		
-		return 1.0D - starEmc / (double) EMCHelper.getKleinStarMaxEmc(stack);
-	}
+public class KleinStar extends ItemPE implements IItemEmc {
+    public KleinStar() {
+        this.setTranslationKey("klein_star");
+        this.setMaxDamage(0);
+        this.setHasSubtypes(true);
+        this.setMaxStackSize(1);
+        this.setNoRepair();
+    }
 
-	
-	@Nonnull
-	@Override
-	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, @Nonnull EnumHand hand)
-	{
-		ItemStack stack = player.getHeldItem(hand);
-		if (!world.isRemote && PECore.DEV_ENVIRONMENT)
-		{
-			setEmc(stack, EMCHelper.getKleinStarMaxEmc(stack));
-			return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
-		}
-		
-		return ActionResult.newResult(EnumActionResult.PASS, stack);
-	}
-	
-	@Nonnull
-	@Override
-	public String getTranslationKey(ItemStack stack)
-	{
-		if (stack.getItemDamage() > 5)
-		{
-			return "pe.debug.metainvalid";
-		}
+    @Override
+    public boolean showDurabilityBar(ItemStack stack) {
+        return stack.hasTagCompound();
+    }
 
-		return super.getTranslationKey()+ "_" + (stack.getItemDamage() + 1);
-	}
+    @Override
+    public double getDurabilityForDisplay(ItemStack stack) {
+        BigInteger starEmc = getEmc(stack);
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void getSubItems(CreativeTabs cTab, NonNullList<ItemStack> list)
-	{
-		if (isInCreativeTab(cTab))
-		{
-			for (int i = 0; i < 6; ++i)
-			{
-				list.add(new ItemStack(this, 1, i));
-			}
-		}
-	}
+        if (starEmc.equals(BigInteger.ZERO)) {
+            return 1.0D;
+        }
 
-	public enum EnumKleinTier
-	{
-		EIN("ein"),
-		ZWEI("zwei"),
-		DREI("drei"),
-		VIER("vier"),
-		SPHERE("sphere"),
-		OMEGA("omega");
+        return BigDecimal.ONE.subtract(
+                new BigDecimal(starEmc).divide(new BigDecimal(EMCHelper.getKleinStarMaxEmc(stack)))
+        ).doubleValue();
+    }
 
-		public final String name;
-		EnumKleinTier(String name)
-		{
-			this.name = name;
-		}
-	}
 
-	// -- IItemEmc -- //
+    @Nonnull
+    @Override
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, @Nonnull EnumHand hand) {
+        ItemStack stack = player.getHeldItem(hand);
+        if (!world.isRemote && PECore.DEV_ENVIRONMENT) {
+            setEmc(stack, EMCHelper.getKleinStarMaxEmc(stack));
+            return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
+        }
 
-	@Override
-	public long addEmc(@Nonnull ItemStack stack, long toAdd)
-	{
-		long add = Math.min(getMaximumEmc(stack) - getStoredEmc(stack), toAdd);
-		ItemPE.addEmcToStack(stack, add);
-		return add;
-	}
+        return ActionResult.newResult(EnumActionResult.PASS, stack);
+    }
 
-	@Override
-	public long extractEmc(@Nonnull ItemStack stack, long toRemove)
-	{
-		long sub = Math.min(getStoredEmc(stack), toRemove);
-		ItemPE.removeEmc(stack, sub);
-		return sub;
-	}
+    @Nonnull
+    @Override
+    public String getTranslationKey(ItemStack stack) {
+        if (stack.getItemDamage() > 5) {
+            return "pe.debug.metainvalid";
+        }
 
-	@Override
-	public long getStoredEmc(@Nonnull ItemStack stack)
-	{
-		return ItemPE.getEmc(stack);
-	}
+        return super.getTranslationKey() + "_" + (stack.getItemDamage() + 1);
+    }
 
-	@Override
-	public long getMaximumEmc(@Nonnull ItemStack stack)
-	{
-		return EMCHelper.getKleinStarMaxEmc(stack);
-	}
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void getSubItems(CreativeTabs cTab, NonNullList<ItemStack> list) {
+        if (isInCreativeTab(cTab)) {
+            for (int i = 0; i < 6; ++i) {
+                list.add(new ItemStack(this, 1, i));
+            }
+        }
+    }
+
+    public enum EnumKleinTier {
+        EIN("ein"),
+        ZWEI("zwei"),
+        DREI("drei"),
+        VIER("vier"),
+        SPHERE("sphere"),
+        OMEGA("omega");
+
+        public final String name;
+
+        EnumKleinTier(String name) {
+            this.name = name;
+        }
+    }
+
+    // -- IItemEmc -- //
+
+    @Override
+    public BigInteger addEmc(@Nonnull ItemStack stack, BigInteger toAdd) {
+        BigInteger add = getMaximumEMC(stack).subtract(getStoredEMC(stack)).min(toAdd);
+        addEmcToStack(stack, add);
+        return add;
+    }
+
+    @Override
+    public BigInteger extractEmc(@Nonnull ItemStack stack, BigInteger toRemove) {
+        BigInteger sub = getStoredEMC(stack).min(toRemove);
+        removeEmc(stack, sub);
+        return sub;
+    }
+
+    @Override
+    public BigInteger getStoredEMC(@Nonnull ItemStack stack) {
+        return getEmc(stack);
+    }
+
+    @Override
+    public BigInteger getMaximumEMC(@Nonnull ItemStack stack) {
+        return EMCHelper.getKleinStarMaxEmc(stack);
+    }
 }

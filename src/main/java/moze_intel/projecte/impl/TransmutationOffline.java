@@ -19,32 +19,28 @@ import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-public class TransmutationOffline
-{
+
+public class TransmutationOffline {
     private static final IKnowledgeProvider NOT_FOUND_PROVIDER = immutableCopy(ProjectEAPI.KNOWLEDGE_CAPABILITY.getDefaultInstance());
 
     private static final Map<UUID, IKnowledgeProvider> cachedKnowledgeProviders = new HashMap<>();
 
-    public static void cleanAll()
-    {
+    public static void cleanAll() {
         cachedKnowledgeProviders.clear();
     }
 
-    public static void clear(UUID playerUUID)
-    {
+    public static void clear(UUID playerUUID) {
         cachedKnowledgeProviders.remove(playerUUID);
     }
 
-    static IKnowledgeProvider forPlayer(UUID playerUUID)
-    {
-        if (!cachedKnowledgeProviders.containsKey(playerUUID))
-        {
-            if (!cacheOfflineData(playerUUID))
-            {
+    static IKnowledgeProvider forPlayer(UUID playerUUID) {
+        if (!cachedKnowledgeProviders.containsKey(playerUUID)) {
+            if (!cacheOfflineData(playerUUID)) {
                 cachedKnowledgeProviders.put(playerUUID, NOT_FOUND_PROVIDER);
             }
         }
@@ -55,11 +51,10 @@ public class TransmutationOffline
     private static boolean cacheOfflineData(UUID playerUUID) {
         Preconditions.checkState(FMLCommonHandler.instance().getEffectiveSide().isServer(), "CRITICAL: Trying to read filesystem on client!!");
         File playerData = new File(DimensionManager.getCurrentSaveRootDirectory(), "playerdata");
-        if (playerData.exists())
-        {
+        if (playerData.exists()) {
             File player = new File(playerData, playerUUID.toString() + ".dat");
             if (player.exists() && player.isFile()) {
-                try(FileInputStream in = new FileInputStream(player)) {
+                try (FileInputStream in = new FileInputStream(player)) {
                     NBTTagCompound playerDat = CompressedStreamTools.readCompressed(in); // No need to create buffered stream, that call does it for us
                     NBTTagCompound knowledgeProvider = playerDat.getCompoundTag("ForgeCaps").getCompoundTag(KnowledgeImpl.Provider.NAME.toString());
 
@@ -78,8 +73,7 @@ public class TransmutationOffline
         return false;
     }
 
-    private static IKnowledgeProvider immutableCopy(final IKnowledgeProvider toCopy)
-    {
+    private static IKnowledgeProvider immutableCopy(final IKnowledgeProvider toCopy) {
         return new IKnowledgeProvider() {
             final List<ItemStack> immutableKnowledge = ImmutableList.copyOf(toCopy.getKnowledge());
             final IItemHandlerModifiable immutableInputLocks = ItemHelper.immutableCopy(toCopy.getInputAndLocks());
@@ -90,10 +84,12 @@ public class TransmutationOffline
             }
 
             @Override
-            public void setFullKnowledge(boolean fullKnowledge) {}
+            public void setFullKnowledge(boolean fullKnowledge) {
+            }
 
             @Override
-            public void clearKnowledge() {}
+            public void clearKnowledge() {
+            }
 
             @Override
             public boolean hasKnowledge(@Nonnull ItemStack stack) {
@@ -101,10 +97,14 @@ public class TransmutationOffline
             }
 
             @Override
-            public boolean addKnowledge(@Nonnull ItemStack stack) { return false; }
+            public boolean addKnowledge(@Nonnull ItemStack stack) {
+                return false;
+            }
 
             @Override
-            public boolean removeKnowledge(@Nonnull ItemStack stack) { return false; }
+            public boolean removeKnowledge(@Nonnull ItemStack stack) {
+                return false;
+            }
 
             @Nonnull
             @Override
@@ -119,12 +119,13 @@ public class TransmutationOffline
             }
 
             @Override
-            public long getEmc() {
-                return toCopy.getEmc();
+            public BigInteger getEMC() {
+                return toCopy.getEMC();
             }
 
             @Override
-            public void setEmc(long emc) {}
+            public void setEmc(BigInteger emc) {
+            }
 
             @Override
             public void sync(@Nonnull EntityPlayerMP player) {
@@ -137,7 +138,8 @@ public class TransmutationOffline
             }
 
             @Override
-            public void deserializeNBT(NBTTagCompound nbt) {}
+            public void deserializeNBT(NBTTagCompound nbt) {
+            }
         };
     }
 }

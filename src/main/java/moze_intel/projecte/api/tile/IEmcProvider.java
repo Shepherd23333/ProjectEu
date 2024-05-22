@@ -3,6 +3,7 @@ package moze_intel.projecte.api.tile;
 import net.minecraft.util.EnumFacing;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 
 /**
  * Implement this interface to specify that "EMC can be taken from this Tile Entity from an external source"
@@ -12,25 +13,14 @@ import javax.annotation.Nonnull;
  *
  * @author williewillus
  */
-public interface IEmcProvider extends IEmcStorage
-{
-	/**
-	 * Extract, at most, the given amount of EMC from the given side
-	 * @param side The side to extract EMC from
-	 * @param toExtract The maximum amount to extract
-	 * @return The amount actually extracted
-	 */
-	long provideEMC(@Nonnull EnumFacing side, long toExtract);
+public interface IEmcProvider extends IEmcStorage {
+    /**
+     * Extract, at most, the given amount of EMC from the given side
+     *
+     * @param side      The side to extract EMC from
+     * @param toExtract The maximum amount to extract
+     * @return The amount actually extracted
+     */
+    BigInteger provideEMC(@Nonnull EnumFacing side, BigInteger toExtract);
 
-	/**
-	 * Extract, at most, the given amount of EMC from the given side
-	 * @param side The side to extract EMC from
-	 * @param toExtract The maximum amount to extract
-	 * @return The amount actually extracted
-	 * @deprecated Since ProjectE API version 1.2.0
-	 */
-	@Deprecated
-	default double provideEMC(@Nonnull EnumFacing side, double toExtract) {
-		return provideEMC(side, (long) toExtract);
-	}
 }

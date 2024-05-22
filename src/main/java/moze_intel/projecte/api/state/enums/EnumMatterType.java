@@ -4,28 +4,24 @@ import net.minecraft.util.IStringSerializable;
 
 import javax.annotation.Nonnull;
 
-public enum EnumMatterType implements IStringSerializable
-{
+public enum EnumMatterType implements IStringSerializable {
     DARK_MATTER("dark_matter"),
     RED_MATTER("red_matter");
 
     private final String name;
 
-    EnumMatterType(String name)
-    {
+    EnumMatterType(String name) {
         this.name = name;
     }
 
     @Nonnull
     @Override
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return name;
     }
 }

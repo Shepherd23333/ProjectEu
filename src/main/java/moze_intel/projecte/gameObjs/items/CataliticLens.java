@@ -8,22 +8,18 @@ import net.minecraft.util.EnumHand;
 
 import javax.annotation.Nonnull;
 
-public class CataliticLens extends DestructionCatalyst implements IProjectileShooter
-{
-	public CataliticLens() 
-	{
-		this.setTranslationKey("catalitic_lens");
-	}
-	
-	@Override
-	public boolean shootProjectile(@Nonnull EntityPlayer player, @Nonnull ItemStack stack, EnumHand hand)
-	{
-		return ((IProjectileShooter) ObjHandler.hyperLens).shootProjectile(player, stack, hand);
-	}
+public class CataliticLens extends DestructionCatalyst implements IProjectileShooter {
+    public CataliticLens() {
+        this.setTranslationKey("catalitic_lens");
+    }
 
-	@Override
-	public int getNumCharges(@Nonnull ItemStack stack)
-	{
-		return 7;
-	}
+    @Override
+    public boolean shootProjectile(@Nonnull EntityPlayer player, @Nonnull ItemStack stack, EnumHand hand) {
+        return ((IProjectileShooter) ObjHandler.hyperLens).shootProjectile(player, stack, hand);
+    }
+
+    @Override
+    public int getNumCharges(@Nonnull ItemStack stack) {
+        return 7;
+    }
 }

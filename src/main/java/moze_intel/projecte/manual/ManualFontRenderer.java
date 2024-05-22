@@ -14,29 +14,23 @@ import java.util.List;
  * A shim class that very slightly modifies the behavior of the default fontrenderer. The modifed area is indicated via comment.
  */
 @SideOnly(Side.CLIENT)
-public class ManualFontRenderer extends FontRenderer
-{
-    public ManualFontRenderer()
-    {
+public class ManualFontRenderer extends FontRenderer {
+    public ManualFontRenderer() {
         super(Minecraft.getMinecraft().gameSettings, new ResourceLocation("textures/font/ascii.png"), Minecraft.getMinecraft().renderEngine, false);
     }
 
     @Nonnull
     @Override
-    public List<String> listFormattedStringToWidth(@Nonnull String string, int width)
-    {
+    public List<String> listFormattedStringToWidth(@Nonnull String string, int width) {
         return Arrays.asList(this.wrapFormStringToWidth(string, width).split("\n"));
     }
 
-    private String wrapFormStringToWidth(String str, int width)
-    {
+    private String wrapFormStringToWidth(String str, int width) {
         int j = this.sizeStringToWidth(str, width);
 
-        if (str.length() <= j)
-        {
+        if (str.length() <= j) {
             return str;
-        } else
-        {
+        } else {
             String s1 = str.substring(0, j);
             char c0 = str.charAt(j);
             boolean flag = c0 == 10; // Changed here: Remove check for space (ascii 32)
@@ -48,36 +42,29 @@ public class ManualFontRenderer extends FontRenderer
     /*
      * Copy of some fontrenderer methods because they are private in the superclass
      */
-    private int sizeStringToWidth(String p_78259_1_, int p_78259_2_)
-    {
+    public int sizeStringToWidth(String p_78259_1_, int p_78259_2_) {
         int j = p_78259_1_.length();
         int k = 0;
         int l = 0;
         int i1 = -1;
 
-        for (boolean flag = false; l < j; ++l)
-        {
+        for (boolean flag = false; l < j; ++l) {
             char c0 = p_78259_1_.charAt(l);
 
-            switch (c0)
-            {
+            switch (c0) {
                 case 10:
                     --l;
                     break;
                 case 167:
-                    if (l < j - 1)
-                    {
+                    if (l < j - 1) {
                         ++l;
                         char c1 = p_78259_1_.charAt(l);
 
-                        if (c1 != 108 && c1 != 76)
-                        {
-                            if (c1 == 114 || c1 == 82 || isFormatColor(c1))
-                            {
+                        if (c1 != 108 && c1 != 76) {
+                            if (c1 == 114 || c1 == 82 || isFormatColor(c1)) {
                                 flag = false;
                             }
-                        } else
-                        {
+                        } else {
                             flag = true;
                         }
                     }
@@ -88,21 +75,18 @@ public class ManualFontRenderer extends FontRenderer
                 default:
                     k += Minecraft.getMinecraft().fontRenderer.getCharWidth(c0); // Need to call it on the real fontrenderer due to state stuff >.>
 
-                    if (flag)
-                    {
+                    if (flag) {
                         ++k;
                     }
             }
 
-            if (c0 == 10)
-            {
+            if (c0 == 10) {
                 ++l;
                 i1 = l;
                 break;
             }
 
-            if (k > p_78259_2_)
-            {
+            if (k > p_78259_2_) {
                 break;
             }
         }
@@ -110,8 +94,7 @@ public class ManualFontRenderer extends FontRenderer
         return l != j && i1 != -1 && i1 < l ? i1 : l;
     }
 
-    private static boolean isFormatColor(char color)
-    {
+    private static boolean isFormatColor(char color) {
         return color >= 48 && color <= 57 || color >= 97 && color <= 102 || color >= 65 && color <= 70;
     }
 }

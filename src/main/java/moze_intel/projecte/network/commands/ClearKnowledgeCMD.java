@@ -21,62 +21,52 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class ClearKnowledgeCMD extends CommandBase
-{
+public class ClearKnowledgeCMD extends CommandBase {
 
     private static final List<String> DEFAULT_SELECTORS = Arrays.asList("@p", "@a", "@r", "@e", "@s");
 
-	@Nonnull
-	@Override
-	public String getName()
-	{
-		return "clearKnowledge";
-	}
-	
-	@Nonnull
-	@Override
-	public String getUsage(@Nonnull ICommandSender sender)
-	{
-		return "pe.command.clearknowledge.usage";
-	}
+    @Nonnull
+    @Override
+    public String getName() {
+        return "clearKnowledge";
+    }
 
-	@Override
-	public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] params) throws CommandException
-	{
-		if (params.length < 1)
-		{
-			throw new WrongUsageException(getUsage(sender));
-		}
+    @Nonnull
+    @Override
+    public String getUsage(@Nonnull ICommandSender sender) {
+        return "pe.command.clearknowledge.usage";
+    }
 
-		for (EntityPlayerMP player : getPlayers(server, sender, params[0]))
-		{
-			player.getCapability(ProjectEAPI.KNOWLEDGE_CAPABILITY, null).clearKnowledge();
-			PacketHandler.sendTo(new KnowledgeClearPKT(), player);
-			sender.sendMessage(new TextComponentTranslation("pe.command.clearknowledge.success", player.getName()));
+    @Override
+    public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] params) throws CommandException {
+        if (params.length < 1) {
+            throw new WrongUsageException(getUsage(sender));
+        }
 
-			if (!player.getName().equals(sender.getName()))
-			{
-				player.sendMessage(new TextComponentTranslation("pe.command.clearknowledge.notify", sender.getName()).setStyle(new Style().setColor(TextFormatting.RED)));
-			}
-		}
-	}
+        for (EntityPlayerMP player : getPlayers(server, sender, params[0])) {
+            player.getCapability(ProjectEAPI.KNOWLEDGE_CAPABILITY, null).clearKnowledge();
+            PacketHandler.sendTo(new KnowledgeClearPKT(), player);
+            sender.sendMessage(new TextComponentTranslation("pe.command.clearknowledge.success", player.getName()));
+
+            if (!player.getName().equals(sender.getName())) {
+                player.sendMessage(new TextComponentTranslation("pe.command.clearknowledge.notify", sender.getName()).setStyle(new Style().setColor(TextFormatting.RED)));
+            }
+        }
+    }
 
     @Override
     public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos) {
-        if (args.length == 1)
-        {
+        if (args.length == 1) {
             List<String> list = new ArrayList<>(Arrays.asList(server.getOnlinePlayerNames()));
             list.addAll(DEFAULT_SELECTORS);
             return getListOfStringsMatchingLastWord(args, list);
-        } else
-        {
+        } else {
             return Collections.emptyList();
         }
     }
 
     @Override
-	public int getRequiredPermissionLevel() 
-	{
-		return 4;
-	}
+    public int getRequiredPermissionLevel() {
+        return 4;
+    }
 }

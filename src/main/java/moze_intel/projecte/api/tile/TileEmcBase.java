@@ -1,9 +1,11 @@
 package moze_intel.projecte.api.tile;
 
+import moze_intel.projecte.utils.Constants;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 
 /**
  * Base class for the reference implementations TileEmcProvider, TileEmcAcceptor, and TileEmcHandler
@@ -12,83 +14,68 @@ import javax.annotation.Nonnull;
  *
  * @author williewillus
  */
-public class TileEmcBase extends TileEntity implements IEmcStorage
-{
-	protected long maximumEMC;
-	protected long currentEMC = 0;
+public class TileEmcBase extends TileEntity implements IEmcStorage {
+    protected BigInteger maximumEMC = Constants.TILE_MAX_EMC;
+    protected BigInteger currentEMC = BigInteger.ZERO;
 
-	protected TileEmcBase()
-	{
-		setMaximumEMC(Long.MAX_VALUE);
-	}
+    protected TileEmcBase() {
+    }
 
-	public final void setMaximumEMC(long max)
-	{
-		maximumEMC = max;
-		if (currentEMC > maximumEMC)
-		{
-			currentEMC = maximumEMC;
-		}
-	}
+    public final void setMaximumEMC(BigInteger max) {
+        maximumEMC = max;
+        if (currentEMC.compareTo(maximumEMC) > 0) {
+            currentEMC = maximumEMC;
+        }
+    }
 
-	@Override
-	public long getStoredEmc()
-	{
-		return currentEMC;
-	}
+    @Override
+    public BigInteger getStoredEmc() {
+        return currentEMC;
+    }
 
-	@Override
-	public long getMaximumEmc()
-	{
-		return maximumEMC;
-	}
+    @Override
+    public BigInteger getMaximumEmc() {
+        return maximumEMC;
+    }
 
-	/**
-	 * Add EMC directly into the internal buffer. Use for internal implementation of your tile
-	 */
-	protected void addEMC(long toAdd)
-	{
-		currentEMC += toAdd;
-		if (currentEMC > maximumEMC)
-		{
-			currentEMC = maximumEMC;
-		}
-	}
+    /**
+     * Add EMC directly into the internal buffer. Use for internal implementation of your tile
+     */
+    protected void addEMC(BigInteger toAdd) {
+        currentEMC = currentEMC.add(toAdd);
+        if (currentEMC.compareTo(maximumEMC) > 0) {
+            currentEMC = maximumEMC;
+        }
+    }
 
-	/**
-	 * Removes EMC directly into the internal buffer. Use for internal implementation of your tile
-	 */
-	protected void removeEMC(long toRemove)
-	{
-		currentEMC -= toRemove;
-		if (currentEMC < 0)
-		{
-			currentEMC = 0;
-		}
-	}
+    /**
+     * Removes EMC directly into the internal buffer. Use for internal implementation of your tile
+     */
+    protected void removeEMC(BigInteger toRemove) {
+        currentEMC = currentEMC.subtract(toRemove);
+        if (currentEMC.compareTo(BigInteger.ZERO) < 0) {
+            currentEMC = BigInteger.ZERO;
+        }
+    }
 
-	@Nonnull
-	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound tag)
-	{
-		tag = super.writeToNBT(tag);
-		if (currentEMC > maximumEMC)
-		{
-			currentEMC = maximumEMC;
-		}
-		tag.setLong("EMC", currentEMC);
-		return tag;
-	}
+    @Nonnull
+    @Override
+    public NBTTagCompound writeToNBT(NBTTagCompound tag) {
+        tag = super.writeToNBT(tag);
+        if (currentEMC.compareTo(maximumEMC) > 0) {
+            currentEMC = maximumEMC;
+        }
+        tag.setString("EMC", currentEMC.toString());
+        return tag;
+    }
 
-	@Override
-	public void readFromNBT(NBTTagCompound tag)
-	{
-		super.readFromNBT(tag);
-		long set = tag.getLong("EMC");
-		if (set > maximumEMC)
-		{
-			set = maximumEMC;
-		}
-		currentEMC = set;
-	}
+    @Override
+    public void readFromNBT(NBTTagCompound tag) {
+        super.readFromNBT(tag);
+        BigInteger set = new BigInteger(tag.getString("EMC"));
+        if (set.compareTo(maximumEMC) > 0) {
+            set = maximumEMC;
+        }
+        currentEMC = set;
+    }
 }

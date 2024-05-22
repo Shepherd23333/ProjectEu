@@ -35,6 +35,7 @@ public final class SlotPredicates {
         return state != null && !(state.getBlock().hasTileEntity(state)) && EMCHelper.doesItemHaveEmc(input);
     };
 
-    private SlotPredicates() {}
+    private SlotPredicates() {
+    }
 
 }

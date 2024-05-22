@@ -10,39 +10,34 @@ import net.minecraft.util.text.TextComponentTranslation;
 
 import javax.annotation.Nonnull;
 
-public class ReloadEmcCMD extends CommandBase
-{
-	@Nonnull
-	@Override
-	public String getName()
-	{
-		return "reloadEMC";
-	}
-	
-	@Nonnull
-	@Override
-	public String getUsage(@Nonnull ICommandSender sender)
-	{
-		return "/projecte reloadEMC";
-	}
+public class ReloadEmcCMD extends CommandBase {
+    @Nonnull
+    @Override
+    public String getName() {
+        return "reloadEMC";
+    }
 
-	@Override
-	public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] params)
-	{
-		sender.sendMessage(new TextComponentTranslation("pe.command.reload.started"));
+    @Nonnull
+    @Override
+    public String getUsage(@Nonnull ICommandSender sender) {
+        return "/projecte reloadEMC";
+    }
 
-		EMCMapper.clearMaps();
-		CustomEMCParser.init();
-		EMCMapper.map();
+    @Override
+    public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] params) {
+        sender.sendMessage(new TextComponentTranslation("pe.command.reload.started"));
 
-		sender.sendMessage(new TextComponentTranslation("pe.command.reload.success"));
+        EMCMapper.clearMaps();
+        CustomEMCParser.init();
+        EMCMapper.map();
 
-		PacketHandler.sendFragmentedEmcPacketToAll();
-	}
+        sender.sendMessage(new TextComponentTranslation("pe.command.reload.success"));
 
-	@Override
-	public int getRequiredPermissionLevel() 
-	{
-		return 4;
-	}
+        PacketHandler.sendFragmentedEmcPacketToAll();
+    }
+
+    @Override
+    public int getRequiredPermissionLevel() {
+        return 4;
+    }
 }

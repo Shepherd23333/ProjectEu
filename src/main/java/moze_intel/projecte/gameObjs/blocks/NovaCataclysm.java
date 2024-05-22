@@ -12,36 +12,29 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
 
-public class NovaCataclysm extends BlockTNT
-{
-	public NovaCataclysm()
-	{
-		this.setTranslationKey("pe_nova_cataclysm");
-		this.setCreativeTab(ObjHandler.cTab);
-	}
-	
-	@Override
-	public void explode(World world, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nonnull EntityLivingBase entity)
-	{
-		if (!world.isRemote)
-		{
-			if (state.getValue(EXPLODE))
-			{
-				EntityNovaCataclysmPrimed cataclysmPrimed = new EntityNovaCataclysmPrimed(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, entity);
-				world.spawnEntity(cataclysmPrimed);
-				cataclysmPrimed.playSound(SoundEvents.ENTITY_TNT_PRIMED, 1, 1);
-			}
-		}
-	}
+public class NovaCataclysm extends BlockTNT {
+    public NovaCataclysm() {
+        this.setTranslationKey("pe_nova_cataclysm");
+        this.setCreativeTab(ObjHandler.cTab);
+    }
 
-	@Override
-	public void onExplosionDestroy(World world, @Nonnull BlockPos pos, @Nonnull Explosion explosion)
-	{
-		if (!world.isRemote)
-		{
-			EntityNovaCataclysmPrimed cataclysmPrimed = new EntityNovaCataclysmPrimed(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, explosion.getExplosivePlacedBy());
-			cataclysmPrimed.setFuse(world.rand.nextInt(cataclysmPrimed.getFuse() / 4) + cataclysmPrimed.getFuse() / 8);
-			world.spawnEntity(cataclysmPrimed);
-		}
-	}
+    @Override
+    public void explode(World world, @Nonnull BlockPos pos, @Nonnull IBlockState state, @Nonnull EntityLivingBase entity) {
+        if (!world.isRemote) {
+            if (state.getValue(EXPLODE)) {
+                EntityNovaCataclysmPrimed cataclysmPrimed = new EntityNovaCataclysmPrimed(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, entity);
+                world.spawnEntity(cataclysmPrimed);
+                cataclysmPrimed.playSound(SoundEvents.ENTITY_TNT_PRIMED, 1, 1);
+            }
+        }
+    }
+
+    @Override
+    public void onExplosionDestroy(World world, @Nonnull BlockPos pos, @Nonnull Explosion explosion) {
+        if (!world.isRemote) {
+            EntityNovaCataclysmPrimed cataclysmPrimed = new EntityNovaCataclysmPrimed(world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, explosion.getExplosivePlacedBy());
+            cataclysmPrimed.setFuse(world.rand.nextInt(cataclysmPrimed.getFuse() / 4) + cataclysmPrimed.getFuse() / 8);
+            world.spawnEntity(cataclysmPrimed);
+        }
+    }
 }

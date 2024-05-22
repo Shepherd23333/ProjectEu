@@ -21,86 +21,73 @@ import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 
-public class AlchemicalChest extends BlockDirection
-{
+public class AlchemicalChest extends BlockDirection {
 
-	private static final AxisAlignedBB AABB = new AxisAlignedBB(0.0625F, 0.0F, 0.0625F, 0.9375F, 0.875F, 0.9375F);
+    private static final AxisAlignedBB AABB = new AxisAlignedBB(0.0625F, 0.0F, 0.0625F, 0.9375F, 0.875F, 0.9375F);
 
-	public AlchemicalChest() 
-	{
-		super(Material.ROCK);
-		this.setTranslationKey("pe_alchemy_chest");
-		this.setHardness(10.0f);
-		this.setDefaultState(blockState.getBaseState().withProperty(PEStateProps.FACING, EnumFacing.NORTH));
-		this.setResistance(6000000.0F);
-	}
+    public AlchemicalChest() {
+        super(Material.ROCK);
+        this.setTranslationKey("pe_alchemy_chest");
+        this.setHardness(10.0f);
+        this.setDefaultState(blockState.getBaseState().withProperty(PEStateProps.FACING, EnumFacing.NORTH));
+        this.setResistance(6000000.0F);
+    }
 
-	@Nonnull
-	@Override
-	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos)
-	{
-		return AABB;
-	}
-	
-	@Override
-	public boolean isFullCube(IBlockState state)
-	{
-		return false;
-	}
+    @Nonnull
+    @Override
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
+        return AABB;
+    }
 
-	@Override
-	public boolean isOpaqueCube(IBlockState state)
-	{
-		return false;
-	}
-	
-	@Nonnull
-	@Override
-	public EnumBlockRenderType getRenderType(IBlockState state)
-	{
-		return EnumBlockRenderType.ENTITYBLOCK_ANIMATED;
-	}
-	
-	@Override
-	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
-	{
-		if (!world.isRemote) 
-		{
-			player.openGui(PECore.instance, Constants.ALCH_CHEST_GUI, world, pos.getX(), pos.getY(), pos.getZ());
-		}
-		
-		return true;
-	}
+    @Override
+    public boolean isFullCube(IBlockState state) {
+        return false;
+    }
 
-	@Override
-	public boolean hasTileEntity(IBlockState state)
-	{
-		return true;
-	}
+    @Override
+    public boolean isOpaqueCube(IBlockState state) {
+        return false;
+    }
 
-	@Nonnull
-	@Override
-	public TileEntity createTileEntity(@Nonnull World var1, @Nonnull IBlockState state)
-	{
-		return new AlchChestTile();
-	}
+    @Nonnull
+    @Override
+    public EnumBlockRenderType getRenderType(IBlockState state) {
+        return EnumBlockRenderType.ENTITYBLOCK_ANIMATED;
+    }
 
-	@Override
-	public boolean hasComparatorInputOverride(IBlockState state)
-	{
-		return true;
-	}
+    @Override
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+        if (!world.isRemote) {
+            player.openGui(PECore.instance, Constants.ALCH_CHEST_GUI, world, pos.getX(), pos.getY(), pos.getZ());
+        }
 
-	@Override
-	public int getComparatorInputOverride(IBlockState state, World world, BlockPos pos)
-	{
-		TileEntity te = world.getTileEntity(pos);
-		if (te != null)
-		{
-			IItemHandler inv = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-			return ItemHandlerHelper.calcRedstoneFromInventory(inv);
-		}
+        return true;
+    }
 
-		return 0;
-	}
+    @Override
+    public boolean hasTileEntity(IBlockState state) {
+        return true;
+    }
+
+    @Nonnull
+    @Override
+    public TileEntity createTileEntity(@Nonnull World var1, @Nonnull IBlockState state) {
+        return new AlchChestTile();
+    }
+
+    @Override
+    public boolean hasComparatorInputOverride(IBlockState state) {
+        return true;
+    }
+
+    @Override
+    public int getComparatorInputOverride(IBlockState state, World world, BlockPos pos) {
+        TileEntity te = world.getTileEntity(pos);
+        if (te != null) {
+            IItemHandler inv = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+            return ItemHandlerHelper.calcRedstoneFromInventory(inv);
+        }
+
+        return 0;
+    }
 }

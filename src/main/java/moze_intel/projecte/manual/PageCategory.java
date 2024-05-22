@@ -4,8 +4,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public enum PageCategory
-{
+public enum PageCategory {
     INDEX("index"),
     NONE("none"),
     ITEM("items"),
@@ -16,13 +15,11 @@ public enum PageCategory
 
     private final String identifier;
 
-    PageCategory(String identifier)
-    {
+    PageCategory(String identifier) {
         this.identifier = identifier;
     }
 
-    public String getUnlocalName()
-    {
+    public String getUnlocalName() {
         return "pe.manual.category." + identifier;
     }
 }

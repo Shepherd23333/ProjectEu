@@ -38,166 +38,149 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Mod.EventBusSubscriber(value = Side.CLIENT, modid = PECore.MODID)
-public class TransmutationRenderingEvent 
-{
-	private static final Minecraft mc = Minecraft.getMinecraft();
-	private static final List<AxisAlignedBB> renderList = new ArrayList<>();
-	private static double playerX;
-	private static double playerY;
-	private static double playerZ;
-	private static IBlockState transmutationResult;
+public class TransmutationRenderingEvent {
+    private static final Minecraft mc = Minecraft.getMinecraft();
+    private static final List<AxisAlignedBB> renderList = new ArrayList<>();
+    private static double playerX;
+    private static double playerY;
+    private static double playerZ;
+    private static IBlockState transmutationResult;
 
-	@SubscribeEvent
-	public static void preDrawHud(RenderGameOverlayEvent.Pre event)
-	{
-		if (event.getType() == ElementType.CROSSHAIRS)
-		{
-			if (transmutationResult != null)
-			{
-				if (FluidRegistry.lookupFluidForBlock(transmutationResult.getBlock()) != null)
-				{
-					TextureAtlasSprite sprite = mc.getTextureMapBlocks().getAtlasSprite(FluidRegistry.lookupFluidForBlock(transmutationResult.getBlock()).getFlowing().toString());
-					mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-					BufferBuilder wr = Tessellator.getInstance().getBuffer();
-					wr.begin(7, DefaultVertexFormats.POSITION_TEX);
-					wr.pos(0, 0, 0).tex(sprite.getMinU(), sprite.getMinV()).endVertex();
-					wr.pos(0, 16, 0).tex(sprite.getMinU(), sprite.getMaxV()).endVertex();
-					wr.pos(16, 16, 0).tex(sprite.getMaxU(), sprite.getMaxV()).endVertex();
-					wr.pos(16, 0, 0).tex(sprite.getMaxU(), sprite.getMinV()).endVertex();
-					Tessellator.getInstance().draw();
-				} else
-				{
-					RenderHelper.enableStandardItemLighting();
+    @SubscribeEvent
+    public static void preDrawHud(RenderGameOverlayEvent.Pre event) {
+        if (event.getType() == ElementType.CROSSHAIRS) {
+            if (transmutationResult != null) {
+                if (FluidRegistry.lookupFluidForBlock(transmutationResult.getBlock()) != null) {
+                    TextureAtlasSprite sprite = mc.getTextureMapBlocks().getAtlasSprite(FluidRegistry.lookupFluidForBlock(transmutationResult.getBlock()).getFlowing().toString());
+                    mc.renderEngine.bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+                    BufferBuilder wr = Tessellator.getInstance().getBuffer();
+                    wr.begin(7, DefaultVertexFormats.POSITION_TEX);
+                    wr.pos(0, 0, 0).tex(sprite.getMinU(), sprite.getMinV()).endVertex();
+                    wr.pos(0, 16, 0).tex(sprite.getMinU(), sprite.getMaxV()).endVertex();
+                    wr.pos(16, 16, 0).tex(sprite.getMaxU(), sprite.getMaxV()).endVertex();
+                    wr.pos(16, 0, 0).tex(sprite.getMaxU(), sprite.getMinV()).endVertex();
+                    Tessellator.getInstance().draw();
+                } else {
+                    RenderHelper.enableStandardItemLighting();
 
-					IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getModelForState(transmutationResult);
-					Minecraft.getMinecraft().getRenderItem().renderItemModelIntoGUI(ItemHelper.stateToDroppedStack(transmutationResult, 1), 0, 0, model);
+                    IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getModelForState(transmutationResult);
+                    Minecraft.getMinecraft().getRenderItem().renderItemModelIntoGUI(ItemHelper.stateToDroppedStack(transmutationResult, 1), 0, 0, model);
 
-					RenderHelper.disableStandardItemLighting();
-				}
-			}
-		}
-	}
-	
-	@SubscribeEvent
-	public static void onOverlay(DrawBlockHighlightEvent event)
-	{
-		EntityPlayer player = Minecraft.getMinecraft().player;
-		World world = player.getEntityWorld();
-		ItemStack stack = player.getHeldItem(EnumHand.MAIN_HAND);
+                    RenderHelper.disableStandardItemLighting();
+                }
+            }
+        }
+    }
 
-		if (stack.isEmpty())
-			stack = player.getHeldItem(EnumHand.OFF_HAND);
-		
-		if (stack.isEmpty() || stack.getItem() != ObjHandler.philosStone)
-		{
-			transmutationResult = null;
-			return;
-		}
-		
-		playerX = player.lastTickPosX + (player.posX - player.lastTickPosX) * (double) event.getPartialTicks();
-		playerY = player.lastTickPosY + (player.posY - player.lastTickPosY) * (double) event.getPartialTicks();
-		playerZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * (double) event.getPartialTicks();
-		
-		RayTraceResult mop = ((PhilosophersStone) ObjHandler.philosStone).getHitBlock(player);
-		
-		if (mop != null && mop.typeOfHit == Type.BLOCK)
-		{
-			IBlockState current = world.getBlockState(mop.getBlockPos());
-			transmutationResult = WorldTransmutations.getWorldTransmutation(current, player.isSneaking());
+    @SubscribeEvent
+    public static void onOverlay(DrawBlockHighlightEvent event) {
+        EntityPlayer player = Minecraft.getMinecraft().player;
+        World world = player.getEntityWorld();
+        ItemStack stack = player.getHeldItem(EnumHand.MAIN_HAND);
 
-			if (transmutationResult != null)
-			{
-				int charge = ((ItemMode) stack.getItem()).getCharge(stack);
-				byte mode = ((ItemMode) stack.getItem()).getMode(stack);
+        if (stack.isEmpty())
+            stack = player.getHeldItem(EnumHand.OFF_HAND);
 
-				for (BlockPos pos : PhilosophersStone.getAffectedPositions(world, mop.getBlockPos(), player, mop.sideHit, mode, charge))
-				{
-					addBlockToRenderList(world, pos);
-				}
-				
-				drawAll();
-				renderList.clear();
-			}
-		}
-		else
-		{
-			transmutationResult = null;
-		}
-	}
-	
-	private static void drawAll()
-	{
-		GlStateManager.enableBlend();
-		GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-		GlStateManager.disableTexture2D();
-		GlStateManager.disableCull();
-		GlStateManager.disableLighting();
-		GlStateManager.depthMask(false);
+        if (stack.isEmpty() || stack.getItem() != ObjHandler.philosStone) {
+            transmutationResult = null;
+            return;
+        }
 
-		GlStateManager.color(1.0f, 1.0f, 1.0f, ProjectEConfig.misc.pulsatingOverlay ? getPulseProportion() * 0.60f : 0.35f);
-		
-		Tessellator tess = Tessellator.getInstance();
-		BufferBuilder wr = tess.getBuffer();
+        playerX = player.lastTickPosX + (player.posX - player.lastTickPosX) * (double) event.getPartialTicks();
+        playerY = player.lastTickPosY + (player.posY - player.lastTickPosY) * (double) event.getPartialTicks();
+        playerZ = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * (double) event.getPartialTicks();
 
-		wr.begin(7, DefaultVertexFormats.POSITION);
+        RayTraceResult mop = ((PhilosophersStone) ObjHandler.philosStone).getHitBlock(player);
 
-		for (AxisAlignedBB b : renderList)
-		{
-			//Top
-			wr.pos(b.minX, b.maxY, b.minZ).endVertex();
-			wr.pos(b.maxX, b.maxY, b.minZ).endVertex();
-			wr.pos(b.maxX, b.maxY, b.maxZ).endVertex();
-			wr.pos(b.minX, b.maxY, b.maxZ).endVertex();
+        if (mop != null && mop.typeOfHit == Type.BLOCK) {
+            IBlockState current = world.getBlockState(mop.getBlockPos());
+            transmutationResult = WorldTransmutations.getWorldTransmutation(current, player.isSneaking());
 
-			//Bottom
-			wr.pos(b.minX, b.minY, b.minZ).endVertex();
-			wr.pos(b.maxX, b.minY, b.minZ).endVertex();
-			wr.pos(b.maxX, b.minY, b.maxZ).endVertex();
-			wr.pos(b.minX, b.minY, b.maxZ).endVertex();
+            if (transmutationResult != null) {
+                int charge = ((ItemMode) stack.getItem()).getCharge(stack);
+                byte mode = ((ItemMode) stack.getItem()).getMode(stack);
 
-			//Front
-			wr.pos(b.maxX, b.maxY, b.maxZ).endVertex();
-			wr.pos(b.minX, b.maxY, b.maxZ).endVertex();
-			wr.pos(b.minX, b.minY, b.maxZ).endVertex();
-			wr.pos(b.maxX, b.minY, b.maxZ).endVertex();
+                for (BlockPos pos : PhilosophersStone.getAffectedPositions(world, mop.getBlockPos(), player, mop.sideHit, mode, charge)) {
+                    addBlockToRenderList(world, pos);
+                }
 
-			//Back
-			wr.pos(b.maxX, b.minY, b.minZ).endVertex();
-			wr.pos(b.minX, b.minY, b.minZ).endVertex();
-			wr.pos(b.minX, b.maxY, b.minZ).endVertex();
-			wr.pos(b.maxX, b.maxY, b.minZ).endVertex();
+                drawAll();
+                renderList.clear();
+            }
+        } else {
+            transmutationResult = null;
+        }
+    }
 
-			//Left
-			wr.pos(b.minX, b.maxY, b.maxZ).endVertex();
-			wr.pos(b.minX, b.maxY, b.minZ).endVertex();
-			wr.pos(b.minX, b.minY, b.minZ).endVertex();
-			wr.pos(b.minX, b.minY, b.maxZ).endVertex();
+    private static void drawAll() {
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        GlStateManager.disableTexture2D();
+        GlStateManager.disableCull();
+        GlStateManager.disableLighting();
+        GlStateManager.depthMask(false);
 
-			//Right
-			wr.pos(b.maxX, b.maxY, b.maxZ).endVertex();
-			wr.pos(b.maxX, b.maxY, b.minZ).endVertex();
-			wr.pos(b.maxX, b.minY, b.minZ).endVertex();
-			wr.pos(b.maxX, b.minY, b.maxZ).endVertex();
-		}
+        GlStateManager.color(1.0f, 1.0f, 1.0f, ProjectEConfig.misc.pulsatingOverlay ? getPulseProportion() * 0.60f : 0.35f);
 
-		tess.draw();
+        Tessellator tess = Tessellator.getInstance();
+        BufferBuilder wr = tess.getBuffer();
 
-		GlStateManager.depthMask(true);
-		GlStateManager.enableCull();
-		GlStateManager.enableLighting();
-		GlStateManager.enableTexture2D();
-		GlStateManager.disableBlend();
-	}
-	
-	private static void addBlockToRenderList(World world, BlockPos pos)
-	{
-		AxisAlignedBB box = world.getBlockState(pos).getSelectedBoundingBox(world, pos).grow(0.02);
-		box = box.offset(-playerX, -playerY, -playerZ);
-		renderList.add(box);
-	}
+        wr.begin(7, DefaultVertexFormats.POSITION);
 
-	private static float getPulseProportion()
-	{
-		return (float) (0.5F * Math.sin(System.currentTimeMillis() / 350.0) + 0.5F);
-	}
+        for (AxisAlignedBB b : renderList) {
+            //Top
+            wr.pos(b.minX, b.maxY, b.minZ).endVertex();
+            wr.pos(b.maxX, b.maxY, b.minZ).endVertex();
+            wr.pos(b.maxX, b.maxY, b.maxZ).endVertex();
+            wr.pos(b.minX, b.maxY, b.maxZ).endVertex();
+
+            //Bottom
+            wr.pos(b.minX, b.minY, b.minZ).endVertex();
+            wr.pos(b.maxX, b.minY, b.minZ).endVertex();
+            wr.pos(b.maxX, b.minY, b.maxZ).endVertex();
+            wr.pos(b.minX, b.minY, b.maxZ).endVertex();
+
+            //Front
+            wr.pos(b.maxX, b.maxY, b.maxZ).endVertex();
+            wr.pos(b.minX, b.maxY, b.maxZ).endVertex();
+            wr.pos(b.minX, b.minY, b.maxZ).endVertex();
+            wr.pos(b.maxX, b.minY, b.maxZ).endVertex();
+
+            //Back
+            wr.pos(b.maxX, b.minY, b.minZ).endVertex();
+            wr.pos(b.minX, b.minY, b.minZ).endVertex();
+            wr.pos(b.minX, b.maxY, b.minZ).endVertex();
+            wr.pos(b.maxX, b.maxY, b.minZ).endVertex();
+
+            //Left
+            wr.pos(b.minX, b.maxY, b.maxZ).endVertex();
+            wr.pos(b.minX, b.maxY, b.minZ).endVertex();
+            wr.pos(b.minX, b.minY, b.minZ).endVertex();
+            wr.pos(b.minX, b.minY, b.maxZ).endVertex();
+
+            //Right
+            wr.pos(b.maxX, b.maxY, b.maxZ).endVertex();
+            wr.pos(b.maxX, b.maxY, b.minZ).endVertex();
+            wr.pos(b.maxX, b.minY, b.minZ).endVertex();
+            wr.pos(b.maxX, b.minY, b.maxZ).endVertex();
+        }
+
+        tess.draw();
+
+        GlStateManager.depthMask(true);
+        GlStateManager.enableCull();
+        GlStateManager.enableLighting();
+        GlStateManager.enableTexture2D();
+        GlStateManager.disableBlend();
+    }
+
+    private static void addBlockToRenderList(World world, BlockPos pos) {
+        AxisAlignedBB box = world.getBlockState(pos).getSelectedBoundingBox(world, pos).grow(0.02);
+        box = box.offset(-playerX, -playerY, -playerZ);
+        renderList.add(box);
+    }
+
+    private static float getPulseProportion() {
+        return (float) (0.5F * Math.sin(System.currentTimeMillis() / 350.0) + 0.5F);
+    }
 }

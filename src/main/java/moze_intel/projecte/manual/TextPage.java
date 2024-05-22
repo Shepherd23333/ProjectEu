@@ -5,27 +5,23 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class TextPage extends AbstractPage
-{
+public class TextPage extends AbstractPage {
     private final String header;
     private final String text;
 
-    protected TextPage(String identifier, PageCategory category, String text)
-    {
+    protected TextPage(String identifier, PageCategory category, String text) {
         super(category);
         this.header = identifier;
         this.text = text;
     }
 
     @Override
-    public String getHeaderText()
-    {
+    public String getHeaderText() {
         return I18n.format("pe.manual." + header + ".header");
     }
 
     @Override
-    public String getBodyText()
-    {
+    public String getBodyText() {
         return text;
     }
 

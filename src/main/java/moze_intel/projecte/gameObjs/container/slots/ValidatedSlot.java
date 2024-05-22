@@ -12,15 +12,13 @@ public class ValidatedSlot extends SlotItemHandler {
 
     private final Predicate<ItemStack> validator;
 
-    public ValidatedSlot(IItemHandler itemHandler, int index, int xPosition, int yPosition, Predicate<ItemStack> validator)
-    {
+    public ValidatedSlot(IItemHandler itemHandler, int index, int xPosition, int yPosition, Predicate<ItemStack> validator) {
         super(itemHandler, index, xPosition, yPosition);
         this.validator = validator;
     }
 
     @Override
-    public boolean isItemValid(@Nonnull ItemStack stack)
-    {
+    public boolean isItemValid(@Nonnull ItemStack stack) {
         return super.isItemValid(stack) && validator.test(stack);
     }
 

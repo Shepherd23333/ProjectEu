@@ -5,7 +5,6 @@ import com.google.common.collect.Maps;
 import moze_intel.projecte.api.tile.IEmcAcceptor;
 import moze_intel.projecte.api.tile.IEmcProvider;
 import moze_intel.projecte.api.tile.TileEmcBase;
-import moze_intel.projecte.utils.Constants;
 import moze_intel.projecte.utils.WorldHelper;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
@@ -17,82 +16,68 @@ import net.minecraft.world.World;
 import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 import java.util.Map;
 
-public abstract class TileEmc extends TileEmcBase implements ITickable
-{
-	public TileEmc()
-	{
-		setMaximumEMC(Constants.TILE_MAX_EMC);
-	}
-	
-	public TileEmc(long maxAmount)
-	{
-		setMaximumEMC(maxAmount);
-	}
+public abstract class TileEmc extends TileEmcBase implements ITickable {
+    public TileEmc() {
+    }
 
-	@Override
-	public final NBTTagCompound getUpdateTag()
-	{
-		return writeToNBT(new NBTTagCompound());
-	}
+    public TileEmc(BigInteger maxAmount) {
+        setMaximumEMC(maxAmount);
+    }
 
-	@Override
-	public boolean shouldRefresh(World world, BlockPos pos, @Nonnull IBlockState state, @Nonnull IBlockState newState)
-	{
-		return state.getBlock() != newState.getBlock();
-	}
-	
-	protected boolean hasMaxedEmc()
-	{
-		return getStoredEmc() >= getMaximumEmc();
-	}
+    @Override
+    public final NBTTagCompound getUpdateTag() {
+        return writeToNBT(new NBTTagCompound());
+    }
 
-	/**
-	 * The amount provided will be divided and evenly distributed as best as possible between adjacent IEMCAcceptors
-	 * Remainder or rejected EMC is added back to this provider
-	 *
-	 * @param emc The maximum combined emc to send to others
-	 */
-	protected void sendToAllAcceptors(long emc)
-	{
-		if (!(this instanceof IEmcProvider))
-		{
-			// todo move this method somewhere
-			throw new UnsupportedOperationException("sending without being a provider");
-		}
+    @Override
+    public boolean shouldRefresh(World world, BlockPos pos, @Nonnull IBlockState state, @Nonnull IBlockState newState) {
+        return state.getBlock() != newState.getBlock();
+    }
+
+    protected boolean hasMaxedEmc() {
+        return getStoredEmc().compareTo(getMaximumEmc()) >= 0;
+    }
+
+    /**
+     * The amount provided will be divided and evenly distributed as best as possible between adjacent IEMCAcceptors
+     * Remainder or rejected EMC is added back to this provider
+     *
+     * @param emc The maximum combined emc to send to others
+     */
+    protected void sendToAllAcceptors(BigInteger emc) {
+        if (!(this instanceof IEmcProvider)) {
+            // todo move this method somewhere
+            throw new UnsupportedOperationException("sending without being a provider");
+        }
 
 
-		Map<EnumFacing, TileEntity> tiles = Maps.filterValues(WorldHelper.getAdjacentTileEntitiesMapped(world, this), Predicates.instanceOf(IEmcAcceptor.class));
-		if (tiles.isEmpty())
-		{
-			return;
-		}
+        Map<EnumFacing, TileEntity> tiles = Maps.filterValues(WorldHelper.getAdjacentTileEntitiesMapped(world, this), Predicates.instanceOf(IEmcAcceptor.class));
+        if (tiles.isEmpty()) {
+            return;
+        }
 
-		long emcPer = emc / tiles.size();
-		for (Map.Entry<EnumFacing, TileEntity> entry : tiles.entrySet())
-		{
-			if (this instanceof RelayMK1Tile && entry.getValue() instanceof RelayMK1Tile)
-			{
-				continue;
-			}
-			long provide = ((IEmcProvider) this).provideEMC(entry.getKey().getOpposite(), emcPer);
-			long remain = provide - ((IEmcAcceptor) entry.getValue()).acceptEMC(entry.getKey(), provide);
-			this.addEMC(remain);
-		}
-	}
+        BigInteger emcPer = emc.divide(BigInteger.valueOf(tiles.size()));
+        for (Map.Entry<EnumFacing, TileEntity> entry : tiles.entrySet()) {
+            if (this instanceof RelayMK1Tile && entry.getValue() instanceof RelayMK1Tile) {
+                continue;
+            }
+            BigInteger provide = ((IEmcProvider) this).provideEMC(entry.getKey().getOpposite(), emcPer);
+            BigInteger remain = provide.subtract(((IEmcAcceptor) entry.getValue()).acceptEMC(entry.getKey(), provide));
+            this.addEMC(remain);
+        }
+    }
 
-	class StackHandler extends ItemStackHandler
-	{
-		StackHandler(int size)
-		{
-			super(size);
-		}
+    class StackHandler extends ItemStackHandler {
+        StackHandler(int size) {
+            super(size);
+        }
 
-		@Override
-		public void onContentsChanged(int slot)
-		{
-			TileEmc.this.markDirty();
-		}
-	}
+        @Override
+        public void onContentsChanged(int slot) {
+            TileEmc.this.markDirty();
+        }
+    }
 }

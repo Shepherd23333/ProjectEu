@@ -7,4 +7,5 @@ import net.minecraftforge.fml.common.eventhandler.Event;
  * This event is not cancelable, and has no result
  * This event is fired on MinecraftForge#EVENT_BUS
  */
-public class EMCRemapEvent extends Event {}
+public class EMCRemapEvent extends Event {
+}

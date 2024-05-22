@@ -9,10 +9,8 @@ import net.minecraftforge.fml.common.event.FMLInterModComms;
 import java.util.Locale;
 
 // TODO 1.13 change to use te/entity ids instead of class names
-public class IMCHandler
-{
-    public static void handleIMC(FMLInterModComms.IMCMessage msg)
-    {
+public class IMCHandler {
+    public static void handleIMC(FMLInterModComms.IMCMessage msg) {
         String messageKey = msg.key.toLowerCase(Locale.ROOT);
         if ("interdictionblacklist".equals(messageKey) && msg.isStringMessage()) {
             blacklist(false, msg);
@@ -27,49 +25,37 @@ public class IMCHandler
         }
     }
 
-    private static void blacklist(boolean isSWRG, FMLInterModComms.IMCMessage msg)
-    {
+    private static void blacklist(boolean isSWRG, FMLInterModComms.IMCMessage msg) {
         Class<? extends Entity> clazz = loadAndCheckSubclass(msg.getStringValue(), Entity.class);
-        if (clazz != null)
-        {
-            if (isSWRG)
-            {
+        if (clazz != null) {
+            if (isSWRG) {
                 ((BlacklistProxyImpl) BlacklistProxyImpl.instance).doBlacklistSwiftwolf(clazz, msg.getSender());
-            }
-            else
-            {
+            } else {
                 ((BlacklistProxyImpl) BlacklistProxyImpl.instance).doBlacklistInterdiction(clazz, msg.getSender());
             }
         }
 
     }
 
-    private static void blacklistWatch(FMLInterModComms.IMCMessage msg)
-    {
+    private static void blacklistWatch(FMLInterModComms.IMCMessage msg) {
         Class<? extends TileEntity> clazz = loadAndCheckSubclass(msg.getStringValue(), TileEntity.class);
-        if (clazz != null)
-        {
+        if (clazz != null) {
             ((BlacklistProxyImpl) BlacklistProxyImpl.instance).doBlacklistTimewatch(clazz, msg.getSender());
         }
     }
 
-    private static void whitelistNBT(FMLInterModComms.IMCMessage msg)
-    {
+    private static void whitelistNBT(FMLInterModComms.IMCMessage msg) {
         ItemStack s = msg.getItemStackValue();
-        if (!s.isEmpty())
-        {
+        if (!s.isEmpty()) {
             ((BlacklistProxyImpl) BlacklistProxyImpl.instance).doWhitelistNBT(s, msg.getSender());
         }
     }
 
     @SuppressWarnings("unchecked")
-    private static <T, U extends T> Class<U> loadAndCheckSubclass(String name, Class<T> toCheck)
-    {
-        try
-        {
+    private static <T, U extends T> Class<U> loadAndCheckSubclass(String name, Class<T> toCheck) {
+        try {
             Class<?> clazz = Class.forName(name);
-            if (toCheck.isAssignableFrom(clazz))
-            {
+            if (toCheck.isAssignableFrom(clazz)) {
                 return (Class<U>) clazz;
             }
         } catch (ClassNotFoundException ex) {

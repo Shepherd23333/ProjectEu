@@ -16,40 +16,33 @@ import net.minecraftforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nonnull;
 
-public class Condenser extends AlchemicalChest
-{
-	public Condenser() 
-	{
-		this.setTranslationKey("pe_condenser");
-	}
-	
-	@Nonnull
-	@Override
-	public TileEntity createTileEntity(@Nonnull World world, @Nonnull IBlockState state)
-	{
-		return new CondenserTile();
-	}
-	
-	@Override
-	public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ)
-	{
-		if (!world.isRemote) 
-		{
-			player.openGui(PECore.instance, Constants.CONDENSER_GUI, world, pos.getX(), pos.getY(), pos.getZ());
-		}
-		
-		return true;
-	}
+public class Condenser extends AlchemicalChest {
+    public Condenser() {
+        this.setTranslationKey("pe_condenser");
+    }
 
-	@Override
-	public int getComparatorInputOverride(IBlockState state, World world, BlockPos pos)
-	{
-		TileEntity te = world.getTileEntity(pos);
-		if (te != null)
-		{
-			IItemHandler inv = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-			return ItemHandlerHelper.calcRedstoneFromInventory(inv);
-		}
-		return 0;
-	}
+    @Nonnull
+    @Override
+    public TileEntity createTileEntity(@Nonnull World world, @Nonnull IBlockState state) {
+        return new CondenserTile();
+    }
+
+    @Override
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
+        if (!world.isRemote) {
+            player.openGui(PECore.instance, Constants.CONDENSER_GUI, world, pos.getX(), pos.getY(), pos.getZ());
+        }
+
+        return true;
+    }
+
+    @Override
+    public int getComparatorInputOverride(IBlockState state, World world, BlockPos pos) {
+        TileEntity te = world.getTileEntity(pos);
+        if (te != null) {
+            IItemHandler inv = te.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+            return ItemHandlerHelper.calcRedstoneFromInventory(inv);
+        }
+        return 0;
+    }
 }

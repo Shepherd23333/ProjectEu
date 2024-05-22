@@ -17,20 +17,16 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class PEManual extends ItemPE
-{
-    public PEManual()
-    {
+public class PEManual extends ItemPE {
+    public PEManual() {
         this.setTranslationKey("manual");
         this.setMaxStackSize(1);
     }
 
     @Nonnull
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, @Nonnull EnumHand hand)
-    {
-        if (world.isRemote)
-        {
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, @Nonnull EnumHand hand) {
+        if (world.isRemote) {
             FMLCommonHandler.instance().showGuiScreen(new GUIManual());
         }
         return ActionResult.newResult(EnumActionResult.SUCCESS, player.getHeldItem(hand));
@@ -38,8 +34,7 @@ public class PEManual extends ItemPE
 
     @SideOnly(Side.CLIENT)
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag flags)
-    {
+    public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag flags) {
         tooltip.add(I18n.format("pe.manual.tooltip1"));
     }
 

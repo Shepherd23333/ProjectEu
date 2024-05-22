@@ -3,52 +3,45 @@ package moze_intel.projecte.api.tile;
 import net.minecraft.util.EnumFacing;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 
 /**
  * Reference implementation of both IEMCAcceptor and IEMCProvider
  *
  * @author williewillus
  */
-public class TileEmcHandler extends TileEmcBase implements IEmcAcceptor, IEmcProvider
-{
-	public TileEmcHandler()
-	{
-		this.maximumEMC = Long.MAX_VALUE;
-	}
+public class TileEmcHandler extends TileEmcBase implements IEmcAcceptor, IEmcProvider {
+    public TileEmcHandler() {
+    }
 
-	public TileEmcHandler(long max)
-	{
-		this.maximumEMC = max;
-	}
+    public TileEmcHandler(BigInteger max) {
+        this.maximumEMC = max;
+    }
 
-	// -- IEMCAcceptor -- //
-	@Override
-	public long acceptEMC(@Nonnull EnumFacing side, long toAccept)
-	{
-		long toAdd = Math.min(maximumEMC - currentEMC, toAccept);
-		currentEMC += toAdd;
-		return toAdd;
-	}
+    // -- IEMCAcceptor -- //
+    @Override
+    public BigInteger acceptEMC(@Nonnull EnumFacing side, BigInteger toAccept) {
+        BigInteger toAdd = maximumEMC.subtract(currentEMC).min(toAccept);
+        currentEMC = currentEMC.add(toAdd);
+        return toAdd;
+    }
 
-	// -- IEMCProvider -- //
-	@Override
-	public long provideEMC(@Nonnull EnumFacing side, long toExtract)
-	{
-		long toRemove = Math.min(currentEMC, toExtract);
-		currentEMC -= toRemove;
-		return toRemove;
-	}
+    // -- IEMCProvider -- //
+    @Override
+    public BigInteger provideEMC(@Nonnull EnumFacing side, BigInteger toExtract) {
+        BigInteger toRemove = currentEMC.min(toExtract);
+        currentEMC = currentEMC.subtract(toRemove);
+        return toRemove;
+    }
 
-	// -- IEMCStorage --//
-	@Override
-	public long getStoredEmc()
-	{
-		return currentEMC;
-	}
+    // -- IEMCStorage --//
+    @Override
+    public BigInteger getStoredEmc() {
+        return currentEMC;
+    }
 
-	@Override
-	public long getMaximumEmc()
-	{
-		return maximumEMC;
-	}
+    @Override
+    public BigInteger getMaximumEmc() {
+        return maximumEMC;
+    }
 }

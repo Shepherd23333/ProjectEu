@@ -11,14 +11,11 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
  * Helper class for anything having to do with Fluids
  * Notice: Please try to keep methods tidy and alphabetically ordered. Thanks!
  */
-public final class FluidHelper
-{
-	public static void tryFillTank(TileEntity tile, Fluid fluid, EnumFacing side, int quantity)
-	{
-		if (tile.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side))
-		{
-			IFluidHandler handler = tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side);
-			handler.fill(new FluidStack(fluid, quantity), true);
-		}
-	}
+public final class FluidHelper {
+    public static void tryFillTank(TileEntity tile, Fluid fluid, EnumFacing side, int quantity) {
+        if (tile.hasCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side)) {
+            IFluidHandler handler = tile.getCapability(CapabilityFluidHandler.FLUID_HANDLER_CAPABILITY, side);
+            handler.fill(new FluidStack(fluid, quantity), true);
+        }
+    }
 }

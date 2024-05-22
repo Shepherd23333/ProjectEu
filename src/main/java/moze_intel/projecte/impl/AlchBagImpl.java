@@ -23,16 +23,12 @@ import javax.annotation.Nullable;
 import java.util.EnumMap;
 import java.util.Map;
 
-public final class AlchBagImpl
-{
+public final class AlchBagImpl {
 
-    public static void init()
-    {
-        CapabilityManager.INSTANCE.register(IAlchBagProvider.class, new Capability.IStorage<IAlchBagProvider>()
-        {
+    public static void init() {
+        CapabilityManager.INSTANCE.register(IAlchBagProvider.class, new Capability.IStorage<IAlchBagProvider>() {
             @Override
-            public NBTTagCompound writeNBT(Capability<IAlchBagProvider> capability, IAlchBagProvider instance, EnumFacing side)
-            {
+            public NBTTagCompound writeNBT(Capability<IAlchBagProvider> capability, IAlchBagProvider instance, EnumFacing side) {
                 return instance.serializeNBT();
             }
 
@@ -44,16 +40,13 @@ public final class AlchBagImpl
         }, DefaultImpl::new);
     }
 
-    private static class DefaultImpl implements IAlchBagProvider
-    {
+    private static class DefaultImpl implements IAlchBagProvider {
         private final Map<EnumDyeColor, IItemHandler> inventories = new EnumMap<>(EnumDyeColor.class);
 
         @Nonnull
         @Override
-        public IItemHandler getBag(@Nonnull EnumDyeColor color)
-        {
-            if (!inventories.containsKey(color))
-            {
+        public IItemHandler getBag(@Nonnull EnumDyeColor color) {
+            if (!inventories.containsKey(color)) {
                 inventories.put(color, new ItemStackHandler(104));
             }
 
@@ -61,19 +54,15 @@ public final class AlchBagImpl
         }
 
         @Override
-        public void sync(@Nullable EnumDyeColor color, @Nonnull EntityPlayerMP player)
-        {
+        public void sync(@Nullable EnumDyeColor color, @Nonnull EntityPlayerMP player) {
             PacketHandler.sendTo(new SyncBagDataPKT(writeNBT(color)), player);
         }
 
-        private NBTTagCompound writeNBT(EnumDyeColor color)
-        {
+        private NBTTagCompound writeNBT(EnumDyeColor color) {
             NBTTagCompound ret = new NBTTagCompound();
-            EnumDyeColor[] colors = color == null ? EnumDyeColor.values() : new EnumDyeColor[] { color };
-            for (EnumDyeColor c : colors)
-            {
-                if (inventories.containsKey(c))
-                {
+            EnumDyeColor[] colors = color == null ? EnumDyeColor.values() : new EnumDyeColor[]{color};
+            for (EnumDyeColor c : colors) {
+                if (inventories.containsKey(c)) {
                     NBTBase inv = CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.getStorage()
                             .writeNBT(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, inventories.get(c), null);
                     ret.setTag(c.getName(), inv);
@@ -83,18 +72,14 @@ public final class AlchBagImpl
         }
 
         @Override
-        public NBTTagCompound serializeNBT()
-        {
+        public NBTTagCompound serializeNBT() {
             return writeNBT(null);
         }
 
         @Override
-        public void deserializeNBT(NBTTagCompound nbt)
-        {
-            for (EnumDyeColor e : EnumDyeColor.values())
-            {
-                if (nbt.hasKey(e.getName()))
-                {
+        public void deserializeNBT(NBTTagCompound nbt) {
+            for (EnumDyeColor e : EnumDyeColor.values()) {
+                if (nbt.hasKey(e.getName())) {
                     IItemHandler inv = new ItemStackHandler(104);
                     CapabilityItemHandler.ITEM_HANDLER_CAPABILITY.getStorage()
                             .readNBT(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, inv, null, nbt.getTag(e.getName()));
@@ -104,24 +89,20 @@ public final class AlchBagImpl
         }
     }
 
-    public static class Provider implements ICapabilitySerializable<NBTTagCompound>
-    {
+    public static class Provider implements ICapabilitySerializable<NBTTagCompound> {
 
         public static final ResourceLocation NAME = new ResourceLocation(PECore.MODID, "alch_bags");
 
         private final IAlchBagProvider cap = new DefaultImpl();
 
         @Override
-        public boolean hasCapability(@Nonnull Capability<?> capability, EnumFacing facing)
-        {
+        public boolean hasCapability(@Nonnull Capability<?> capability, EnumFacing facing) {
             return capability == ProjectEAPI.ALCH_BAG_CAPABILITY;
         }
 
         @Override
-        public <T> T getCapability(@Nonnull Capability<T> capability, EnumFacing facing)
-        {
-            if (capability == ProjectEAPI.ALCH_BAG_CAPABILITY)
-            {
+        public <T> T getCapability(@Nonnull Capability<T> capability, EnumFacing facing) {
+            if (capability == ProjectEAPI.ALCH_BAG_CAPABILITY) {
                 return ProjectEAPI.ALCH_BAG_CAPABILITY.cast(cap);
             }
 
@@ -129,18 +110,17 @@ public final class AlchBagImpl
         }
 
         @Override
-        public NBTTagCompound serializeNBT()
-        {
+        public NBTTagCompound serializeNBT() {
             return cap.serializeNBT();
         }
 
         @Override
-        public void deserializeNBT(NBTTagCompound nbt)
-        {
+        public void deserializeNBT(NBTTagCompound nbt) {
             cap.deserializeNBT(nbt);
         }
     }
 
-    private AlchBagImpl() {}
+    private AlchBagImpl() {
+    }
 
 }

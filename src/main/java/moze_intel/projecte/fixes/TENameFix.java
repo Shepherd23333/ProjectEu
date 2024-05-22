@@ -8,12 +8,10 @@ import net.minecraft.util.datafix.IFixableData;
 import javax.annotation.Nonnull;
 import java.util.Map;
 
-public class TENameFix implements IFixableData
-{
+public class TENameFix implements IFixableData {
     private static final Map<String, String> NAME_MAP;
-    
-    static
-    {
+
+    static {
         ImmutableMap.Builder<String, String> builder = ImmutableMap.builder();
         builder.put("minecraft:alchchesttile", PECore.MODID + ":alchemical_chest");
         builder.put("minecraft:interdictiontile", PECore.MODID + ":interdiction_torch");
@@ -30,7 +28,7 @@ public class TENameFix implements IFixableData
         builder.put("minecraft:dmpedestaltile", PECore.MODID + ":dm_pedestal");
         NAME_MAP = builder.build();
     }
-    
+
     @Override
     public int getFixVersion() {
         return 1;
@@ -38,11 +36,9 @@ public class TENameFix implements IFixableData
 
     @Nonnull
     @Override
-    public NBTTagCompound fixTagCompound(@Nonnull NBTTagCompound compound)
-    {
+    public NBTTagCompound fixTagCompound(@Nonnull NBTTagCompound compound) {
         String oldId = compound.getString("id");
-        if (NAME_MAP.containsKey(oldId))
-        {
+        if (NAME_MAP.containsKey(oldId)) {
             PECore.debugLog("Fixed TE from {} to {}", oldId, NAME_MAP.get(oldId));
             compound.setString("id", NAME_MAP.get(oldId));
         }

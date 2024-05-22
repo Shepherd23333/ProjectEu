@@ -1,5 +1,7 @@
 package moze_intel.projecte.api.tile;
 
+import java.math.BigInteger;
+
 /**
  * Defines the contract for arbitrary objects that can store EMC
  * You usually do not want to use this directly
@@ -7,17 +9,18 @@ package moze_intel.projecte.api.tile;
  *
  * @author williewillus
  */
-public interface IEmcStorage
-{
-	/**
-	 * Gets the current amount of EMC in this IEMCStorage
-	 * @return The current EMC stored
-	 */
-	long getStoredEmc();
+public interface IEmcStorage {
+    /**
+     * Gets the current amount of EMC in this IEMCStorage
+     *
+     * @return The current EMC stored
+     */
+    BigInteger getStoredEmc();
 
-	/**
-	 * Gets the maximum amount of EMC this IEMCStorage is allowed to contain
-	 * @return The maximum EMC allowed
-	 */
-	long getMaximumEmc();
+    /**
+     * Gets the maximum amount of EMC this IEMCStorage is allowed to contain
+     *
+     * @return The maximum EMC allowed
+     */
+    BigInteger getMaximumEmc();
 }

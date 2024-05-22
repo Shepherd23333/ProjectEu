@@ -20,75 +20,63 @@ import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
 
-public abstract class BlockDirection extends Block
-{
+public abstract class BlockDirection extends Block {
 
-	public BlockDirection(Material material)
-	{
-		super(material);
-		this.setCreativeTab(ObjHandler.cTab);
-	}
+    public BlockDirection(Material material) {
+        super(material);
+        this.setCreativeTab(ObjHandler.cTab);
+    }
 
-	@Nonnull
-	@Override
-	public BlockStateContainer createBlockState()
-	{
-		return new BlockStateContainer(this, PEStateProps.FACING);
-	}
+    @Nonnull
+    @Override
+    public BlockStateContainer createBlockState() {
+        return new BlockStateContainer(this, PEStateProps.FACING);
+    }
 
-	@Override
-	public int getMetaFromState(IBlockState state)
-	{
-		return state.getValue(PEStateProps.FACING).getHorizontalIndex();
-	}
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return state.getValue(PEStateProps.FACING).getHorizontalIndex();
+    }
 
-	@Nonnull
-	@Override
-	public IBlockState getStateFromMeta(int meta)
-	{
-		return this.getDefaultState().withProperty(PEStateProps.FACING, EnumFacing.byHorizontalIndex(meta));
-	}
+    @Nonnull
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return this.getDefaultState().withProperty(PEStateProps.FACING, EnumFacing.byHorizontalIndex(meta));
+    }
 
-	@Nonnull
-	@Override
-	public IBlockState getStateForPlacement(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull EnumFacing facing, float hitX, float hitY, float hitZ, int meta, @Nonnull EntityLivingBase placer, EnumHand hand)
-	{
-		return getStateFromMeta(meta).withProperty(PEStateProps.FACING, placer.getHorizontalFacing().getOpposite());
-	}
+    @Nonnull
+    @Override
+    public IBlockState getStateForPlacement(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull EnumFacing facing, float hitX, float hitY, float hitZ, int meta, @Nonnull EntityLivingBase placer, EnumHand hand) {
+        return getStateFromMeta(meta).withProperty(PEStateProps.FACING, placer.getHorizontalFacing().getOpposite());
+    }
 
-	@Override
-	public void breakBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBlockState state)
-	{
-		TileEntity tile = world.getTileEntity(pos);
+    @Override
+    public void breakBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBlockState state) {
+        TileEntity tile = world.getTileEntity(pos);
 
-		if (tile != null)
-		{
-			IItemHandler inv = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
-			WorldHelper.dropInventory(inv, world, pos);
-		}
+        if (tile != null) {
+            IItemHandler inv = tile.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+            WorldHelper.dropInventory(inv, world, pos);
+        }
 
-		super.breakBlock(world, pos, state);
-	}
-	
-	@Override
-	public void onBlockClicked(World world, BlockPos pos, EntityPlayer player)
-	{
-		if (world.isRemote)
-		{
-			return;
-		}
-		
-		ItemStack stack = player.getHeldItem(EnumHand.MAIN_HAND);
-		
-		if (!stack.isEmpty() && stack.getItem() == ObjHandler.philosStone)
-		{
-			setFacingMeta(world, pos, player);
-		}
-	}
+        super.breakBlock(world, pos, state);
+    }
 
-	private void setFacingMeta(World world, BlockPos pos, EntityPlayer player)
-	{
-		world.setBlockState(pos, world.getBlockState(pos).withProperty(PEStateProps.FACING, player.getHorizontalFacing().getOpposite()));
-	}
+    @Override
+    public void onBlockClicked(World world, BlockPos pos, EntityPlayer player) {
+        if (world.isRemote) {
+            return;
+        }
+
+        ItemStack stack = player.getHeldItem(EnumHand.MAIN_HAND);
+
+        if (!stack.isEmpty() && stack.getItem() == ObjHandler.philosStone) {
+            setFacingMeta(world, pos, player);
+        }
+    }
+
+    private void setFacingMeta(World world, BlockPos pos, EntityPlayer player) {
+        world.setBlockState(pos, world.getBlockState(pos).withProperty(PEStateProps.FACING, player.getHorizontalFacing().getOpposite()));
+    }
 
 }

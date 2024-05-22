@@ -8,18 +8,15 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
 
-public class CreativeTab extends CreativeTabs
-{
-	public CreativeTab()
-	{
-		super(PECore.MODID);
-	}
+public class CreativeTab extends CreativeTabs {
+    public CreativeTab() {
+        super(PECore.MODID);
+    }
 
-	@Nonnull
-	@Override
-	@SideOnly(Side.CLIENT)
-	public ItemStack createIcon()
-	{
-		return new ItemStack(ObjHandler.philosStone);
-	}
+    @Nonnull
+    @Override
+    @SideOnly(Side.CLIENT)
+    public ItemStack createIcon() {
+        return new ItemStack(ObjHandler.philosStone);
+    }
 }

@@ -22,16 +22,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class WorldTransmuteRecipeCategory implements IRecipeCategory
-{
+public class WorldTransmuteRecipeCategory implements IRecipeCategory {
     public static final String UID = "pe.worldtransmute";
     private final IDrawable background;
     private final IDrawable arrow;
     private final IDrawable icon;
     private final String localizedName;
 
-    public WorldTransmuteRecipeCategory(IGuiHelper guiHelper)
-    {
+    public WorldTransmuteRecipeCategory(IGuiHelper guiHelper) {
         background = guiHelper.createBlankDrawable(175, 48);
         arrow = guiHelper.createDrawable(new ResourceLocation(PECore.MODID, "textures/gui/arrow.png"), 0, 0, 22, 15, 32, 32);
         icon = guiHelper.createDrawable(new ResourceLocation(PECore.MODID, "textures/items/philosophers_stone.png"), 0, 0, 16, 16, 16, 16);
@@ -40,15 +38,13 @@ public class WorldTransmuteRecipeCategory implements IRecipeCategory
 
     @Nonnull
     @Override
-    public String getUid()
-    {
+    public String getUid() {
         return UID;
     }
 
     @Nonnull
     @Override
-    public String getTitle()
-    {
+    public String getTitle() {
         return localizedName;
     }
 
@@ -60,33 +56,28 @@ public class WorldTransmuteRecipeCategory implements IRecipeCategory
 
     @Nonnull
     @Override
-    public IDrawable getBackground()
-    {
+    public IDrawable getBackground() {
         return background;
     }
 
     @Nullable
     @Override
-    public IDrawable getIcon()
-    {
+    public IDrawable getIcon() {
         return icon;
     }
 
     @Override
-    public void drawExtras(@Nonnull Minecraft minecraft)
-    {
+    public void drawExtras(@Nonnull Minecraft minecraft) {
         arrow.draw(minecraft, 75, 18);
     }
 
     @Override
-    public void setRecipe(@Nonnull IRecipeLayout recipeLayout, @Nonnull IRecipeWrapper recipeWrapper, @Nonnull IIngredients ingredients)
-    {
+    public void setRecipe(@Nonnull IRecipeLayout recipeLayout, @Nonnull IRecipeWrapper recipeWrapper, @Nonnull IIngredients ingredients) {
         int itemSlots = 0;
         int fluidSlots = 0;
 
         int xPos = 16;
-        for (List<FluidStack> s : ingredients.getInputs(FluidStack.class))
-        {
+        for (List<FluidStack> s : ingredients.getInputs(FluidStack.class)) {
             recipeLayout.getFluidStacks().init(fluidSlots, true, xPos, 16, 16, 16, 1000, false, null);
             recipeLayout.getFluidStacks().set(fluidSlots, s);
             fluidSlots++;
@@ -94,8 +85,7 @@ public class WorldTransmuteRecipeCategory implements IRecipeCategory
         }
 
         xPos = 16;
-        for (List<ItemStack> s : ingredients.getInputs(ItemStack.class))
-        {
+        for (List<ItemStack> s : ingredients.getInputs(ItemStack.class)) {
             recipeLayout.getItemStacks().init(itemSlots, true, xPos, 16);
             recipeLayout.getItemStacks().set(itemSlots, s);
             itemSlots++;
@@ -103,8 +93,7 @@ public class WorldTransmuteRecipeCategory implements IRecipeCategory
         }
 
         xPos = 128;
-        for (List<ItemStack> stacks : ingredients.getOutputs(ItemStack.class))
-        {
+        for (List<ItemStack> stacks : ingredients.getOutputs(ItemStack.class)) {
             recipeLayout.getItemStacks().init(itemSlots, false, xPos, 16);
             recipeLayout.getItemStacks().set(itemSlots, stacks);
             itemSlots++;
@@ -112,8 +101,7 @@ public class WorldTransmuteRecipeCategory implements IRecipeCategory
         }
 
         xPos = 128;
-        for (List<FluidStack> stacks : ingredients.getOutputs(FluidStack.class))
-        {
+        for (List<FluidStack> stacks : ingredients.getOutputs(FluidStack.class)) {
             recipeLayout.getFluidStacks().init(fluidSlots, false, xPos, 16, 16, 16, 1000, false, null);
             recipeLayout.getFluidStacks().set(fluidSlots, stacks);
             fluidSlots++;
@@ -128,30 +116,24 @@ public class WorldTransmuteRecipeCategory implements IRecipeCategory
         return Collections.emptyList();
     }
 
-    public static List<WorldTransmuteEntry> getAllTransmutations()
-    {
+    public static List<WorldTransmuteEntry> getAllTransmutations() {
         List<WorldTransmutations.Entry> allWorldTransmutations = WorldTransmutations.getWorldTransmutations();
         //All the ones that have a block state that can be rendered in JEI.
         //For example only render one pumpkin to melon transmutation
         List<WorldTransmuteEntry> visible = new ArrayList<>();
         allWorldTransmutations.forEach(entry -> {
             WorldTransmuteEntry e = new WorldTransmuteEntry(entry);
-            if (e.isRenderable())
-            {
+            if (e.isRenderable()) {
                 boolean alreadyHas;
                 FluidStack inputFluid = e.getInputFluid();
-                if (inputFluid != null)
-                {
+                if (inputFluid != null) {
                     Fluid fluid = inputFluid.getFluid();
                     alreadyHas = visible.stream().map(WorldTransmuteEntry::getInputFluid).anyMatch(otherInputFluid -> otherInputFluid != null && fluid == otherInputFluid.getFluid());
-                }
-                else
-                {
+                } else {
                     ItemStack inputItem = e.getInputItem();
                     alreadyHas = visible.stream().anyMatch(otherEntry -> ItemHelper.basicAreStacksEqual(inputItem, otherEntry.getInputItem()));
                 }
-                if (!alreadyHas)
-                {
+                if (!alreadyHas) {
                     //Only add items that we haven't already had.
                     visible.add(e);
                 }

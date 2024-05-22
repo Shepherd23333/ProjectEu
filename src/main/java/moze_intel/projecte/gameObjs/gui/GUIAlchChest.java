@@ -12,37 +12,32 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
-public class GUIAlchChest extends GuiContainer
-{
-	private static final ResourceLocation texture = new ResourceLocation(PECore.MODID.toLowerCase(), "textures/gui/alchchest.png");
-	
-	public GUIAlchChest(InventoryPlayer invPlayer, AlchChestTile tile) 
-	{
-		super(new AlchChestContainer(invPlayer, tile));
-		this.xSize = 255;
-		this.ySize = 230;
-	}
-	
-	public GUIAlchChest(InventoryPlayer invPlayer, EnumHand hand, IItemHandlerModifiable invBag)
-	{
-		super(new AlchBagContainer(invPlayer, hand, invBag));
-		this.xSize = 255;
-		this.ySize = 230;
-	}
+public class GUIAlchChest extends GuiContainer {
+    private static final ResourceLocation texture = new ResourceLocation(PECore.MODID.toLowerCase(), "textures/gui/alchchest.png");
 
-	@Override
-	public void drawScreen(int mouseX, int mouseY, float partialTicks)
-    {
+    public GUIAlchChest(InventoryPlayer invPlayer, AlchChestTile tile) {
+        super(new AlchChestContainer(invPlayer, tile));
+        this.xSize = 255;
+        this.ySize = 230;
+    }
+
+    public GUIAlchChest(InventoryPlayer invPlayer, EnumHand hand, IItemHandlerModifiable invBag) {
+        super(new AlchBagContainer(invPlayer, hand, invBag));
+        this.xSize = 255;
+        this.ySize = 230;
+    }
+
+    @Override
+    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
         super.drawScreen(mouseX, mouseY, partialTicks);
         this.renderHoveredToolTip(mouseX, mouseY);
     }
 
-	@Override
-	protected void drawGuiContainerBackgroundLayer(float var1, int var2, int var3) 
-	{
-		GlStateManager.color(1, 1, 1, 1);
-		Minecraft.getMinecraft().renderEngine.bindTexture(texture);
-		this.drawTexturedModalRect((width - xSize) / 2, (height - ySize) / 2, 0, 0, xSize, ySize);
-	}
+    @Override
+    protected void drawGuiContainerBackgroundLayer(float var1, int var2, int var3) {
+        GlStateManager.color(1, 1, 1, 1);
+        Minecraft.getMinecraft().renderEngine.bindTexture(texture);
+        this.drawTexturedModalRect((width - xSize) / 2, (height - ySize) / 2, 0, 0, xSize, ySize);
+    }
 }

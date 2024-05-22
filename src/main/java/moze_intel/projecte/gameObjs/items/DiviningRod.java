@@ -1,6 +1,5 @@
 package moze_intel.projecte.gameObjs.items;
 
-import com.google.common.collect.Lists;
 import moze_intel.projecte.api.item.IModeChanger;
 import moze_intel.projecte.gameObjs.ObjHandler;
 import moze_intel.projecte.utils.EMCHelper;
@@ -11,11 +10,9 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -28,179 +25,150 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-public class DiviningRod extends ItemPE implements IModeChanger
-{
-	// Modes should be in the format depthx3x3
-	private final String[] modes;
+public class DiviningRod extends ItemPE implements IModeChanger {
+    // Modes should be in the format depthx3x3
+    private final String[] modes;
 
-	public DiviningRod(String[] modeDesc)
-	{
-		modes = modeDesc;
-	}
-	
-	@Nonnull
-	@Override
-	public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
-	{
-		if (world.isRemote)
-		{
-			return EnumActionResult.SUCCESS;
-		}
+    public DiviningRod(String[] modeDesc) {
+        modes = modeDesc;
+    }
 
-		PlayerHelper.swingItem(player, hand);
-		List<Long> emcValues = new ArrayList<>();
-		long totalEmc = 0;
-		int numBlocks = 0;
+    @Nonnull
+    @Override
+    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        if (world.isRemote) {
+            return EnumActionResult.SUCCESS;
+        }
 
-		byte mode = getMode(player.getHeldItem(hand));
-		int depth = getDepthFromMode(mode);
-		AxisAlignedBB box = WorldHelper.getDeepBox(pos, facing, depth);
+        PlayerHelper.swingItem(player, hand);
+        List<BigInteger> emcValues = new ArrayList<>();
+        BigInteger totalEmc = BigInteger.ZERO;
+        int numBlocks = 0;
 
-		for (BlockPos digPos : WorldHelper.getPositionsFromBox(box))
-		{
-			IBlockState state = world.getBlockState(digPos);
-			Block block = state.getBlock();
+        byte mode = getMode(player.getHeldItem(hand));
+        int depth = getDepthFromMode(mode);
+        AxisAlignedBB box = WorldHelper.getDeepBox(pos, facing, depth);
 
-			if (world.isAirBlock(digPos))
-			{
-				continue;
-			}
+        for (BlockPos digPos : WorldHelper.getPositionsFromBox(box)) {
+            IBlockState state = world.getBlockState(digPos);
+            Block block = state.getBlock();
 
-			List<ItemStack> drops = block.getDrops(world, digPos, state, 0);
+            if (world.isAirBlock(digPos)) {
+                continue;
+            }
 
-			if (drops.size() == 0)
-			{
-				continue;
-			}
+            List<ItemStack> drops = block.getDrops(world, digPos, state, 0);
 
-			ItemStack blockStack = drops.get(0);
-			long blockEmc = EMCHelper.getEmcValue(blockStack);
+            if (drops.size() == 0) {
+                continue;
+            }
 
-			if (blockEmc == 0)
-			{
-				Map<ItemStack, ItemStack> map = FurnaceRecipes.instance().getSmeltingList();
+            ItemStack blockStack = drops.get(0);
+            BigInteger blockEmc = EMCHelper.getEmcValue(blockStack);
 
-				for (Entry<ItemStack, ItemStack> entry : map.entrySet())
-				{
-					if (entry == null || entry.getKey().isEmpty())
-					{
-						continue;
-					}
+            if (blockEmc.equals(BigInteger.ZERO)) {
+                Map<ItemStack, ItemStack> map = FurnaceRecipes.instance().getSmeltingList();
 
-					if (ItemHelper.areItemStacksEqualIgnoreNBT(entry.getKey(), blockStack))
-					{
-						long currentValue = EMCHelper.getEmcValue(entry.getValue());
+                for (Entry<ItemStack, ItemStack> entry : map.entrySet()) {
+                    if (entry == null || entry.getKey().isEmpty()) {
+                        continue;
+                    }
 
-						if (currentValue != 0)
-						{
-							if (!emcValues.contains(currentValue))
-							{
-								emcValues.add(currentValue);
-							}
+                    if (ItemHelper.areItemStacksEqualIgnoreNBT(entry.getKey(), blockStack)) {
+                        BigInteger currentValue = EMCHelper.getEmcValue(entry.getValue());
 
-							totalEmc += currentValue;
-						}
-					}
-				}
-			}
-			else
-			{
-				if (!emcValues.contains(blockEmc))
-				{
-					emcValues.add(blockEmc);
-				}
+                        if (!currentValue.equals(BigInteger.ZERO)) {
+                            if (!emcValues.contains(currentValue)) {
+                                emcValues.add(currentValue);
+                            }
 
-				totalEmc += blockEmc;
-			}
+                            totalEmc = totalEmc.add(currentValue);
+                        }
+                    }
+                }
+            } else {
+                if (!emcValues.contains(blockEmc)) {
+                    emcValues.add(blockEmc);
+                }
 
-			numBlocks++;
-		}
+                totalEmc = totalEmc.add(blockEmc);
+            }
 
-		if (numBlocks == 0)
-		{
-			return EnumActionResult.FAIL;
-		}
+            numBlocks++;
+        }
 
-		long[] maxValues = new long[3];
+        if (numBlocks == 0) {
+            return EnumActionResult.FAIL;
+        }
 
-		for (int i = 0; i < 3; i++)
-		{
-			maxValues[i] = 1;
-		}
+        BigInteger[] maxValues = new BigInteger[3];
 
-		emcValues.sort(Comparator.reverseOrder());
+        for (int i = 0; i < 3; i++) {
+            maxValues[i] = BigInteger.ONE;
+        }
 
-		int num = emcValues.size() >= 3 ? 3 : emcValues.size();
+        emcValues.sort(Comparator.reverseOrder());
 
-		for (int i = 0; i < num; i++)
-		{
-			maxValues[i] = emcValues.get(i);
-		}
+        int num = emcValues.size() >= 3 ? 3 : emcValues.size();
 
-		player.sendMessage(new TextComponentTranslation("pe.divining.avgemc", numBlocks, (totalEmc / numBlocks)));
+        for (int i = 0; i < num; i++) {
+            maxValues[i] = emcValues.get(i);
+        }
 
-		if (this == ObjHandler.dRod2 || this == ObjHandler.dRod3)
-		{
-			player.sendMessage(new TextComponentTranslation("pe.divining.maxemc", maxValues[0]));
-		}
+        player.sendMessage(new TextComponentTranslation("pe.divining.avgemc", numBlocks, totalEmc.divide(BigInteger.valueOf(numBlocks))));
 
-		if (this == ObjHandler.dRod3)
-		{
-			player.sendMessage(new TextComponentTranslation("pe.divining.secondmax", maxValues[1]));
-			player.sendMessage(new TextComponentTranslation("pe.divining.thirdmax", maxValues[2]));
-		}
+        if (this == ObjHandler.dRod2 || this == ObjHandler.dRod3) {
+            player.sendMessage(new TextComponentTranslation("pe.divining.maxemc", maxValues[0]));
+        }
 
-		return EnumActionResult.SUCCESS;
-	}
+        if (this == ObjHandler.dRod3) {
+            player.sendMessage(new TextComponentTranslation("pe.divining.secondmax", maxValues[1]));
+            player.sendMessage(new TextComponentTranslation("pe.divining.thirdmax", maxValues[2]));
+        }
 
-	/**
-	 * Gets the first number in the mode description.
-	 */
-	private int getDepthFromMode(byte mode)
-	{
-		String modeDesc = modes[mode];
-		// Subtract one because of how the box method works
-		return Integer.parseInt(modeDesc.substring(0, modeDesc.indexOf('x'))) - 1;
-	}
+        return EnumActionResult.SUCCESS;
+    }
 
-	@Override
-	public byte getMode(@Nonnull ItemStack stack)
-	{
-		return ItemHelper.getOrCreateCompound(stack).getByte(TAG_MODE);
-	}
+    /**
+     * Gets the first number in the mode description.
+     */
+    private int getDepthFromMode(byte mode) {
+        String modeDesc = modes[mode];
+        // Subtract one because of how the box method works
+        return Integer.parseInt(modeDesc.substring(0, modeDesc.indexOf('x'))) - 1;
+    }
 
-	@Override
-	public boolean changeMode(@Nonnull EntityPlayer player, @Nonnull ItemStack stack, EnumHand hand)
-	{
-		if (modes.length == 1)
-		{
-			return false;
-		}
-		if (getMode(stack) == modes.length - 1)
-		{
-			ItemHelper.getOrCreateCompound(stack).setByte(TAG_MODE, ((byte) 0));
-		}
-		else
-		{
-			ItemHelper.getOrCreateCompound(stack).setByte(TAG_MODE, ((byte) (getMode(stack) + 1)));
-		}
+    @Override
+    public byte getMode(@Nonnull ItemStack stack) {
+        return ItemHelper.getOrCreateCompound(stack).getByte(TAG_MODE);
+    }
 
-		player.sendMessage(new TextComponentTranslation("pe.item.mode_switch", modes[getMode(stack)]));
+    @Override
+    public boolean changeMode(@Nonnull EntityPlayer player, @Nonnull ItemStack stack, EnumHand hand) {
+        if (modes.length == 1) {
+            return false;
+        }
+        if (getMode(stack) == modes.length - 1) {
+            ItemHelper.getOrCreateCompound(stack).setByte(TAG_MODE, ((byte) 0));
+        } else {
+            ItemHelper.getOrCreateCompound(stack).setByte(TAG_MODE, ((byte) (getMode(stack) + 1)));
+        }
 
-		return true;
-	}
+        player.sendMessage(new TextComponentTranslation("pe.item.mode_switch", modes[getMode(stack)]));
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, World world, List<String> list, ITooltipFlag flags)
-	{
-		list.add(I18n.format("pe.item.mode") + ": " + TextFormatting.AQUA + modes[getMode(stack)]);
-	}
+        return true;
+    }
+
+    @Override
+    @SideOnly(Side.CLIENT)
+    public void addInformation(ItemStack stack, World world, List<String> list, ITooltipFlag flags) {
+        list.add(I18n.format("pe.item.mode") + ": " + TextFormatting.AQUA + modes[getMode(stack)]);
+    }
 }

@@ -18,7 +18,6 @@ import moze_intel.projecte.impl.KnowledgeImpl;
 import moze_intel.projecte.impl.TransmutationOffline;
 import moze_intel.projecte.integration.jei.PEJeiPlugin;
 import moze_intel.projecte.network.PacketHandler;
-import moze_intel.projecte.network.ThreadCheckUUID;
 import moze_intel.projecte.network.commands.ProjectECMD;
 import moze_intel.projecte.playerData.Transmutation;
 import moze_intel.projecte.proxies.IProxy;
@@ -39,13 +38,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLInterModComms;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
-import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
+import net.minecraftforge.fml.common.event.*;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import org.apache.logging.log4j.LogManager;
@@ -56,163 +49,143 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Mod(modid = PECore.MODID, name = PECore.MODNAME, version = PECore.VERSION, acceptedMinecraftVersions = "[1.12,]", dependencies = PECore.DEPS, updateJSON = PECore.UPDATE_JSON)
+@Mod(modid = PECore.MODID, name = PECore.MODNAME, version = Tags.VERSION, acceptedMinecraftVersions = "[1.12,]", dependencies = PECore.DEPS)
 @Mod.EventBusSubscriber(modid = PECore.MODID)
-public class PECore
-{
-	public static final String MODID = "projecte";
-	public static final String MODNAME = "ProjectE";
-	public static final String VERSION = "@VERSION@";
-	public static final String DEPS = "required-after:forge@[13.20.0.2253,);after:baubles@[1.3.3,);after:jei@[4.6.0,)";
-	public static final String UPDATE_JSON = "https://raw.githubusercontent.com/sinkillerj/ProjectE/mc1.12.x/update.json";
-	public static final GameProfile FAKEPLAYER_GAMEPROFILE = new GameProfile(UUID.fromString("590e39c7-9fb6-471b-a4c2-c0e539b2423d"), "[" + MODNAME + "]");
-	public static final int DATA_VERSION = 1;
-	public static File CONFIG_DIR;
-	public static File PREGENERATED_EMC_FILE;
-	public static boolean DEV_ENVIRONMENT;
-	public static final Logger LOGGER = LogManager.getLogger(MODID);
+public class PECore {
+    public static final String MODID = "projecte";
+    public static final String MODNAME = "ProjectE";
+    public static final String VERSION = Tags.VERSION;
+    public static final String DEPS = "required-after:forge@[13.20.0.2253,);after:baubles@[1.3.3,);after:jei@[4.6.0,)";
+    public static final GameProfile FAKEPLAYER_GAMEPROFILE = new GameProfile(UUID.fromString("590e39c7-9fb6-471b-a4c2-c0e539b2423d"), "[" + MODNAME + "]");
+    public static final int DATA_VERSION = 1;
+    public static File CONFIG_DIR;
+    public static File PREGENERATED_EMC_FILE;
+    public static boolean DEV_ENVIRONMENT;
+    public static final Logger LOGGER = LogManager.getLogger(MODID);
 
-	@Instance(MODID)
-	public static PECore instance;
-	
-	@SidedProxy(clientSide = "moze_intel.projecte.proxies.ClientProxy", serverSide = "moze_intel.projecte.proxies.ServerProxy")
-	public static IProxy proxy;
+    @Instance(MODID)
+    public static PECore instance;
 
-	public static final List<String> uuids = new ArrayList<>();
+    @SidedProxy(clientSide = "moze_intel.projecte.proxies.ClientProxy", serverSide = "moze_intel.projecte.proxies.ServerProxy")
+    public static IProxy proxy;
 
-	public static void debugLog(String msg, Object... args)
-	{
-		if (DEV_ENVIRONMENT || ProjectEConfig.misc.debugLogging)
-		{
-			LOGGER.info(msg, args);
-		} else
-		{
-			LOGGER.debug(msg, args);
-		}
-	}
+    public static final List<String> uuids = new ArrayList<>();
 
-	@EventHandler
-	public void preInit(FMLPreInitializationEvent event)
-	{
-		DEV_ENVIRONMENT = ((Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment"));
+    public static void debugLog(String msg, Object... args) {
+        if (DEV_ENVIRONMENT || ProjectEConfig.misc.debugLogging) {
+            LOGGER.info(msg, args);
+        } else {
+            LOGGER.debug(msg, args);
+        }
+    }
 
-		CONFIG_DIR = new File(event.getModConfigurationDirectory(), MODNAME);
-		
-		if (!CONFIG_DIR.exists())
-		{
-			CONFIG_DIR.mkdirs();
-		}
+    @EventHandler
+    public void preInit(FMLPreInitializationEvent event) {
+        DEV_ENVIRONMENT = ((Boolean) Launch.blackboard.get("fml.deobfuscatedEnvironment"));
 
-		PREGENERATED_EMC_FILE = new File(CONFIG_DIR, "pregenerated_emc.json");
+        CONFIG_DIR = new File(event.getModConfigurationDirectory(), MODNAME);
 
-		PacketHandler.register();
+        if (!CONFIG_DIR.exists()) {
+            CONFIG_DIR.mkdirs();
+        }
 
-		AlchBagImpl.init();
-		KnowledgeImpl.init();
-		CapabilityManager.INSTANCE.register(InternalTimers.class, new DummyIStorage<>(), InternalTimers::new);
-		CapabilityManager.INSTANCE.register(InternalAbilities.class, new DummyIStorage<>(), () -> new InternalAbilities(null));
-		
-		NetworkRegistry.INSTANCE.registerGuiHandler(PECore.instance, new GuiHandler());
+        PREGENERATED_EMC_FILE = new File(CONFIG_DIR, "pregenerated_emc.json");
 
-		proxy.registerKeyBinds();
-		ObjHandler.register();
+        PacketHandler.register();
 
-		proxy.registerRenderers();
-	}
-	
-	@EventHandler
-	public void load(FMLInitializationEvent event)
-	{
-		proxy.registerLayerRenderers();
+        AlchBagImpl.init();
+        KnowledgeImpl.init();
+        CapabilityManager.INSTANCE.register(InternalTimers.class, new DummyIStorage<>(), InternalTimers::new);
+        CapabilityManager.INSTANCE.register(InternalAbilities.class, new DummyIStorage<>(), () -> new InternalAbilities(null));
 
-		CompoundDataFixer fixer = FMLCommonHandler.instance().getDataFixer();
-		ModFixs modFixer = fixer.init(MODID, DATA_VERSION);
+        NetworkRegistry.INSTANCE.registerGuiHandler(PECore.instance, new GuiHandler());
 
-		// Fixers
-		modFixer.registerFix(FixTypes.BLOCK_ENTITY, new TENameFix());
+        proxy.registerKeyBinds();
+        ObjHandler.register();
 
-		// Walkers
-		// These two do not have extra layer of indirection so can use the vanilla walker
-		fixer.registerWalker(FixTypes.BLOCK_ENTITY, new ItemStackDataLists(AlchChestTile.class, "Items"));
-		fixer.registerWalker(FixTypes.BLOCK_ENTITY, new ItemStackDataLists(DMPedestalTile.class, "Items"));
+        proxy.registerRenderers();
+    }
 
-		fixer.registerWalker(FixTypes.BLOCK_ENTITY, new CapInventoryWalker(
-				ImmutableSet.of(CollectorMK1Tile.class, CollectorMK2Tile.class, CollectorMK3Tile.class),
-				"Input", "AuxSlots"));
-		fixer.registerWalker(FixTypes.BLOCK_ENTITY, new CapInventoryWalker(CondenserTile.class, "Input", "LockSlot"));
-		fixer.registerWalker(FixTypes.BLOCK_ENTITY, new CapInventoryWalker(CondenserMK2Tile.class, "Input", "LockSlot", "Output"));
-		fixer.registerWalker(FixTypes.BLOCK_ENTITY, new CapInventoryWalker(
-				ImmutableSet.of(DMFurnaceTile.class, RMFurnaceTile.class),
-				"Input", "Output", "Fuel"));
-		fixer.registerWalker(FixTypes.BLOCK_ENTITY, new CapInventoryWalker(
-				ImmutableSet.of(RelayMK1Tile.class, RelayMK2Tile.class, RelayMK3Tile.class),
-				"Input", "Output"));
-	}
+    @EventHandler
+    public void load(FMLInitializationEvent event) {
+        proxy.registerLayerRenderers();
 
-	@EventHandler
-	public void postInit(FMLPostInitializationEvent event)
-	{
-		NBTWhitelistParser.init();
-		proxy.initializeManual();
-	}
-	
-	@Mod.EventHandler
-	public void serverStarting(FMLServerStartingEvent event)
-	{
-		event.registerServerCommand(new ProjectECMD());
+        CompoundDataFixer fixer = FMLCommonHandler.instance().getDataFixer();
+        ModFixs modFixer = fixer.init(MODID, DATA_VERSION);
 
-		if (!ThreadCheckUUID.hasRunServer())
-		{
-			new ThreadCheckUUID(true).start();
-		}
+        // Fixers
+        modFixer.registerFix(FixTypes.BLOCK_ENTITY, new TENameFix());
 
-		long start = System.currentTimeMillis();
+        // Walkers
+        // These two do not have extra layer of indirection so can use the vanilla walker
+        fixer.registerWalker(FixTypes.BLOCK_ENTITY, new ItemStackDataLists(AlchChestTile.class, "Items"));
+        fixer.registerWalker(FixTypes.BLOCK_ENTITY, new ItemStackDataLists(DMPedestalTile.class, "Items"));
 
-		CustomEMCParser.init();
+        fixer.registerWalker(FixTypes.BLOCK_ENTITY, new CapInventoryWalker(
+                ImmutableSet.of(CollectorMK1Tile.class, CollectorMK2Tile.class, CollectorMK3Tile.class),
+                "Input", "AuxSlots"));
+        fixer.registerWalker(FixTypes.BLOCK_ENTITY, new CapInventoryWalker(CondenserTile.class, "Input", "LockSlot"));
+        fixer.registerWalker(FixTypes.BLOCK_ENTITY, new CapInventoryWalker(CondenserMK2Tile.class, "Input", "LockSlot", "Output"));
+        fixer.registerWalker(FixTypes.BLOCK_ENTITY, new CapInventoryWalker(
+                ImmutableSet.of(DMFurnaceTile.class, RMFurnaceTile.class),
+                "Input", "Output", "Fuel"));
+        fixer.registerWalker(FixTypes.BLOCK_ENTITY, new CapInventoryWalker(
+                ImmutableSet.of(RelayMK1Tile.class, RelayMK2Tile.class, RelayMK3Tile.class),
+                "Input", "Output"));
+    }
 
-		LOGGER.info("Starting server-side EMC mapping.");
+    @EventHandler
+    public void postInit(FMLPostInitializationEvent event) {
+        NBTWhitelistParser.init();
+        proxy.initializeManual();
+    }
 
-		EMCMapper.map();
+    @Mod.EventHandler
+    public void serverStarting(FMLServerStartingEvent event) {
+        event.registerServerCommand(new ProjectECMD());
 
-		LOGGER.info("Registered " + EMCMapper.emc.size() + " EMC values. (took " + (System.currentTimeMillis() - start) + " ms)");
-	}
+        /*if (!ThreadCheckUUID.hasRunServer())
+            new ThreadCheckUUID(true).start();*/
 
-	@Mod.EventHandler
-	public void serverStopping (FMLServerStoppingEvent event)
-	{
-		TransmutationOffline.cleanAll();
-	}
-	
-	@Mod.EventHandler
-	public void serverQuit(FMLServerStoppedEvent event)
-	{
-		Transmutation.clearCache();
-		EMCMapper.clearMaps();
-	}
+        long start = System.currentTimeMillis();
 
-	@Mod.EventHandler
-	public void onIMCMessage(FMLInterModComms.IMCEvent event)
-	{
-		for (FMLInterModComms.IMCMessage msg : event.getMessages())
-		{
-			IMCHandler.handleIMC(msg);
-		}
-	}
+        CustomEMCParser.init();
 
-	@SubscribeEvent
-	public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event)
-	{
-		if (event.getModID().equals(MODID))
-		{
-			ConfigManager.sync(MODID, Config.Type.INSTANCE);
-		}
-	}
+        LOGGER.info("Starting server-side EMC mapping.");
 
-	public static void refreshJEI()
-	{
-		if (Loader.isModLoaded("jei"))
-		{
-			PEJeiPlugin.refresh();
-		}
-	}
+        EMCMapper.map();
+
+        LOGGER.info("Registered " + EMCMapper.emc.size() + " EMC values. (took " + (System.currentTimeMillis() - start) + " ms)");
+    }
+
+    @Mod.EventHandler
+    public void serverStopping(FMLServerStoppingEvent event) {
+        TransmutationOffline.cleanAll();
+    }
+
+    @Mod.EventHandler
+    public void serverQuit(FMLServerStoppedEvent event) {
+        Transmutation.clearCache();
+        EMCMapper.clearMaps();
+    }
+
+    @Mod.EventHandler
+    public void onIMCMessage(FMLInterModComms.IMCEvent event) {
+        for (FMLInterModComms.IMCMessage msg : event.getMessages()) {
+            IMCHandler.handleIMC(msg);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
+        if (event.getModID().equals(MODID)) {
+            ConfigManager.sync(MODID, Config.Type.INSTANCE);
+        }
+    }
+
+    public static void refreshJEI() {
+        if (Loader.isModLoaded("jei")) {
+            PEJeiPlugin.refresh();
+        }
+    }
 }

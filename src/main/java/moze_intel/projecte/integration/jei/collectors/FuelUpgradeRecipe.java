@@ -8,29 +8,30 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.item.ItemStack;
 
 import java.awt.*;
-import java.util.*;
+import java.math.BigInteger;
+import java.util.Collections;
 
 public class FuelUpgradeRecipe implements IRecipeWrapper {
 
     private ItemStack input;
     private ItemStack output;
-    private long upgradeEMC;
+    private BigInteger upgradeEMC;
 
-    public FuelUpgradeRecipe(ItemStack input, ItemStack output){
+    public FuelUpgradeRecipe(ItemStack input, ItemStack output) {
         this.input = input;
         this.output = output;
-        this.upgradeEMC = EMCHelper.getEmcValue(output) - EMCHelper.getEmcValue(input);
+        this.upgradeEMC = EMCHelper.getEmcValue(output).subtract(EMCHelper.getEmcValue(input));
     }
 
-    public ItemStack getInput(){
+    public ItemStack getInput() {
         return input;
     }
 
-    public ItemStack getOutput(){
+    public ItemStack getOutput() {
         return output;
     }
 
-    public long getUpgradeEMC(){
+    public BigInteger getUpgradeEMC() {
         return upgradeEMC;
     }
 
@@ -42,7 +43,7 @@ public class FuelUpgradeRecipe implements IRecipeWrapper {
 
     @Override
     public void drawInfo(Minecraft minecraft, int recipeWidth, int recipeHeight, int mouseX, int mouseY) {
-        String emc = Long.toString(getUpgradeEMC());
+        String emc = getUpgradeEMC().toString();
         FontRenderer fontRenderer = minecraft.fontRenderer;
         int stringWidth = fontRenderer.getStringWidth(emc);
         fontRenderer.drawString(emc, (recipeWidth / 2) - (stringWidth / 2), 5, Color.gray.getRGB());
@@ -52,8 +53,8 @@ public class FuelUpgradeRecipe implements IRecipeWrapper {
     @Override
     public java.util.List<String> getTooltipStrings(int mouseX, int mouseY) {
 
-        if(mouseX > 67 && mouseX < 107)
-            if(mouseY > 0 && mouseY < 20)
+        if (mouseX > 67 && mouseX < 107)
+            if (mouseY > 0 && mouseY < 20)
                 return Collections.singletonList("EMC needed to upgrade");
 
         return Collections.emptyList();

@@ -9,43 +9,38 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class KnowledgeSyncPKT implements IMessage
-{
-	private NBTTagCompound nbt;
+public class KnowledgeSyncPKT implements IMessage {
+    private NBTTagCompound nbt;
 
-	public KnowledgeSyncPKT() {}
+    public KnowledgeSyncPKT() {
+    }
 
-	public KnowledgeSyncPKT(NBTTagCompound nbt)
-	{
-		this.nbt = nbt;
-	}
+    public KnowledgeSyncPKT(NBTTagCompound nbt) {
+        this.nbt = nbt;
+    }
 
-	@Override
-	public void fromBytes(ByteBuf buf)
-	{
-		nbt = ByteBufUtils.readTag(buf);
-	}
+    @Override
+    public void fromBytes(ByteBuf buf) {
+        nbt = ByteBufUtils.readTag(buf);
+    }
 
-	@Override
-	public void toBytes(ByteBuf buf)
-	{
-		ByteBufUtils.writeTag(buf, nbt);
-	}
+    @Override
+    public void toBytes(ByteBuf buf) {
+        ByteBufUtils.writeTag(buf, nbt);
+    }
 
-	public static class Handler implements IMessageHandler<KnowledgeSyncPKT, IMessage>
-	{
-		@Override
-		public IMessage onMessage(final KnowledgeSyncPKT message, MessageContext ctx)
-		{
-			Minecraft.getMinecraft().addScheduledTask(new Runnable() {
-				@Override
-				public void run() {
-					PECore.proxy.getClientTransmutationProps().deserializeNBT(message.nbt);
-					PECore.debugLog("** RECEIVED TRANSMUTATION DATA CLIENTSIDE **");
-				}
-			});
+    public static class Handler implements IMessageHandler<KnowledgeSyncPKT, IMessage> {
+        @Override
+        public IMessage onMessage(final KnowledgeSyncPKT message, MessageContext ctx) {
+            Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+                @Override
+                public void run() {
+                    PECore.proxy.getClientTransmutationProps().deserializeNBT(message.nbt);
+                    PECore.debugLog("** RECEIVED TRANSMUTATION DATA CLIENTSIDE **");
+                }
+            });
 
-			return null;
-		}
-	}
+            return null;
+        }
+    }
 }

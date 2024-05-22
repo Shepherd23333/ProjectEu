@@ -5,7 +5,6 @@ import moze_intel.projecte.api.capabilities.IKnowledgeProvider;
 import moze_intel.projecte.api.event.PlayerAttemptLearnEvent;
 import moze_intel.projecte.api.item.IItemEmc;
 import moze_intel.projecte.emc.FuelMapper;
-import moze_intel.projecte.utils.Constants;
 import moze_intel.projecte.utils.EMCHelper;
 import moze_intel.projecte.utils.ItemHelper;
 import moze_intel.projecte.utils.NBTWhitelist;
@@ -13,510 +12,375 @@ import moze_intel.projecte.utils.PlayerHelper;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.CombinedInvWrapper;
 
+import java.math.BigInteger;
 import java.util.*;
 
-public class TransmutationInventory extends CombinedInvWrapper
-{
-	public final EntityPlayer player;
-	public final IKnowledgeProvider provider;
-	private final IItemHandlerModifiable inputLocks;
-	private final IItemHandlerModifiable learning;
-	public final IItemHandlerModifiable outputs;
+public class TransmutationInventory extends CombinedInvWrapper {
+    public final EntityPlayer player;
+    public final IKnowledgeProvider provider;
+    private final IItemHandlerModifiable inputLocks;
+    private final IItemHandlerModifiable learning;
+    public final IItemHandlerModifiable outputs;
 
-	private static final int LOCK_INDEX = 8;
-	private static final int FUEL_START = 12;
-	public int learnFlag = 0;
-	public int unlearnFlag = 0;
-	public String filter = "";
-	public int searchpage = 0;
-	public final List<ItemStack> knowledge = new ArrayList<>();
-	
-	public TransmutationInventory(EntityPlayer player)
-	{
-		super((IItemHandlerModifiable) player.getCapability(ProjectEAPI.KNOWLEDGE_CAPABILITY, null).getInputAndLocks(),
-				new ItemStackHandler(2), new ItemStackHandler(16));
+    private static final int LOCK_INDEX = 8;
+    private static final int FUEL_START = 12;
+    public int learnFlag = 0;
+    public int unlearnFlag = 0;
+    public String filter = "";
+    public int searchpage = 0;
+    public final List<ItemStack> knowledge = new ArrayList<>();
 
-		this.player = player;
-		this.provider = player.getCapability(ProjectEAPI.KNOWLEDGE_CAPABILITY, null);
+    public TransmutationInventory(EntityPlayer player) {
+        super((IItemHandlerModifiable) player.getCapability(ProjectEAPI.KNOWLEDGE_CAPABILITY, null).getInputAndLocks(),
+                new ItemStackHandler(2), new ItemStackHandler(16));
 
-		this.inputLocks = itemHandler[0];
-		this.learning = itemHandler[1];
-		this.outputs = itemHandler[2];
+        this.player = player;
+        this.provider = player.getCapability(ProjectEAPI.KNOWLEDGE_CAPABILITY, null);
 
-		if (player.getEntityWorld().isRemote)
-		{
-			updateClientTargets();
-		}
-	}
-	
-	public void handleKnowledge(ItemStack stack)
-	{
-		if (stack.getCount() > 1)
-		{
-			stack.setCount(1);
-		}
-		
-		if (ItemHelper.isDamageable(stack))
-		{
-			stack.setItemDamage(0);
-		}
-		
-		if (!provider.hasKnowledge(stack))
-		{
-			if (stack.hasTagCompound() && !NBTWhitelist.shouldDupeWithNBT(stack))
-			{
-				stack.setTagCompound(null);
-			}
+        this.inputLocks = itemHandler[0];
+        this.learning = itemHandler[1];
+        this.outputs = itemHandler[2];
 
-			if (!MinecraftForge.EVENT_BUS.post(new PlayerAttemptLearnEvent(player, stack))) //Only show the "learned" text if the knowledge was added
-			{
-				learnFlag = 300;
-				unlearnFlag = 0;
-				provider.addKnowledge(stack);
-			}
+        if (player.getEntityWorld().isRemote) {
+            updateClientTargets();
+        }
+    }
 
-			if (!player.getEntityWorld().isRemote)
-			{
-				provider.sync(((EntityPlayerMP) player));
-			}
-		}
-		
-		updateClientTargets();
-	}
+    public void handleKnowledge(ItemStack stack) {
+        if (stack.getCount() > 1) {
+            stack.setCount(1);
+        }
 
-	public void handleUnlearn(ItemStack stack)
-	{
-		if (stack.getCount() > 1)
-		{
-			stack.setCount(1);
-		}
+        if (ItemHelper.isDamageable(stack)) {
+            stack.setItemDamage(0);
+        }
 
-		if (ItemHelper.isDamageable(stack))
-		{
-			stack.setItemDamage(0);
-		}
+        if (!provider.hasKnowledge(stack)) {
+            if (stack.hasTagCompound() && !NBTWhitelist.shouldDupeWithNBT(stack)) {
+                stack.setTagCompound(null);
+            }
 
-		if (provider.hasKnowledge(stack))
-		{
-			unlearnFlag = 300;
-			learnFlag = 0;
+            if (!MinecraftForge.EVENT_BUS.post(new PlayerAttemptLearnEvent(player, stack))) //Only show the "learned" text if the knowledge was added
+            {
+                learnFlag = 300;
+                unlearnFlag = 0;
+                provider.addKnowledge(stack);
+            }
 
-			if (stack.hasTagCompound() && !NBTWhitelist.shouldDupeWithNBT(stack))
-			{
-				stack.setTagCompound(null);
-			}
+            if (!player.getEntityWorld().isRemote) {
+                provider.sync(((EntityPlayerMP) player));
+            }
+        }
 
-			provider.removeKnowledge(stack);
-			
-			if (!player.getEntityWorld().isRemote)
-			{
-				provider.sync(((EntityPlayerMP) player));
-			}
-		}
-		
-		updateClientTargets();
-	}
-	
-	public void checkForUpdates()
-	{
-		long matterEmc = EMCHelper.getEmcValue(outputs.getStackInSlot(0));
-		long fuelEmc = EMCHelper.getEmcValue(outputs.getStackInSlot(FUEL_START));
-		
-		if (Math.max(matterEmc, fuelEmc) > getAvailableEMC())
-		{
-			updateClientTargets();
-		}
-	}
+        updateClientTargets();
+    }
 
-	public void updateClientTargets()
-	{
-		if (!this.player.getEntityWorld().isRemote)
-		{
-			return;
-		}
+    public void handleUnlearn(ItemStack stack) {
+        if (stack.getCount() > 1) {
+            stack.setCount(1);
+        }
 
-		knowledge.clear();
-		knowledge.addAll(provider.getKnowledge());
+        if (ItemHelper.isDamageable(stack)) {
+            stack.setItemDamage(0);
+        }
 
-		for (int i = 0; i < outputs.getSlots(); i++)
-		{
-			outputs.setStackInSlot(i, ItemStack.EMPTY);
-		}
+        if (provider.hasKnowledge(stack)) {
+            unlearnFlag = 300;
+            learnFlag = 0;
 
-		ItemStack lockCopy = ItemStack.EMPTY;
+            if (stack.hasTagCompound() && !NBTWhitelist.shouldDupeWithNBT(stack)) {
+                stack.setTagCompound(null);
+            }
 
-		knowledge.sort(Collections.reverseOrder(Comparator.comparing(EMCHelper::getEmcValue)));
-		if (!inputLocks.getStackInSlot(LOCK_INDEX).isEmpty())
-		{
-			lockCopy = ItemHelper.getNormalizedStack(inputLocks.getStackInSlot(LOCK_INDEX));
+            provider.removeKnowledge(stack);
 
-			if (ItemHelper.isDamageable(lockCopy))
-			{
-				lockCopy.setItemDamage(0);
-			}
+            if (!player.getEntityWorld().isRemote) {
+                provider.sync(((EntityPlayerMP) player));
+            }
+        }
 
-			long reqEmc = EMCHelper.getEmcValue(inputLocks.getStackInSlot(LOCK_INDEX));
-			
-			if (getAvailableEMC() < reqEmc)
-			{
-				return;
-			}
+        updateClientTargets();
+    }
 
-			if (lockCopy.hasTagCompound() && !NBTWhitelist.shouldDupeWithNBT(lockCopy))
-			{
-				lockCopy.setTagCompound(null);
-			}
-			
-			Iterator<ItemStack> iter = knowledge.iterator();
-			int pagecounter = 0;
-			
-			while (iter.hasNext())
-			{
-				ItemStack stack = iter.next();
-				
-				if (EMCHelper.getEmcValue(stack) > reqEmc)
-				{
-					iter.remove();
-					continue;
-				}
+    public void checkForUpdates() {
+        BigInteger matterEmc = EMCHelper.getEmcValue(outputs.getStackInSlot(0));
+        BigInteger fuelEmc = EMCHelper.getEmcValue(outputs.getStackInSlot(FUEL_START));
 
-				if (ItemHelper.basicAreStacksEqual(lockCopy, stack))
-				{
-					iter.remove();
-					continue;
-				}
+        if (matterEmc.max(fuelEmc).compareTo(getAvailableEMC()) > 0) {
+            updateClientTargets();
+        }
+    }
 
-				if (!doesItemMatchFilter(stack)) {
-					iter.remove();
-					continue;
-				}
+    public void updateClientTargets() {
+        if (!this.player.getEntityWorld().isRemote) {
+            return;
+        }
 
-				if (pagecounter < (searchpage * 12))
-				{
-					pagecounter++;
-					iter.remove();
-				}
-			}
-		}
-		else
-		{
-			Iterator<ItemStack> iter = knowledge.iterator();
-			int pagecounter = 0;
-			
-			while (iter.hasNext())
-			{
-				ItemStack stack = iter.next();
-				
-				if (getAvailableEMC() < EMCHelper.getEmcValue(stack))
-				{
-					iter.remove();
-					continue;
-				}
+        knowledge.clear();
+        knowledge.addAll(provider.getKnowledge());
 
-				if (!doesItemMatchFilter(stack)) {
-					iter.remove();
-					continue;
-				}
+        for (int i = 0; i < outputs.getSlots(); i++) {
+            outputs.setStackInSlot(i, ItemStack.EMPTY);
+        }
 
-				if (pagecounter < (searchpage * 12))
-				{
-					pagecounter++;
-					iter.remove();
-				}
-			}
-		}
-		
-		int matterCounter = 0;
-		int fuelCounter = 0;
+        ItemStack lockCopy = ItemStack.EMPTY;
 
-		if (!lockCopy.isEmpty() && provider.hasKnowledge(lockCopy))
-		{
-			if (FuelMapper.isStackFuel(lockCopy))
-			{
-				outputs.setStackInSlot(FUEL_START, lockCopy);
-				fuelCounter++;
-			}
-			else
-			{
-				outputs.setStackInSlot(0, lockCopy);
-				matterCounter++;
-			}
-		}
-		
-		for (ItemStack stack : knowledge)
-		{
-			if (FuelMapper.isStackFuel(stack))
-			{
-				if (fuelCounter < 4)
-				{
-					outputs.setStackInSlot(FUEL_START + fuelCounter, stack);
+        knowledge.sort(Collections.reverseOrder(Comparator.comparing(EMCHelper::getEmcValue)));
+        if (!inputLocks.getStackInSlot(LOCK_INDEX).isEmpty()) {
+            lockCopy = ItemHelper.getNormalizedStack(inputLocks.getStackInSlot(LOCK_INDEX));
 
-					fuelCounter++;
-				}
-			}
-			else
-			{
-				if (matterCounter < 12)
-				{
-					outputs.setStackInSlot(matterCounter, stack);
+            if (ItemHelper.isDamageable(lockCopy)) {
+                lockCopy.setItemDamage(0);
+            }
 
-					matterCounter++;
- 				}
-			}
-		}
-	}
+            BigInteger reqEmc = EMCHelper.getEmcValue(inputLocks.getStackInSlot(LOCK_INDEX));
 
-	private boolean doesItemMatchFilter(ItemStack stack)
-	{
-		String displayName;
+            if (getAvailableEMC().compareTo(reqEmc) < 0) {
+                return;
+            }
 
-		try
-		{
-			displayName = stack.getDisplayName().toLowerCase(Locale.ROOT);
-		} catch (Exception e)
-		{
-			e.printStackTrace();
-			//From old code... Not sure if intended to not remove items that crash on getDisplayName
-			return true;
-		}
+            if (lockCopy.hasTagCompound() && !NBTWhitelist.shouldDupeWithNBT(lockCopy)) {
+                lockCopy.setTagCompound(null);
+            }
 
-		if (displayName == null)
-		{
-			return false;
-		}
-		else if (filter.length() > 0 && !displayName.contains(filter))
-		{
-			return false;
-		}
-		return true;
-	}
+            Iterator<ItemStack> iter = knowledge.iterator();
+            int pagecounter = 0;
 
-	public void writeIntoOutputSlot(int slot, ItemStack item)
-	{
+            while (iter.hasNext()) {
+                ItemStack stack = iter.next();
 
-		if (EMCHelper.doesItemHaveEmc(item)
-				&& EMCHelper.getEmcValue(item) <= getAvailableEMC()
-				&& provider.hasKnowledge(item))
-		{
-			outputs.setStackInSlot(slot, item);
-		}
-		else
-		{
-			outputs.setStackInSlot(slot, ItemStack.EMPTY);
-		}
-	}
+                if (getAvailableEMC().compareTo(EMCHelper.getEmcValue(stack)) < 0) {
+                    iter.remove();
+                    continue;
+                }
 
-	public void addEmc(long value)
-	{
-		if (value == 0)
-		{
-			//Optimization to not look at the items if nothing will happen anyways
-			return;
-		}
-		if (value < 0)
-		{
-			//Make sure it is using the correct method so that it handles the klein stars properly
-			removeEmc(-value);
-		}
-		//Start by trying to add it to the EMC items on the left
-		for (int i = 0; i < inputLocks.getSlots(); i++)
-		{
-			if (i == LOCK_INDEX)
-			{
-				continue;
-			}
-			ItemStack stack = inputLocks.getStackInSlot(i);
-			if (!stack.isEmpty() && stack.getItem() instanceof IItemEmc)
-			{
-				IItemEmc itemEmc = ((IItemEmc) stack.getItem());
-				long neededEmc = itemEmc.getMaximumEmc(stack) - itemEmc.getStoredEmc(stack);
-				if (value <= neededEmc)
-				{
-					//This item can store all of the amount being added
-					itemEmc.addEmc(stack, value);
-					return;
-				}
-				//else more than this item can fit, so fill the item and then continue going
-				itemEmc.addEmc(stack, neededEmc);
-				value -= neededEmc;
-			}
-		}
-		long emcToMax = Constants.TILE_MAX_EMC - provider.getEmc();
-		if (value > emcToMax)
-		{
-			long excessEMC = value - emcToMax;
-			value = emcToMax;
-			//Will finish filling provider
-			//Now with excess EMC we can check against the lock slot as that is the last spot that has its EMC used.
-			ItemStack stack = inputLocks.getStackInSlot(LOCK_INDEX);
-			if (!stack.isEmpty() && stack.getItem() instanceof IItemEmc)
-			{
-				IItemEmc itemEmc = ((IItemEmc) stack.getItem());
-				long neededEmc = itemEmc.getMaximumEmc(stack) - itemEmc.getStoredEmc(stack);
-				if (excessEMC > neededEmc)
-				{
-					itemEmc.addEmc(stack, neededEmc);
-				}
-				else
-				{
-					itemEmc.addEmc(stack, excessEMC);
-				}
-			}
-		}
+                if (ItemHelper.basicAreStacksEqual(lockCopy, stack)) {
+                    iter.remove();
+                    continue;
+                }
 
-		provider.setEmc(provider.getEmc() + value);
-		
-		if (provider.getEmc() >= Constants.TILE_MAX_EMC || provider.getEmc() < 0)
-		{
-			provider.setEmc(Constants.TILE_MAX_EMC);
-		}
+                if (!doesItemMatchFilter(stack)) {
+                    iter.remove();
+                    continue;
+                }
 
-		if (!player.getEntityWorld().isRemote)
-		{
-			PlayerHelper.updateScore((EntityPlayerMP) player, PlayerHelper.SCOREBOARD_EMC, MathHelper.floor(provider.getEmc()));
-		}
-	}
-	
-	public void removeEmc(long value) 
-	{
-		if (value == 0)
-		{
-			//Optimization to not look at the items if nothing will happen anyways
-			return;
-		}
-		if (value < 0)
-		{
-			//Make sure it is using the correct method so that it handles the klein stars properly
-			addEmc(-value);
-		}
-		if (hasMaxedEmc())
-		{
-			//If the EMC is maxed, check and try to remove from the lock slot if it is IItemEMC
-			//This is the only case if the provider is full when the IItemEMC was put in the lock slot
-			ItemStack stack = inputLocks.getStackInSlot(LOCK_INDEX);
-			if (!stack.isEmpty() && stack.getItem() instanceof IItemEmc)
-			{
-				IItemEmc itemEmc = ((IItemEmc) stack.getItem());
-				long storedEmc = itemEmc.getStoredEmc(stack);
-				if (storedEmc >= value)
-				{
-					//All of it can be removed from the lock item
-					itemEmc.extractEmc(stack, value);
-					return;
-				}
-				itemEmc.extractEmc(stack, storedEmc);
-				value -= storedEmc;
-			}
-		}
-		if (value > provider.getEmc())
-		{
-			//Remove from provider first
-			//This code runs first to simplify the logic
-			//But it simulates removal first by extracting the amount from value and then removing that excess from items
-			long toRemove = value - provider.getEmc();
-			value = provider.getEmc();
-			for (int i = 0; i < inputLocks.getSlots(); i++)
-			{
-				if (i == LOCK_INDEX)
-				{
-					continue;
-				}
-				ItemStack stack = inputLocks.getStackInSlot(i);
-				if (!stack.isEmpty() && stack.getItem() instanceof IItemEmc)
-				{
-					IItemEmc itemEmc = ((IItemEmc) stack.getItem());
-					long storedEmc = itemEmc.getStoredEmc(stack);
-					if (toRemove <= storedEmc)
-					{
-						//The EMC that is being removed that the provider does not contain is satisfied by this IItemEMC
-						//Remove it and then
-						itemEmc.extractEmc(stack, toRemove);
-						break;
-					}
-					//Removes all the emc from this item
-					itemEmc.extractEmc(stack, storedEmc);
-					toRemove -= storedEmc;
-				}
-			}
-		}
-		provider.setEmc(provider.getEmc() - value);
-		
-		if (provider.getEmc() < 0)
-		{
-			provider.setEmc(0);
-		}
+                if (pagecounter < (searchpage * 12)) {
+                    pagecounter++;
+                    iter.remove();
+                }
+            }
+        } else {
+            Iterator<ItemStack> iter = knowledge.iterator();
+            int pagecounter = 0;
 
-		if (!player.getEntityWorld().isRemote)
-		{
-			PlayerHelper.updateScore((EntityPlayerMP) player, PlayerHelper.SCOREBOARD_EMC, MathHelper.floor(provider.getEmc()));
-		}
-	}
+            while (iter.hasNext()) {
+                ItemStack stack = iter.next();
 
-	public boolean hasMaxedEmc()
-	{
-		return provider.getEmc() >= Constants.TILE_MAX_EMC;
-	}
+                if (getAvailableEMC().compareTo(EMCHelper.getEmcValue(stack)) < 0) {
+                    iter.remove();
+                    continue;
+                }
 
-	public IItemHandlerModifiable getHandlerForSlot(int slot)
-	{
-		return super.getHandlerFromIndex(super.getIndexForSlot(slot));
-	}
+                if (!doesItemMatchFilter(stack)) {
+                    iter.remove();
+                    continue;
+                }
 
-	public int getIndexFromSlot(int slot)
-	{
-		for (IItemHandlerModifiable h : itemHandler)
-		{
-			if (slot >= h.getSlots())
-			{
-				slot -= h.getSlots();
-			}
-		}
+                if (pagecounter < (searchpage * 12)) {
+                    pagecounter++;
+                    iter.remove();
+                }
+            }
+        }
 
-		return slot;
-	}
+        int matterCounter = 0;
+        int fuelCounter = 0;
 
-	/**
-	 * @return EMC available from the Provider + any klein stars in the input slots.
-	 */
-	public long getAvailableEMC()
-	{
-		//TODO: Cache this value somehow, or at least cache which slots have IItemEMC in them?
-		if (hasMaxedEmc())
-		{
-			return Constants.TILE_MAX_EMC;
-		}
+        if (!lockCopy.isEmpty() && provider.hasKnowledge(lockCopy)) {
+            if (FuelMapper.isStackFuel(lockCopy)) {
+                outputs.setStackInSlot(FUEL_START, lockCopy);
+                fuelCounter++;
+            } else {
+                outputs.setStackInSlot(0, lockCopy);
+                matterCounter++;
+            }
+        }
 
-		long emc = provider.getEmc();
-		long emcToMax = Constants.TILE_MAX_EMC - emc;
-		for (int i = 0; i < inputLocks.getSlots(); i++)
-		{
-			if (i == LOCK_INDEX)
-			{
-				//Skip it even though this technically could add to available EMC.
-				//This is because this case can only happen if the provider is already at max EMC
-				continue;
-			}
-			ItemStack stack = inputLocks.getStackInSlot(i);
-			if (!stack.isEmpty() && stack.getItem() instanceof IItemEmc)
-			{
-				IItemEmc itemEmc = ((IItemEmc) stack.getItem());
-				long storedEmc = itemEmc.getStoredEmc(stack);
-				if (storedEmc >= emcToMax)
-				{
-					return Constants.TILE_MAX_EMC;
-				}
-				emc += storedEmc;
-				emcToMax -= storedEmc;
-			}
-		}
-		return emc;
-	}
+        for (ItemStack stack : knowledge) {
+            if (FuelMapper.isStackFuel(stack)) {
+                if (fuelCounter < 4) {
+                    outputs.setStackInSlot(FUEL_START + fuelCounter, stack);
+
+                    fuelCounter++;
+                }
+            } else {
+                if (matterCounter < 12) {
+                    outputs.setStackInSlot(matterCounter, stack);
+
+                    matterCounter++;
+                }
+            }
+        }
+    }
+
+    private boolean doesItemMatchFilter(ItemStack stack) {
+        String displayName;
+
+        try {
+            displayName = stack.getDisplayName().toLowerCase(Locale.ROOT);
+        } catch (Exception e) {
+            e.printStackTrace();
+            //From old code... Not sure if intended to not remove items that crash on getDisplayName
+            return true;
+        }
+
+        if (displayName == null) {
+            return false;
+        } else if (filter.length() > 0 && !displayName.contains(filter)) {
+            return false;
+        }
+        return true;
+    }
+
+    public void writeIntoOutputSlot(int slot, ItemStack item) {
+
+        if (EMCHelper.doesItemHaveEmc(item)
+                && EMCHelper.getEmcValue(item).compareTo(getAvailableEMC()) <= 0
+                && provider.hasKnowledge(item)) {
+            outputs.setStackInSlot(slot, item);
+        } else {
+            outputs.setStackInSlot(slot, ItemStack.EMPTY);
+        }
+    }
+
+    public void addEmc(BigInteger value) {
+        int comp = value.compareTo(BigInteger.ZERO);
+        if (comp == 0) {
+            //Optimization to not look at the items if nothing will happen anyways
+            return;
+        }
+        if (comp < 0) {
+            //Make sure it is using the correct method so that it handles the klein stars properly
+            removeEmc(value.negate());
+        }
+        //Start by trying to add it to the EMC items on the left
+        for (int i = 0; i < inputLocks.getSlots(); i++) {
+            if (i == LOCK_INDEX) {
+                continue;
+            }
+            ItemStack stack = inputLocks.getStackInSlot(i);
+            if (!stack.isEmpty() && stack.getItem() instanceof IItemEmc) {
+                IItemEmc itemEmc = ((IItemEmc) stack.getItem());
+                BigInteger neededEmc = itemEmc.getMaximumEMC(stack).subtract(itemEmc.getStoredEMC(stack));
+                if (value.compareTo(neededEmc) <= 0) {
+                    //This item can store all of the amount being added
+                    itemEmc.addEmc(stack, value);
+                    return;
+                }
+                //else more than this item can fit, so fill the item and then continue going
+                itemEmc.addEmc(stack, neededEmc);
+                value = value.subtract(neededEmc);
+            }
+        }
+
+        provider.setEmc(provider.getEMC().add(value));
+
+        if (provider.getEMC().compareTo(BigInteger.ZERO) < 0) {
+            provider.setEmc(BigInteger.ZERO);
+        }
+
+        if (!player.getEntityWorld().isRemote) {
+            PlayerHelper.updateScore((EntityPlayerMP) player, PlayerHelper.SCOREBOARD_EMC, provider.getEMC());
+        }
+    }
+
+    public void removeEmc(BigInteger value) {
+        int comp = value.compareTo(BigInteger.ZERO);
+        if (comp == 0) {
+            //Optimization to not look at the items if nothing will happen anyways
+            return;
+        }
+        if (comp < 0) {
+            //Make sure it is using the correct method so that it handles the klein stars properly
+            addEmc(value.negate());
+        }
+        if (value.compareTo(provider.getEMC()) > 0) {
+            //Remove from provider first
+            //This code runs first to simplify the logic
+            //But it simulates removal first by extracting the amount from value and then removing that excess from items
+            BigInteger toRemove = value.subtract(provider.getEMC());
+            value = provider.getEMC();
+            for (int i = 0; i < inputLocks.getSlots(); i++) {
+                if (i == LOCK_INDEX) {
+                    continue;
+                }
+                ItemStack stack = inputLocks.getStackInSlot(i);
+                if (!stack.isEmpty() && stack.getItem() instanceof IItemEmc) {
+                    IItemEmc itemEmc = ((IItemEmc) stack.getItem());
+                    BigInteger storedEmc = itemEmc.getStoredEMC(stack);
+                    if (toRemove.compareTo(storedEmc) <= 0) {
+                        //The EMC that is being removed that the provider does not contain is satisfied by this IItemEMC
+                        //Remove it and then
+                        itemEmc.extractEmc(stack, toRemove);
+                        break;
+                    }
+                    //Removes all the emc from this item
+                    itemEmc.extractEmc(stack, storedEmc);
+                    toRemove = toRemove.subtract(storedEmc);
+                }
+            }
+        }
+        provider.setEmc(provider.getEMC().subtract(value));
+
+        if (provider.getEMC().compareTo(BigInteger.ZERO) < 0) {
+            provider.setEmc(BigInteger.ZERO);
+        }
+
+        if (!player.getEntityWorld().isRemote) {
+            PlayerHelper.updateScore((EntityPlayerMP) player, PlayerHelper.SCOREBOARD_EMC, provider.getEMC());
+        }
+    }
+
+    public IItemHandlerModifiable getHandlerForSlot(int slot) {
+        return super.getHandlerFromIndex(super.getIndexForSlot(slot));
+    }
+
+    public int getIndexFromSlot(int slot) {
+        for (IItemHandlerModifiable h : itemHandler) {
+            if (slot >= h.getSlots()) {
+                slot -= h.getSlots();
+            }
+        }
+
+        return slot;
+    }
+
+    /**
+     * @return EMC available from the Provider + any klein stars in the input slots.
+     */
+    public BigInteger getAvailableEMC() {
+        //TODO: Cache this value somehow, or at least cache which slots have IItemEMC in them?
+
+        BigInteger emc = provider.getEMC();
+        for (int i = 0; i < inputLocks.getSlots(); i++) {
+            if (i == LOCK_INDEX) {
+                //Skip it even though this technically could add to available EMC.
+                //This is because this case can only happen if the provider is already at max EMC
+                continue;
+            }
+            ItemStack stack = inputLocks.getStackInSlot(i);
+            if (!stack.isEmpty() && stack.getItem() instanceof IItemEmc) {
+                IItemEmc itemEmc = ((IItemEmc) stack.getItem());
+                BigInteger storedEmc = itemEmc.getStoredEMC(stack);
+                emc = emc.add(storedEmc);
+            }
+        }
+        return emc;
+    }
 
 }

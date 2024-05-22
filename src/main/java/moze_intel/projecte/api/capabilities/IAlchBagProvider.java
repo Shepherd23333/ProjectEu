@@ -16,19 +16,21 @@ import javax.annotation.Nonnull;
  * This is exposed through the Capability system.
  * Acquire an instance of this using {@link net.minecraft.entity.Entity#getCapability(Capability, EnumFacing)}.
  */
-public interface IAlchBagProvider extends INBTSerializable<NBTTagCompound>
-{
+public interface IAlchBagProvider extends INBTSerializable<NBTTagCompound> {
 
     /**
      * Note: modifying this clientside is not advised
+     *
      * @param color The bag color to acquire
      * @return The inventory representing this alchemical bag
      */
-    @Nonnull IItemHandler getBag(@Nonnull EnumDyeColor color);
+    @Nonnull
+    IItemHandler getBag(@Nonnull EnumDyeColor color);
 
     /**
      * Syncs the bag inventory associated with this color to the player provided (usually the owner of this capability instance)
-     * @param color The bag color to sync. If null, syncs every color.
+     *
+     * @param color  The bag color to sync. If null, syncs every color.
      * @param player The player to sync the bags to.
      */
     void sync(EnumDyeColor color, @Nonnull EntityPlayerMP player);

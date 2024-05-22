@@ -5,23 +5,19 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class IndexPage extends AbstractPage
-{
-    protected IndexPage()
-    {
+public class IndexPage extends AbstractPage {
+    protected IndexPage() {
         super(PageCategory.INDEX);
         this.setIndexed(false);
     }
 
     @Override
-    public String getBodyText()
-    {
+    public String getBodyText() {
         return "";
     }
 
     @Override
-    public String getHeaderText()
-    {
+    public String getHeaderText() {
         return I18n.format("pe.manual.index");
     }
 }

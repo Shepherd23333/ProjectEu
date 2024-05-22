@@ -9,12 +9,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 
 @Mod.EventBusSubscriber(modid = PECore.MODID)
-public final class SoundHandler
-{
+public final class SoundHandler {
 
     @SubscribeEvent
-    public static void registerSounds(RegistryEvent.Register<SoundEvent> evt)
-    {
+    public static void registerSounds(RegistryEvent.Register<SoundEvent> evt) {
         registerSound(evt.getRegistry(), "item.pewindmagic");
         registerSound(evt.getRegistry(), "item.pewatermagic");
         registerSound(evt.getRegistry(), "item.pepower");
@@ -25,11 +23,11 @@ public final class SoundHandler
         registerSound(evt.getRegistry(), "item.petransmute");
     }
 
-    private static void registerSound(IForgeRegistry<SoundEvent> registry, String soundName)
-    {
+    private static void registerSound(IForgeRegistry<SoundEvent> registry, String soundName) {
         ResourceLocation name = new ResourceLocation(PECore.MODID, soundName);
         registry.register(new SoundEvent(name).setRegistryName(name));
     }
 
-    private SoundHandler() {}
+    private SoundHandler() {
+    }
 }

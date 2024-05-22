@@ -9,14 +9,14 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nonnull;
+import java.math.BigInteger;
 import java.util.List;
 
 /**
  * This interface defines the contract for some object that exposes transmutation knowledge through the Capability system.
  * Acquire an instance of this using {@link net.minecraft.entity.Entity#getCapability(Capability, EnumFacing)}.
  */
-public interface IKnowledgeProvider extends INBTSerializable<NBTTagCompound>
-{
+public interface IKnowledgeProvider extends INBTSerializable<NBTTagCompound> {
 
     /**
      * @return Whether the player has the "tome" flag set, meaning all knowledge checks automatically return true
@@ -54,30 +54,31 @@ public interface IKnowledgeProvider extends INBTSerializable<NBTTagCompound>
     /**
      * @return An unmodifiable but live view of the knowledge list.
      */
-    @Nonnull List<ItemStack> getKnowledge();
+    @Nonnull
+    List<ItemStack> getKnowledge();
 
     /**
      * @return The player's input and lock slots
      */
-    @Nonnull IItemHandler getInputAndLocks();
+    @Nonnull
+    IItemHandler getInputAndLocks();
 
     /**
      * @return The emc in this player's transmutation tablet network
      */
-    long getEmc();
+    BigInteger getEMC();
+
+    default long getEmc() {
+        return getEMC().min(BigInteger.valueOf(Long.MAX_VALUE)).longValue();
+    }
 
     /**
      * @param emc The emc to set in this player's transmutation tablet network
      */
-    void setEmc(long emc);
+    void setEmc(BigInteger emc);
 
-    /**
-     * @param emc The emc to set in this player's transmutation tablet network
-     * @deprecated 
-     */
-    @Deprecated
-    default void setEmc(double emc) {
-        setEmc((long) emc);
+    default void setEmc(long emc) {
+        setEmc(BigInteger.valueOf(emc));
     }
 
     /**

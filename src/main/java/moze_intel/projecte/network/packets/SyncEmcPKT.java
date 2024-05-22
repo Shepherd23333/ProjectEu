@@ -13,95 +13,95 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class SyncEmcPKT implements IMessage
-{
-	private EmcPKTInfo[] data;
+import java.math.BigInteger;
 
-	public SyncEmcPKT() {}
+public class SyncEmcPKT implements IMessage {
+    private EmcPKTInfo[] data;
 
-	public SyncEmcPKT(EmcPKTInfo[] data)
-	{
-		this.data = data;
-	}
+    public SyncEmcPKT() {
+    }
 
-	@Override
-	public void fromBytes(ByteBuf buf)
-	{
-		int size = ByteBufUtils.readVarInt(buf, 5);
-		data = new EmcPKTInfo[size];
+    public SyncEmcPKT(EmcPKTInfo[] data) {
+        this.data = data;
+    }
 
-		for (int i = 0; i < size; i++)
-		{
-			data[i] = new EmcPKTInfo(ByteBufUtils.readVarInt(buf, 5), ByteBufUtils.readVarInt(buf, 5), buf.readLong());
-		}
-	}
+    @Override
+    public void fromBytes(ByteBuf buf) {
+        int size = ByteBufUtils.readVarInt(buf, 5);
+        data = new EmcPKTInfo[size];
 
-	@Override
-	public void toBytes(ByteBuf buf)
-	{
-		ByteBufUtils.writeVarInt(buf, data.length, 5);
+        for (int i = 0; i < size; i++) {
+            int id = ByteBufUtils.readVarInt(buf, 5),
+                    damage = ByteBufUtils.readVarInt(buf, 5),
+                    length = buf.readInt();
+            byte[] bytes = new byte[length];
+            buf.readBytes(bytes);
+            data[i] = new EmcPKTInfo(id, damage, length > 0 ? new BigInteger(bytes) : BigInteger.ZERO);
+        }
+    }
 
-		for (EmcPKTInfo info : data)
-		{
-			ByteBufUtils.writeVarInt(buf, info.getId(), 5);
-			ByteBufUtils.writeVarInt(buf, info.getDamage(), 5);
-			buf.writeLong(info.getEmc());
-		}
-	}
+    @Override
+    public void toBytes(ByteBuf buf) {
+        ByteBufUtils.writeVarInt(buf, data.length, 5);
 
-	public static class Handler implements IMessageHandler<SyncEmcPKT, IMessage>
-	{
-		@Override
-		public IMessage onMessage(final SyncEmcPKT pkt, MessageContext ctx)
-		{
-			Minecraft.getMinecraft().addScheduledTask(new Runnable() {
-				@Override
-				public void run() {
-					PECore.LOGGER.info("Receiving EMC data from server.");
-					EMCMapper.emc.clear();
+        for (EmcPKTInfo info : data) {
+            ByteBufUtils.writeVarInt(buf, info.getId(), 5);
+            ByteBufUtils.writeVarInt(buf, info.getDamage(), 5);
+            byte[] bytes = info.getEmc().toByteArray();
+            buf.writeInt(bytes.length);
+            buf.writeBytes(bytes);
+        }
+    }
 
-					for (EmcPKTInfo info : pkt.data)
-					{
-						Item i = Item.REGISTRY.getObjectById(info.getId());
+    public static class Handler implements IMessageHandler<SyncEmcPKT, IMessage> {
+        @Override
+        public IMessage onMessage(final SyncEmcPKT pkt, MessageContext ctx) {
+            Minecraft.getMinecraft().addScheduledTask(new Runnable() {
+                @Override
+                public void run() {
+                    PECore.LOGGER.info("Receiving EMC data from server.");
+                    EMCMapper.emc.clear();
 
-						SimpleStack stack = new SimpleStack(i.getRegistryName(), info.getDamage());
+                    for (EmcPKTInfo info : pkt.data) {
+                        Item i = Item.REGISTRY.getObjectById(info.getId());
 
-						if (stack.isValid())
-						{
-							EMCMapper.emc.put(stack, info.getEmc());
-						}
-					}
+                        SimpleStack stack = new SimpleStack(i.getRegistryName(), info.getDamage());
 
-					Transmutation.cacheFullKnowledge();
-					FuelMapper.loadMap();
-					PECore.refreshJEI();
-				}
-			});
+                        if (stack.isValid()) {
+                            EMCMapper.emc.put(stack, info.getEmc());
+                        }
+                    }
 
-			return null;
-		}
-	}
+                    Transmutation.cacheFullKnowledge();
+                    FuelMapper.loadMap();
+                    PECore.refreshJEI();
+                }
+            });
 
-	public static class EmcPKTInfo {
-		private int id, damage;
-		private long emc;
+            return null;
+        }
+    }
 
-		public EmcPKTInfo(int id, int damage, long emc) {
-			this.id = id;
-			this.damage = damage;
-			this.emc = emc;
-		}
+    public static class EmcPKTInfo {
+        private int id, damage;
+        private BigInteger emc;
 
-		public int getDamage() {
-			return damage;
-		}
+        public EmcPKTInfo(int id, int damage, BigInteger emc) {
+            this.id = id;
+            this.damage = damage;
+            this.emc = emc;
+        }
 
-		public int getId() {
-			return id;
-		}
+        public int getDamage() {
+            return damage;
+        }
 
-		public long getEmc() {
-			return emc;
-		}
-	}
+        public int getId() {
+            return id;
+        }
+
+        public BigInteger getEmc() {
+            return emc;
+        }
+    }
 }

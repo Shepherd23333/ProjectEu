@@ -20,73 +20,64 @@ import net.minecraft.world.World;
 
 import javax.annotation.Nonnull;
 
-public class DarkHammer extends PEToolBase
-{
-	public DarkHammer() 
-	{
-		super("dm_hammer", (byte)2, new String[] {});
-		this.setNoRepair();
-		this.peToolMaterial = "dm_tools";
-		this.harvestMaterials.add(Material.IRON);
-		this.harvestMaterials.add(Material.ANVIL);
-		this.harvestMaterials.add(Material.ROCK);
+public class DarkHammer extends PEToolBase {
+    public DarkHammer() {
+        super("dm_hammer", (byte) 2, new String[]{});
+        this.setNoRepair();
+        this.peToolMaterial = "dm_tools";
+        this.harvestMaterials.add(Material.IRON);
+        this.harvestMaterials.add(Material.ANVIL);
+        this.harvestMaterials.add(Material.ROCK);
 
-		this.toolClasses.add("hammer");
-		this.toolClasses.add("pickaxe");
-		this.toolClasses.add("chisel");
-	}
+        this.toolClasses.add("hammer");
+        this.toolClasses.add("pickaxe");
+        this.toolClasses.add("chisel");
+    }
 
-	// Only for RedHammer
-	protected DarkHammer(String name, byte numCharges, String[] modeDesc)
-	{
-		super(name, numCharges, modeDesc);
-	}
+    // Only for RedHammer
+    protected DarkHammer(String name, byte numCharges, String[] modeDesc) {
+        super(name, numCharges, modeDesc);
+    }
 
-	@Override
-	public boolean hitEntity(ItemStack stack, EntityLivingBase damaged, EntityLivingBase damager)
-	{
-		attackWithCharge(stack, damaged, damager, 1.0F);
-		return true;
-	}
+    @Override
+    public boolean hitEntity(ItemStack stack, EntityLivingBase damaged, EntityLivingBase damager) {
+        attackWithCharge(stack, damaged, damager, 1.0F);
+        return true;
+    }
 
-	@Nonnull
-	@Override
-	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, @Nonnull EnumHand hand)
-	{
-		ItemStack stack = player.getHeldItem(hand);
-		digAOE(stack, world, player, true, 0, hand);
-		return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
-	}
-	
-	@Override
-	public float getDestroySpeed(ItemStack stack, IBlockState state)
-	{
-		Block block = state.getBlock();
-		if ((block == ObjHandler.matterBlock && state.getValue(PEStateProps.TIER_PROP) == EnumMatterType.DARK_MATTER)
-				|| block == ObjHandler.dmFurnaceOff
-				|| block == ObjHandler.dmFurnaceOn)
-		{
-			return 1200000.0F;
-		}
-		
-		return super.getDestroySpeed(stack, state);
-	}
+    @Nonnull
+    @Override
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, @Nonnull EnumHand hand) {
+        ItemStack stack = player.getHeldItem(hand);
+        digAOE(stack, world, player, true, 0, hand);
+        return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
+    }
 
-	@Nonnull
-	@Override
-	public Multimap<String, AttributeModifier> getAttributeModifiers(@Nonnull EntityEquipmentSlot slot, ItemStack stack)
-	{
-		if (slot != EntityEquipmentSlot.MAINHAND)
-		{
-			return super.getAttributeModifiers(slot, stack);
-		}
+    @Override
+    public float getDestroySpeed(ItemStack stack, IBlockState state) {
+        Block block = state.getBlock();
+        if ((block == ObjHandler.matterBlock && state.getValue(PEStateProps.TIER_PROP) == EnumMatterType.DARK_MATTER)
+                || block == ObjHandler.dmFurnaceOff
+                || block == ObjHandler.dmFurnaceOn) {
+            return 1200000.0F;
+        }
 
-		int charge = getCharge(stack);
-		float damage = HAMMER_BASE_ATTACK + charge;
+        return super.getDestroySpeed(stack, state);
+    }
 
-		Multimap<String, AttributeModifier> multimap = super.getAttributeModifiers(slot, stack);
-		multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", damage, 0));
-		multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Tool modifier", -3, 0));
-		return multimap;
-	}
+    @Nonnull
+    @Override
+    public Multimap<String, AttributeModifier> getAttributeModifiers(@Nonnull EntityEquipmentSlot slot, ItemStack stack) {
+        if (slot != EntityEquipmentSlot.MAINHAND) {
+            return super.getAttributeModifiers(slot, stack);
+        }
+
+        int charge = getCharge(stack);
+        float damage = HAMMER_BASE_ATTACK + charge;
+
+        Multimap<String, AttributeModifier> multimap = super.getAttributeModifiers(slot, stack);
+        multimap.put(SharedMonsterAttributes.ATTACK_DAMAGE.getName(), new AttributeModifier(ATTACK_DAMAGE_MODIFIER, "Weapon modifier", damage, 0));
+        multimap.put(SharedMonsterAttributes.ATTACK_SPEED.getName(), new AttributeModifier(ATTACK_SPEED_MODIFIER, "Tool modifier", -3, 0));
+        return multimap;
+    }
 }

@@ -11,11 +11,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityXPOrb;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextFormatting;
@@ -26,214 +24,175 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import javax.annotation.Nonnull;
 import java.util.List;
 
-public class MindStone extends RingToggle implements IPedestalItem
-{
-	private static final int TRANSFER_RATE = 50;
+public class MindStone extends RingToggle implements IPedestalItem {
+    private static final int TRANSFER_RATE = 50;
 
-	public MindStone() 
-	{
-		super("mind_stone");
-		this.setNoRepair();
-	}
+    public MindStone() {
+        super("mind_stone");
+        this.setNoRepair();
+    }
 
-	@Override
-	public void onUpdate(ItemStack stack, World world, Entity entity, int par4, boolean par5) 
-	{
-		if (world.isRemote || par4 > 8 || !(entity instanceof EntityPlayer))
-		{
-			return;
-		}
+    @Override
+    public void onUpdate(ItemStack stack, World world, Entity entity, int par4, boolean par5) {
+        if (world.isRemote || par4 > 8 || !(entity instanceof EntityPlayer)) {
+            return;
+        }
 
-		super.onUpdate(stack, world, entity, par4, par5);
+        super.onUpdate(stack, world, entity, par4, par5);
 
-		EntityPlayer player = (EntityPlayer) entity;
+        EntityPlayer player = (EntityPlayer) entity;
 
-		if (ItemHelper.getOrCreateCompound(stack).getBoolean(TAG_ACTIVE))
-		{
-			if (getXP(player) > 0)
-			{
-				int toAdd = getXP(player) >= TRANSFER_RATE ? TRANSFER_RATE : getXP(player);
-				addStoredXP(stack, toAdd);
-				removeXP(player, TRANSFER_RATE);
-			}
-		}
-	}
-	
-	@Nonnull
-	@Override
-	public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand)
-	{
-		ItemStack stack = player.getHeldItem(hand);
-		if (!world.isRemote && !ItemHelper.getOrCreateCompound(stack).getBoolean(TAG_ACTIVE) && getStoredXP(stack) != 0)
-		{
-			int toAdd = removeStoredXP(stack, TRANSFER_RATE);
-			
-			if (toAdd > 0)
-			{
-				addXP(player, toAdd);
-			}
-		}
-		
-		return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
-	}
+        if (ItemHelper.getOrCreateCompound(stack).getBoolean(TAG_ACTIVE)) {
+            if (getXP(player) > 0) {
+                int toAdd = getXP(player) >= TRANSFER_RATE ? TRANSFER_RATE : getXP(player);
+                addStoredXP(stack, toAdd);
+                removeXP(player, TRANSFER_RATE);
+            }
+        }
+    }
 
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag flags)
-	{
-		if(stack.getTagCompound() != null)
-			tooltip.add(String.format(TextFormatting.DARK_GREEN + I18n.format("pe.misc.storedxp_tooltip") + " " + TextFormatting.GREEN + "%,d", getStoredXP(stack)));
-	}
+    @Nonnull
+    @Override
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+        ItemStack stack = player.getHeldItem(hand);
+        if (!world.isRemote && !ItemHelper.getOrCreateCompound(stack).getBoolean(TAG_ACTIVE) && getStoredXP(stack) != 0) {
+            int toAdd = removeStoredXP(stack, TRANSFER_RATE);
+
+            if (toAdd > 0) {
+                addXP(player, toAdd);
+            }
+        }
+
+        return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void addInformation(ItemStack stack, World world, List<String> tooltip, ITooltipFlag flags) {
+        if (stack.getTagCompound() != null)
+            tooltip.add(String.format(TextFormatting.DARK_GREEN + I18n.format("pe.misc.storedxp_tooltip") + " " + TextFormatting.GREEN + "%,d", getStoredXP(stack)));
+    }
 
 
-	private void removeXP(EntityPlayer player, int amount)
-	{
-		int experiencetotal = getXP(player) - amount;
-		
-		if (experiencetotal < 0)
-		{
-			player.experienceTotal = 0;
-			player.experienceLevel = 0;
-			player.experience = 0;
-		}
-		else
-		{
-			player.experienceTotal = experiencetotal;
-			player.experienceLevel = getLvlForXP(experiencetotal);
-			player.experience = (float)(experiencetotal - getXPForLvl(player.experienceLevel)) / (float)player.xpBarCap();
-		}
-	}
+    private void removeXP(EntityPlayer player, int amount) {
+        int experiencetotal = getXP(player) - amount;
 
-	private void addXP(EntityPlayer player, int amount)
-	{
-		int experiencetotal = getXP(player) + amount;
-		player.experienceTotal = experiencetotal;
-		player.experienceLevel = getLvlForXP(experiencetotal);
-		player.experience = (float)(experiencetotal - getXPForLvl(player.experienceLevel)) / (float)player.xpBarCap();
-	}
+        if (experiencetotal < 0) {
+            player.experienceTotal = 0;
+            player.experienceLevel = 0;
+            player.experience = 0;
+        } else {
+            player.experienceTotal = experiencetotal;
+            player.experienceLevel = getLvlForXP(experiencetotal);
+            player.experience = (float) (experiencetotal - getXPForLvl(player.experienceLevel)) / (float) player.xpBarCap();
+        }
+    }
 
-	private int getXP(EntityPlayer player)
-	{
-		return (int)(getXPForLvl(player.experienceLevel) + (player.experience * player.xpBarCap()));
-	}
+    private void addXP(EntityPlayer player, int amount) {
+        int experiencetotal = getXP(player) + amount;
+        player.experienceTotal = experiencetotal;
+        player.experienceLevel = getLvlForXP(experiencetotal);
+        player.experience = (float) (experiencetotal - getXPForLvl(player.experienceLevel)) / (float) player.xpBarCap();
+    }
 
-	// Math referenced from the MC wiki
-	private int getXPForLvl(int level) 
-	{
-		if (level < 0) 
-		{
-			return Integer.MAX_VALUE;
-		}
+    private int getXP(EntityPlayer player) {
+        return (int) (getXPForLvl(player.experienceLevel) + (player.experience * player.xpBarCap()));
+    }
 
-		if (level <= 16)
-		{
-			return level * level + 6 * level;
-		}
+    // Math referenced from the MC wiki
+    private int getXPForLvl(int level) {
+        if (level < 0) {
+            return Integer.MAX_VALUE;
+        }
 
-		if (level <= 31)
-		{
-			return (int) (((level * level) * 2.5D) - (40.5D * level) + 360.0D);
-		}
+        if (level <= 16) {
+            return level * level + 6 * level;
+        }
 
-		return (int) (((level * level) * 4.5D) - (162.5D * level) + 2220.0D);
-	}
+        if (level <= 31) {
+            return (int) (((level * level) * 2.5D) - (40.5D * level) + 360.0D);
+        }
 
-	private int getLvlForXP(int totalXP)
-	{
-		int result = 0;
+        return (int) (((level * level) * 4.5D) - (162.5D * level) + 2220.0D);
+    }
 
-		while (getXPForLvl(result) <= totalXP) 
-		{
-			result++;
-		}
+    private int getLvlForXP(int totalXP) {
+        int result = 0;
 
-		return --result;
-	}
-	
-	private int getStoredXP(ItemStack stack)
-	{
-		return ItemHelper.getOrCreateCompound(stack).getInteger("StoredXP");
-	}
+        while (getXPForLvl(result) <= totalXP) {
+            result++;
+        }
 
-	private void setStoredXP(ItemStack stack, int XP)
-	{
-		ItemHelper.getOrCreateCompound(stack).setInteger("StoredXP", XP);
-	}
+        return --result;
+    }
 
-	private void addStoredXP(ItemStack stack, int XP) 
-	{
-		long result = getStoredXP(stack) + XP;
-		
-		if (result > Integer.MAX_VALUE)
-		{
-			result = Integer.MAX_VALUE;
-		}
-		
-		setStoredXP(stack, (int) result);
-	}
+    private int getStoredXP(ItemStack stack) {
+        return ItemHelper.getOrCreateCompound(stack).getInteger("StoredXP");
+    }
 
-	private int removeStoredXP(ItemStack stack, int XP) 
-	{
-		int currentXP = getStoredXP(stack);
-		int result;
-		int returnResult;
-		
-		if (currentXP < XP)
-		{
-			result = 0;
-			returnResult = currentXP;
-		}
-		else
-		{
-			result = currentXP - XP;
-			returnResult = XP;
-		}
-		
-		setStoredXP(stack, result);
-		return returnResult;
-	}
+    private void setStoredXP(ItemStack stack, int XP) {
+        ItemHelper.getOrCreateCompound(stack).setInteger("StoredXP", XP);
+    }
 
-	@Override
-	public void updateInPedestal(@Nonnull World world, @Nonnull BlockPos pos)
-	{
-		TileEntity te = world.getTileEntity(pos);
-		if(!(te instanceof DMPedestalTile))
-		{
-			return;
-		}
-		DMPedestalTile tile = (DMPedestalTile) te;
-		List<EntityXPOrb> orbs = world.getEntitiesWithinAABB(EntityXPOrb.class, tile.getEffectBounds());
-		for (EntityXPOrb orb : orbs)
-		{
-			WorldHelper.gravitateEntityTowards(orb, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
-			if (!world.isRemote && orb.getDistanceSq(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) < 1.21)
-			{
-				suckXP(orb, tile.getInventory().getStackInSlot(0));
-			}
-		}
+    private void addStoredXP(ItemStack stack, int XP) {
+        long result = getStoredXP(stack) + XP;
 
-	}
+        if (result > Integer.MAX_VALUE) {
+            result = Integer.MAX_VALUE;
+        }
 
-	private void suckXP(EntityXPOrb orb, ItemStack mindStone)
-	{
-		long l = getStoredXP(mindStone);
-		if (l + orb.xpValue > Integer.MAX_VALUE)
-		{
-			orb.xpValue = ((int) (l + orb.xpValue - Integer.MAX_VALUE));
-			setStoredXP(mindStone, Integer.MAX_VALUE);
-		}
-		else
-		{
-			addStoredXP(mindStone, orb.xpValue);
-			orb.setDead();
-		}
-	}
+        setStoredXP(stack, (int) result);
+    }
 
-	@Nonnull
-	@SideOnly(Side.CLIENT)
-	@Override
-	public List<String> getPedestalDescription()
-	{
-		return Lists.newArrayList(I18n.format("pe.mind.pedestal1"));
-	}
+    private int removeStoredXP(ItemStack stack, int XP) {
+        int currentXP = getStoredXP(stack);
+        int result;
+        int returnResult;
+
+        if (currentXP < XP) {
+            result = 0;
+            returnResult = currentXP;
+        } else {
+            result = currentXP - XP;
+            returnResult = XP;
+        }
+
+        setStoredXP(stack, result);
+        return returnResult;
+    }
+
+    @Override
+    public void updateInPedestal(@Nonnull World world, @Nonnull BlockPos pos) {
+        TileEntity te = world.getTileEntity(pos);
+        if (!(te instanceof DMPedestalTile)) {
+            return;
+        }
+        DMPedestalTile tile = (DMPedestalTile) te;
+        List<EntityXPOrb> orbs = world.getEntitiesWithinAABB(EntityXPOrb.class, tile.getEffectBounds());
+        for (EntityXPOrb orb : orbs) {
+            WorldHelper.gravitateEntityTowards(orb, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
+            if (!world.isRemote && orb.getDistanceSq(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5) < 1.21) {
+                suckXP(orb, tile.getInventory().getStackInSlot(0));
+            }
+        }
+
+    }
+
+    private void suckXP(EntityXPOrb orb, ItemStack mindStone) {
+        long l = getStoredXP(mindStone);
+        if (l + orb.xpValue > Integer.MAX_VALUE) {
+            orb.xpValue = ((int) (l + orb.xpValue - Integer.MAX_VALUE));
+            setStoredXP(mindStone, Integer.MAX_VALUE);
+        } else {
+            addStoredXP(mindStone, orb.xpValue);
+            orb.setDead();
+        }
+    }
+
+    @Nonnull
+    @SideOnly(Side.CLIENT)
+    @Override
+    public List<String> getPedestalDescription() {
+        return Lists.newArrayList(I18n.format("pe.mind.pedestal1"));
+    }
 }
