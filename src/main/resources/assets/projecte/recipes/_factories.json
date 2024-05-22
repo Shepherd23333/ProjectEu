@@ -1,5 +1,5 @@
 {
   "conditions": {
-    "tome_enabled": "me.shepherd23333.projecte.config.TomeEnabledFactory"
+    "tome_enabled": "moze_intel.projecte.config.TomeEnabledFactory"
   }
 }
