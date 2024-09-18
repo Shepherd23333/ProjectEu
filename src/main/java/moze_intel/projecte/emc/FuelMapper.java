@@ -1,11 +1,9 @@
 package moze_intel.projecte.emc;
 
 import moze_intel.projecte.PECore;
-import moze_intel.projecte.gameObjs.ObjHandler;
 import moze_intel.projecte.utils.EMCHelper;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.oredict.OreDictionary;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,7 +16,10 @@ public final class FuelMapper {
     public static void loadMap() {
         FUEL_MAP.clear();
 
-        addToMap(new ItemStack(Items.COAL, 1, 1));
+        for (ItemStack stack : OreDictionary.getOres("collectorFuels"))
+            addToMap(stack);
+
+        /*addToMap(new ItemStack(Items.COAL, 1, 1));
         addToMap(new ItemStack(Items.REDSTONE));
         addToMap(new ItemStack(Blocks.REDSTONE_BLOCK));
         addToMap(new ItemStack(Items.COAL));
@@ -32,7 +33,7 @@ public final class FuelMapper {
         addToMap(new ItemStack(ObjHandler.fuels, 1, 1));
         addToMap(new ItemStack(ObjHandler.fuelBlock, 1, 1));
         addToMap(new ItemStack(ObjHandler.fuels, 1, 2));
-        addToMap(new ItemStack(ObjHandler.fuelBlock, 1, 2));
+        addToMap(new ItemStack(ObjHandler.fuelBlock, 1, 2));*/
 
         FUEL_MAP.sort(Comparator.comparing(EMCMapper::getEmcValue));
     }

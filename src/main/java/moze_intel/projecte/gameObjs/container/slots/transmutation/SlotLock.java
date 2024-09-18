@@ -14,8 +14,8 @@ import java.math.BigInteger;
 public class SlotLock extends SlotItemHandler {
     private final TransmutationInventory inv;
 
-    public SlotLock(TransmutationInventory inv, int par2, int par3, int par4) {
-        super(inv, par2, par3, par4);
+    public SlotLock(TransmutationInventory inv, int id, int x, int y) {
+        super(inv, id, x, y);
         this.inv = inv;
     }
 

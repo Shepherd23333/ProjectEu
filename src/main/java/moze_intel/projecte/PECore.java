@@ -49,7 +49,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Mod(modid = PECore.MODID, name = PECore.MODNAME, version = Tags.VERSION, acceptedMinecraftVersions = "[1.12,]", dependencies = PECore.DEPS)
+@Mod(modid = PECore.MODID, name = PECore.MODNAME, version = PECore.VERSION, acceptedMinecraftVersions = "[1.12,]", dependencies = PECore.DEPS)
 @Mod.EventBusSubscriber(modid = PECore.MODID)
 public class PECore {
     public static final String MODID = "projecte";
@@ -137,6 +137,7 @@ public class PECore {
     @EventHandler
     public void postInit(FMLPostInitializationEvent event) {
         NBTWhitelistParser.init();
+        OreHandler.register();
         proxy.initializeManual();
     }
 
