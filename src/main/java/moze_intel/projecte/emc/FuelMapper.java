@@ -19,22 +19,6 @@ public final class FuelMapper {
         for (ItemStack stack : OreDictionary.getOres("collectorFuels"))
             addToMap(stack);
 
-        /*addToMap(new ItemStack(Items.COAL, 1, 1));
-        addToMap(new ItemStack(Items.REDSTONE));
-        addToMap(new ItemStack(Blocks.REDSTONE_BLOCK));
-        addToMap(new ItemStack(Items.COAL));
-        addToMap(new ItemStack(Blocks.COAL_BLOCK));
-        addToMap(new ItemStack(Items.GUNPOWDER));
-        addToMap(new ItemStack(Items.GLOWSTONE_DUST));
-        addToMap(new ItemStack(ObjHandler.fuels, 1, 0));
-        addToMap(new ItemStack(ObjHandler.fuelBlock, 1, 0));
-        addToMap(new ItemStack(Items.BLAZE_POWDER));
-        addToMap(new ItemStack(Blocks.GLOWSTONE));
-        addToMap(new ItemStack(ObjHandler.fuels, 1, 1));
-        addToMap(new ItemStack(ObjHandler.fuelBlock, 1, 1));
-        addToMap(new ItemStack(ObjHandler.fuels, 1, 2));
-        addToMap(new ItemStack(ObjHandler.fuelBlock, 1, 2));*/
-
         FUEL_MAP.sort(Comparator.comparing(EMCMapper::getEmcValue));
     }
 

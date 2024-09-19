@@ -49,11 +49,10 @@ import java.util.Set;
 
 @Optional.Interface(iface = "baubles.api.IBauble", modid = "baubles")
 public class TimeWatch extends ItemPE implements IModeChanger, IBauble, IPedestalItem, IItemCharge {
-    // TODO 1.13 remove
     private static final Set<String> internalBlacklist = Sets.newHashSet(
             "Reika.ChromatiCraft.TileEntity.AOE.TileEntityAccelerator",
-            "com.sci.torcherino.tile.TileTorcherino",
-            "com.sci.torcherino.tile.TileCompressedTorcherino",
+            //"com.sci.torcherino.tile.TileTorcherino",
+            //"com.sci.torcherino.tile.TileCompressedTorcherino",
             "thaumcraft.common.tiles.crafting.TileSmelter"
     );
 
@@ -88,22 +87,20 @@ public class TimeWatch extends ItemPE implements IModeChanger, IBauble, IPedesta
     public void onUpdate(ItemStack stack, World world, Entity entity, int invSlot, boolean isHeld) {
         super.onUpdate(stack, world, entity, invSlot, isHeld);
 
-        if (!(entity instanceof EntityPlayer) || invSlot > 8) {
+        if (!(entity instanceof EntityPlayer) || invSlot > 8)
             return;
-        }
 
-        if (!ProjectEConfig.items.enableTimeWatch) {
+        if (!ProjectEConfig.items.enableTimeWatch)
             return;
-        }
 
         byte timeControl = getTimeBoost(stack);
 
         if (world.getGameRules().getBoolean("doDaylightCycle")) {
             if (timeControl == 1) {
-                if (world.getWorldTime() + ((getCharge(stack) + 1) * 4) > Long.MAX_VALUE) {
+                if (world.getWorldTime() + (getCharge(stack) + 1) * 4 > Long.MAX_VALUE) {
                     world.setWorldTime(Long.MAX_VALUE);
                 } else {
-                    world.setWorldTime((world.getWorldTime() + ((getCharge(stack) + 1) * 4)));
+                    world.setWorldTime((world.getWorldTime() + (getCharge(stack) + 1) * 4));
                 }
             } else if (timeControl == 2) {
                 if (world.getWorldTime() - ((getCharge(stack) + 1) * 4) < 0) {
@@ -167,45 +164,34 @@ public class TimeWatch extends ItemPE implements IModeChanger, IBauble, IPedesta
 
     private void speedUpTileEntities(World world, int bonusTicks, AxisAlignedBB bBox) {
         if (bBox == null || bonusTicks == 0) // Sanity check the box for chunk unload weirdness
-        {
             return;
-        }
 
         List<String> blacklist = Arrays.asList(ProjectEConfig.effects.timeWatchTEBlacklist);
         List<TileEntity> list = WorldHelper.getTileEntitiesWithinAABB(world, bBox);
-        for (int i = 0; i < bonusTicks; i++) {
-            for (TileEntity tile : list) {
+        for (int i = 0; i < bonusTicks; i++)
+            for (TileEntity tile : list)
                 if (!tile.isInvalid() && tile instanceof ITickable
                         && !internalBlacklist.contains(tile.getClass().toString())
-                        && !blacklist.contains(TileEntity.getKey(tile.getClass()).toString())) {
+                        && !blacklist.contains(TileEntity.getKey(tile.getClass()).toString()))
                     ((ITickable) tile).update();
-                }
-            }
-        }
     }
 
     private void speedUpRandomTicks(World world, int bonusTicks, AxisAlignedBB bBox) {
         if (bBox == null || bonusTicks == 0) // Sanity check the box for chunk unload weirdness
-        {
             return;
-        }
 
         List<String> blacklist = Arrays.asList(ProjectEConfig.effects.timeWatchBlockBlacklist);
-        for (BlockPos pos : WorldHelper.getPositionsFromBox(bBox)) {
+        for (BlockPos pos : WorldHelper.getPositionsFromBox(bBox))
             for (int i = 0; i < bonusTicks; i++) {
                 IBlockState state = world.getBlockState(pos);
                 Block block = state.getBlock();
-                if (block.getTickRandomly()
-                        && !blacklist.contains(block.getRegistryName().toString())
+                if (block.getTickRandomly() && !blacklist.contains(block.getRegistryName().toString())
                         && !(block instanceof BlockLiquid) // Don't speed vanilla non-source blocks - dupe issues
                         && !(block instanceof BlockFluidBase) // Don't speed Forge fluids - just in case of dupes as well
                         && !(block instanceof IGrowable)
                         && !(block instanceof IPlantable)) // All plants should be sped using Harvest Goddess
-                {
                     block.updateTick(world, pos, state, itemRand);
-                }
             }
-        }
     }
 
     private String getTimeName(ItemStack stack) {
@@ -231,8 +217,7 @@ public class TimeWatch extends ItemPE implements IModeChanger, IBauble, IPedesta
     }
 
     public double getEmcPerTick(int charge) {
-        int actualCharge = charge + 2;
-        return (10.0D * actualCharge) / 20.0D;
+        return 0.5D * (charge + 2);
     }
 
     @Override
