@@ -310,36 +310,27 @@ tasks.register('cleanroomAfterSync') {
 }
 
 shadowJar {
+    //Note: We use the include duplicate strategy instead of FAIL as minimize causes
+    // the things to get "added" twice but it is filtered separately by the shadow
+    // plugin anyways
+    duplicatesStrategy(DuplicatesStrategy.INCLUDE)
+    archiveClassifier = 'dev' // Replace the default JAR
+    dependsOn(classes, apiClasses)
+    from([sourceSets.api.output, sourceSets.main.output])
+
     // Only shadow apache commons-math3
     dependencies {
         include dependency('org.apache.commons:commons-math3:.*')
     }
-    exclude('org/apache/commons/math3/analysis/**')
-    exclude('org/apache/commons/math3/complex/**')
-    exclude('org/apache/commons/math3/dfp/**')
-    exclude('org/apache/commons/math3/distribution/**')
-    exclude('org/apache/commons/math3/filter/**')
-    exclude('org/apache/commons/math3/fitting/**')
-    exclude('org/apache/commons/math3/genetics/**')
-    exclude('org/apache/commons/math3/geometry/**')
-    exclude('org/apache/commons/math3/linear/**')
-    exclude('org/apache/commons/math3/ml/**')
-    exclude('org/apache/commons/math3/ode/**')
-    exclude('org/apache/commons/math3/optim/**')
-    exclude('org/apache/commons/math3/optimization/**')
-    exclude('org/apache/commons/math3/primes/**')
-    exclude('org/apache/commons/math3/random/**')
-    exclude('org/apache/commons/math3/special/**')
-    exclude('org/apache/commons/math3/stat/**')
-    exclude('org/apache/commons/math3/transform/**')
-
     exclude('assets/org/**')
     exclude('META-INF/maven/**')
-
+    exclude('META-INF/*.txt')
     // Relocate apache commons-math3 to prevent conflicts with other mods that include it
     relocate 'org.apache.commons.math3', 'moze_intel.projecte.shaded.org.apache.commons.math3'
-
-    archiveClassifier = 'dev' // Replace the default JAR
+    // Minimize the required files so we only include what is needed
+    minimize {
+        include dependency('org.apache.commons:commons-math3:.*')
+    }
 }
 
 reobfJar {
