@@ -18,7 +18,7 @@ import javax.annotation.Nonnull;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-public class RelayMK1Container extends BigIntegerContainer {
+public class RelayMK1Container extends BigIntContainer {
     final RelayMK1Tile tile;
     public BigDecimal kleinChargeProgress = BigDecimal.ZERO;
     public BigDecimal inputBurnProgress = BigDecimal.ZERO;
@@ -58,7 +58,7 @@ public class RelayMK1Container extends BigIntegerContainer {
     @Override
     public void addListener(IContainerListener listener) {
         super.addListener(listener);
-        PacketHandler.sendProgressBarUpdateBigInteger(listener, this, 0, tile.getStoredEmc());
+        PacketHandler.sendProgressBarUpdateBigInt(listener, this, 0, tile.getStoredEmc());
         PacketHandler.sendProgressBarUpdateInt(listener, this, 1, tile.getItemChargeProportion().multiply(BigDecimal.valueOf(8000)).intValue());
         PacketHandler.sendProgressBarUpdateInt(listener, this, 2, tile.getInputBurnProportion().multiply(BigDecimal.valueOf(8000)).intValue());
     }
@@ -69,7 +69,7 @@ public class RelayMK1Container extends BigIntegerContainer {
 
         if (emc != tile.getStoredEmc()) {
             for (IContainerListener icrafting : this.listeners) {
-                PacketHandler.sendProgressBarUpdateBigInteger(icrafting, this, 0, tile.getStoredEmc());
+                PacketHandler.sendProgressBarUpdateBigInt(icrafting, this, 0, tile.getStoredEmc());
             }
 
             emc = tile.getStoredEmc();
@@ -111,7 +111,7 @@ public class RelayMK1Container extends BigIntegerContainer {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void updateProgressBarBigInteger(int id, BigInteger data) {
+    public void updateProgressBarBigInt(int id, BigInteger data) {
         switch (id) {
             case 0:
                 emc = data;

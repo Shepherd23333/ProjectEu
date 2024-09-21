@@ -25,7 +25,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 
-public class CondenserContainer extends BigIntegerContainer {
+public class CondenserContainer extends BigIntContainer {
     protected final CondenserTile tile;
     public BigInteger displayEmc = BigInteger.ZERO;
     public BigInteger requiredEmc = BigInteger.ZERO;
@@ -60,8 +60,8 @@ public class CondenserContainer extends BigIntegerContainer {
     @Override
     public void addListener(IContainerListener listener) {
         super.addListener(listener);
-        PacketHandler.sendProgressBarUpdateBigInteger(listener, this, 0, tile.displayEmc);
-        PacketHandler.sendProgressBarUpdateBigInteger(listener, this, 1, tile.requiredEmc);
+        PacketHandler.sendProgressBarUpdateBigInt(listener, this, 0, tile.displayEmc);
+        PacketHandler.sendProgressBarUpdateBigInt(listener, this, 1, tile.requiredEmc);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class CondenserContainer extends BigIntegerContainer {
 
         if (!displayEmc.equals(tile.displayEmc)) {
             for (IContainerListener listener : listeners) {
-                PacketHandler.sendProgressBarUpdateBigInteger(listener, this, 0, tile.displayEmc);
+                PacketHandler.sendProgressBarUpdateBigInt(listener, this, 0, tile.displayEmc);
             }
 
             displayEmc = tile.displayEmc;
@@ -78,7 +78,7 @@ public class CondenserContainer extends BigIntegerContainer {
 
         if (requiredEmc != tile.requiredEmc) {
             for (IContainerListener listener : listeners) {
-                PacketHandler.sendProgressBarUpdateBigInteger(listener, this, 1, tile.requiredEmc);
+                PacketHandler.sendProgressBarUpdateBigInt(listener, this, 1, tile.requiredEmc);
             }
 
             requiredEmc = tile.requiredEmc;
@@ -100,7 +100,7 @@ public class CondenserContainer extends BigIntegerContainer {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void updateProgressBarBigInteger(int id, BigInteger data) {
+    public void updateProgressBarBigInt(int id, BigInteger data) {
         switch (id) {
             case 0:
                 displayEmc = data;

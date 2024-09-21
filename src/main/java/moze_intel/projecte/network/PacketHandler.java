@@ -43,21 +43,18 @@ public final class PacketHandler {
     }
 
     public static void sendProgressBarUpdateInt(IContainerListener listener, Container container, int propId, int propVal) {
-        if (listener instanceof EntityPlayerMP) {
+        if (listener instanceof EntityPlayerMP)
             sendTo(new UpdateWindowIntPKT((short) container.windowId, (short) propId, propVal), (EntityPlayerMP) listener);
-        }
     }
 
-    public static void sendProgressBarUpdateBigInteger(IContainerListener listener, Container container, int propId, BigInteger propVal) {
-        if (listener instanceof EntityPlayerMP) {
+    public static void sendProgressBarUpdateBigInt(IContainerListener listener, Container container, int propId, BigInteger propVal) {
+        if (listener instanceof EntityPlayerMP)
             sendTo(new UpdateWindowBigIntPKT((short) container.windowId, (short) propId, propVal), (EntityPlayerMP) listener);
-        }
     }
 
     public static void sendNonLocal(IMessage msg, EntityPlayerMP player) {
-        if (player.server.isDedicatedServer() || !player.getName().equals(player.server.getServerOwner())) {
+        if (player.server.isDedicatedServer() || !player.getName().equals(player.server.getServerOwner()))
             HANDLER.sendTo(msg, player);
-        }
     }
 
     public static void sendFragmentedEmcPacket(EntityPlayerMP player) {
@@ -66,9 +63,8 @@ public final class PacketHandler {
 
     public static void sendFragmentedEmcPacketToAll() {
         SyncEmcPKT pkt = new SyncEmcPKT(serializeEmcData());
-        for (EntityPlayerMP player : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers()) {
+        for (EntityPlayerMP player : FMLCommonHandler.instance().getMinecraftServerInstance().getPlayerList().getPlayers())
             sendNonLocal(pkt, player);
-        }
     }
 
     private static SyncEmcPKT.EmcPKTInfo[] serializeEmcData() {
@@ -113,9 +109,8 @@ public final class PacketHandler {
      * Must be called Server side.
      */
     public static void sendTo(IMessage msg, EntityPlayerMP player) {
-        if (!(player instanceof FakePlayer)) {
+        if (!(player instanceof FakePlayer))
             HANDLER.sendTo(msg, player);
-        }
     }
 
     /**

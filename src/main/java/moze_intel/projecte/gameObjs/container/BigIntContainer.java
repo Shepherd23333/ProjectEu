@@ -6,8 +6,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.math.BigInteger;
 
-public abstract class BigIntegerContainer extends Container {
+public abstract class BigIntContainer extends Container {
     @SideOnly(Side.CLIENT)
-    public void updateProgressBarBigInteger(int id, BigInteger data) {
+    public void updateProgressBarBigInt(int id, BigInteger data) {
     }
 }

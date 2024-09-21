@@ -1,7 +1,7 @@
 package moze_intel.projecte.network.packets;
 
 import io.netty.buffer.ByteBuf;
-import moze_intel.projecte.gameObjs.container.BigIntegerContainer;
+import moze_intel.projecte.gameObjs.container.BigIntContainer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -46,18 +46,14 @@ public class UpdateWindowBigIntPKT implements IMessage {
     public static class Handler implements IMessageHandler<UpdateWindowBigIntPKT, IMessage> {
         @Override
         public IMessage onMessage(final UpdateWindowBigIntPKT msg, MessageContext ctx) {
-            Minecraft.getMinecraft().addScheduledTask(new Runnable() {
-                @Override
-                public void run() {
-                    EntityPlayer player = Minecraft.getMinecraft().player;
-                    if (player.openContainer != null && player.openContainer.windowId == msg.windowId) {
-                        //It should always be a LongContainer if it is this type of packet, if not fallback to normal update
-                        if (player.openContainer instanceof BigIntegerContainer) {
-                            ((BigIntegerContainer) player.openContainer).updateProgressBarBigInteger(msg.propId, msg.propVal);
-                        } else {
-                            player.openContainer.updateProgressBar(msg.propId, msg.propVal.intValueExact());
-                        }
-                    }
+            Minecraft.getMinecraft().addScheduledTask(() -> {
+                EntityPlayer player = Minecraft.getMinecraft().player;
+                if (player.openContainer != null && player.openContainer.windowId == msg.windowId) {
+                    //It should always be a LongContainer if it is this type of packet, if not fallback to normal update
+                    if (player.openContainer instanceof BigIntContainer)
+                        ((BigIntContainer) player.openContainer).updateProgressBarBigInt(msg.propId, msg.propVal);
+                    else
+                        player.openContainer.updateProgressBar(msg.propId, msg.propVal.intValueExact());
                 }
             });
             return null;

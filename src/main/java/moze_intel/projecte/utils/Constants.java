@@ -1,5 +1,7 @@
 package moze_intel.projecte.utils;
 
+import moze_intel.projecte.PECore;
+import net.minecraft.util.ResourceLocation;
 import org.apache.commons.math3.fraction.BigFraction;
 
 import java.math.BigInteger;
@@ -57,6 +59,7 @@ public final class Constants {
     public static final int ETERNAL_DENSITY_GUI = 15;
     public static final int CONDENSER_MK2_GUI = 16;
     public static final int MAX_CONDENSER_PROGRESS = 102;
+    public static final ResourceLocation gui = new ResourceLocation(PECore.MODID.toLowerCase(), "textures/gui/collector3.png");
 
     public static final int MAX_VEIN_SIZE = 250;
 

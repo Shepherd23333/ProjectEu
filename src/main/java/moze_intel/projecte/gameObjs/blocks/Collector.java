@@ -37,9 +37,7 @@ public class Collector extends BlockDirection {
 
     @Override
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
-        int x = pos.getX();
-        int y = pos.getY();
-        int z = pos.getZ();
+        int x = pos.getX(), y = pos.getY(), z = pos.getZ();
 
         if (!world.isRemote)
             switch (tier) {
@@ -70,9 +68,8 @@ public class Collector extends BlockDirection {
                 return new CollectorMK2Tile();
             case 1:
                 return new CollectorMK1Tile();
-            default:
-                return null;
         }
+        return null;
     }
 
     @Override
@@ -87,17 +84,14 @@ public class Collector extends BlockDirection {
         if (!charging.isEmpty()) {
             if (charging.getItem() instanceof IItemEmc) {
                 IItemEmc itemEmc = ((IItemEmc) charging.getItem());
-                BigInteger max = itemEmc.getMaximumEMC(charging);
-                BigInteger current = itemEmc.getStoredEMC(charging);
+                BigInteger max = itemEmc.getMaximumEMC(charging), current = itemEmc.getStoredEMC(charging);
                 return MathUtils.scaleToRedstone(current, max);
             } else {
-                BigInteger needed = tile.getEmcToNextGoal();
-                BigInteger current = tile.getStoredEmc();
+                BigInteger needed = tile.getEmcToNextGoal(), current = tile.getStoredEmc();
                 return MathUtils.scaleToRedstone(current, needed);
             }
-        } else {
+        } else
             return MathUtils.scaleToRedstone(tile.getStoredEmc(), tile.getMaximumEmc());
-        }
     }
 
     @Override
@@ -110,11 +104,9 @@ public class Collector extends BlockDirection {
         TileEntity ent = world.getTileEntity(pos);
         if (ent != null) {
             IItemHandler handler = ent.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.UP);
-            for (int i = 0; i < handler.getSlots(); i++) {
-                if (i != CollectorMK1Tile.LOCK_SLOT && !handler.getStackInSlot(i).isEmpty()) {
+            for (int i = 0; i < handler.getSlots(); i++)
+                if (i != CollectorMK1Tile.LOCK_SLOT && !handler.getStackInSlot(i).isEmpty())
                     InventoryHelper.spawnItemStack(world, pos.getX(), pos.getY(), pos.getZ(), handler.getStackInSlot(i));
-                }
-            }
         }
         super.breakBlock(world, pos, state);
     }

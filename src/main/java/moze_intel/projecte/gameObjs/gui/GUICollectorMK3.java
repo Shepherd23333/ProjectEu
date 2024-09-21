@@ -1,8 +1,8 @@
 package moze_intel.projecte.gameObjs.gui;
 
-import moze_intel.projecte.PECore;
 import moze_intel.projecte.gameObjs.container.CollectorMK3Container;
 import moze_intel.projecte.gameObjs.tiles.CollectorMK3Tile;
+import moze_intel.projecte.utils.Constants;
 import moze_intel.projecte.utils.EMCFormat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -13,14 +13,12 @@ import net.minecraft.util.ResourceLocation;
 import java.math.BigInteger;
 
 public class GUICollectorMK3 extends GuiContainer {
-    private static final ResourceLocation texture = new ResourceLocation(PECore.MODID.toLowerCase(), "textures/gui/collector3.png");
-    private final CollectorMK3Tile tile;
+    private static final ResourceLocation texture = Constants.gui;
     private final CollectorMK3Container container;
 
     public GUICollectorMK3(InventoryPlayer invPlayer, CollectorMK3Tile tile) {
         super(new CollectorMK3Container(invPlayer, tile));
-        this.tile = tile;
-        this.container = ((CollectorMK3Container) inventorySlots);
+        this.container = (CollectorMK3Container) inventorySlots;
         this.xSize = 218;
         this.ySize = 165;
     }
@@ -57,7 +55,7 @@ public class GUICollectorMK3 extends GuiContainer {
         this.drawTexturedModalRect(x + 160, y + 49 - progress, 220, 13 - progress, 12, progress);
 
         //EMC storage. Max is 48
-        this.drawTexturedModalRect(x + 98, y + 18, 0, 166, (container.emc.divide(tile.getMaximumEmc()).intValue() * 48), 10);
+        this.drawTexturedModalRect(x + 98, y + 18, 0, 166, (container.emc.divide(container.tile.getMaximumEmc()).intValue() * 48), 10);
 
         //Klein Star Charge Progress. Max is 48
         progress = (int) (container.kleinChargeProgress * 48);

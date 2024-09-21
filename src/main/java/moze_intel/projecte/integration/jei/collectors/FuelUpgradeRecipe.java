@@ -2,6 +2,7 @@ package moze_intel.projecte.integration.jei.collectors;
 
 import mezz.jei.api.ingredients.IIngredients;
 import mezz.jei.api.recipe.IRecipeWrapper;
+import moze_intel.projecte.utils.EMCFormat;
 import moze_intel.projecte.utils.EMCHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -43,7 +44,7 @@ public class FuelUpgradeRecipe implements IRecipeWrapper {
 
     @Override
     public void drawInfo(Minecraft minecraft, int recipeWidth, int recipeHeight, int mouseX, int mouseY) {
-        String emc = getUpgradeEMC().toString();
+        String emc = EMCFormat.format(getUpgradeEMC());
         FontRenderer fontRenderer = minecraft.fontRenderer;
         int stringWidth = fontRenderer.getStringWidth(emc);
         fontRenderer.drawString(emc, (recipeWidth / 2) - (stringWidth / 2), 5, Color.gray.getRGB());

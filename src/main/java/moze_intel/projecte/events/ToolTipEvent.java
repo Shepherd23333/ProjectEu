@@ -83,64 +83,63 @@ public class ToolTipEvent {
             /*
              * Collector ToolTips
              */
-            String unit = I18n.format("pe.emc.name");
-            String rate = I18n.format("pe.emc.rate");
+            String unit = I18n.format("pe.emc.name"), rate = I18n.format("pe.emc.rate");
 
             if (currentBlock == ObjHandler.collectorMK1) {
-                event.getToolTip().add(TextFormatting.DARK_PURPLE
-                        + String.format(I18n.format("pe.emc.maxgenrate_tooltip")
-                        + TextFormatting.BLUE + " %d " + rate, Constants.COLLECTOR_MK1_GEN));
-                event.getToolTip().add(TextFormatting.DARK_PURPLE
-                        + String.format(I18n.format("pe.emc.maxstorage_tooltip")
-                        + TextFormatting.BLUE + " %d " + unit, Constants.COLLECTOR_MK1_MAX));
+                event.getToolTip().add(TextFormatting.DARK_PURPLE + I18n.format("pe.emc.maxgenrate_tooltip")
+                        + TextFormatting.BLUE + Constants.COLLECTOR_MK1_GEN + " " + rate
+                );
+                event.getToolTip().add(TextFormatting.DARK_PURPLE + I18n.format("pe.emc.maxstorage_tooltip")
+                        + TextFormatting.BLUE + EMCFormat.format(Constants.COLLECTOR_MK1_MAX) + " " + unit
+                );
             }
 
             if (currentBlock == ObjHandler.collectorMK2) {
-                event.getToolTip().add(TextFormatting.DARK_PURPLE
-                        + String.format(I18n.format("pe.emc.maxgenrate_tooltip")
-                        + TextFormatting.BLUE + " %d " + rate, Constants.COLLECTOR_MK2_GEN));
-                event.getToolTip().add(TextFormatting.DARK_PURPLE
-                        + String.format(I18n.format("pe.emc.maxstorage_tooltip")
-                        + TextFormatting.BLUE + " %d " + unit, Constants.COLLECTOR_MK2_MAX));
+                event.getToolTip().add(TextFormatting.DARK_PURPLE + I18n.format("pe.emc.maxgenrate_tooltip")
+                        + TextFormatting.BLUE + Constants.COLLECTOR_MK2_GEN + " " + rate
+                );
+                event.getToolTip().add(TextFormatting.DARK_PURPLE + I18n.format("pe.emc.maxstorage_tooltip")
+                        + TextFormatting.BLUE + EMCFormat.format(Constants.COLLECTOR_MK2_MAX) + " " + unit
+                );
             }
 
             if (currentBlock == ObjHandler.collectorMK3) {
-                event.getToolTip().add(TextFormatting.DARK_PURPLE
-                        + String.format(I18n.format("pe.emc.maxgenrate_tooltip")
-                        + TextFormatting.BLUE + " %d " + rate, Constants.COLLECTOR_MK3_GEN));
-                event.getToolTip().add(TextFormatting.DARK_PURPLE
-                        + String.format(I18n.format("pe.emc.maxstorage_tooltip")
-                        + TextFormatting.BLUE + " %d " + unit, Constants.COLLECTOR_MK3_MAX));
+                event.getToolTip().add(TextFormatting.DARK_PURPLE + I18n.format("pe.emc.maxgenrate_tooltip")
+                        + TextFormatting.BLUE + Constants.COLLECTOR_MK3_GEN + " " + rate
+                );
+                event.getToolTip().add(TextFormatting.DARK_PURPLE + I18n.format("pe.emc.maxstorage_tooltip")
+                        + TextFormatting.BLUE + EMCFormat.format(Constants.COLLECTOR_MK3_MAX) + " " + unit
+                );
             }
 
             /*
              * Relay ToolTips
              */
             if (currentBlock == ObjHandler.relay) {
-                event.getToolTip().add(TextFormatting.DARK_PURPLE
-                        + String.format(I18n.format("pe.emc.maxoutrate_tooltip")
-                        + TextFormatting.BLUE + " %d " + rate, Constants.RELAY_MK1_OUTPUT));
-                event.getToolTip().add(TextFormatting.DARK_PURPLE
-                        + String.format(I18n.format("pe.emc.maxstorage_tooltip")
-                        + TextFormatting.BLUE + " %d " + unit, Constants.RELAY_MK1_MAX));
+                event.getToolTip().add(TextFormatting.DARK_PURPLE + I18n.format("pe.emc.maxoutrate_tooltip")
+                        + TextFormatting.BLUE + EMCFormat.format(Constants.RELAY_MK1_OUTPUT) + " " + rate
+                );
+                event.getToolTip().add(TextFormatting.DARK_PURPLE + I18n.format("pe.emc.maxstorage_tooltip")
+                        + TextFormatting.BLUE + EMCFormat.format(Constants.RELAY_MK1_MAX) + " " + unit
+                );
             }
 
             if (currentBlock == ObjHandler.relayMK2) {
-                event.getToolTip().add(TextFormatting.DARK_PURPLE
-                        + String.format(I18n.format("pe.emc.maxoutrate_tooltip")
-                        + TextFormatting.BLUE + " %d " + rate, Constants.RELAY_MK2_OUTPUT));
-                event.getToolTip().add(TextFormatting.DARK_PURPLE
-                        + String.format(I18n.format("pe.emc.maxstorage_tooltip")
-                        + TextFormatting.BLUE + " %d " + unit, Constants.RELAY_MK2_MAX));
+                event.getToolTip().add(TextFormatting.DARK_PURPLE + I18n.format("pe.emc.maxoutrate_tooltip")
+                        + TextFormatting.BLUE + EMCFormat.format(Constants.RELAY_MK2_OUTPUT) + " " + rate
+                );
+                event.getToolTip().add(TextFormatting.DARK_PURPLE + I18n.format("pe.emc.maxstorage_tooltip")
+                        + TextFormatting.BLUE + EMCFormat.format(Constants.RELAY_MK2_MAX) + " " + unit
+                );
             }
 
             if (currentBlock == ObjHandler.relayMK3) {
-                event.getToolTip().add(TextFormatting.DARK_PURPLE
-                        + String.format(I18n.format("pe.emc.maxoutrate_tooltip")
-                        + TextFormatting.BLUE + " %d " + rate, Constants.RELAY_MK3_OUTPUT));
-                event.getToolTip().add(TextFormatting.DARK_PURPLE
-                        + String.format(I18n.format("pe.emc.maxstorage_tooltip")
-                        + TextFormatting.BLUE + " %d " + unit, Constants.RELAY_MK3_MAX));
+                event.getToolTip().add(TextFormatting.DARK_PURPLE + I18n.format("pe.emc.maxoutrate_tooltip")
+                        + TextFormatting.BLUE + EMCFormat.format(Constants.RELAY_MK3_OUTPUT) + " " + rate
+                );
+                event.getToolTip().add(TextFormatting.DARK_PURPLE + I18n.format("pe.emc.maxstorage_tooltip")
+                        + TextFormatting.BLUE + EMCFormat.format(Constants.RELAY_MK3_MAX) + " " + unit
+                );
             }
         }
 

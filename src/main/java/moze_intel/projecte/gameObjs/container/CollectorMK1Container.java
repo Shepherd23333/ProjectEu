@@ -20,8 +20,8 @@ import net.minecraftforge.items.IItemHandler;
 import javax.annotation.Nonnull;
 import java.math.BigInteger;
 
-public class CollectorMK1Container extends BigIntegerContainer {
-    final CollectorMK1Tile tile;
+public class CollectorMK1Container extends BigIntContainer {
+    public final CollectorMK1Tile tile;
     public int sunLevel = 0;
     public BigInteger emc = BigInteger.ZERO;
     public double kleinChargeProgress = 0;
@@ -33,7 +33,7 @@ public class CollectorMK1Container extends BigIntegerContainer {
         initSlots(invPlayer);
     }
 
-    void initSlots(InventoryPlayer invPlayer) {
+    public void initSlots(InventoryPlayer invPlayer) {
         IItemHandler aux = tile.getAux();
         IItemHandler main = tile.getInput();
 
@@ -66,10 +66,10 @@ public class CollectorMK1Container extends BigIntegerContainer {
     public void addListener(IContainerListener listener) {
         super.addListener(listener);
         PacketHandler.sendProgressBarUpdateInt(listener, this, 0, tile.getSunLevel());
-        PacketHandler.sendProgressBarUpdateBigInteger(listener, this, 1, tile.getStoredEmc());
+        PacketHandler.sendProgressBarUpdateBigInt(listener, this, 1, tile.getStoredEmc());
         PacketHandler.sendProgressBarUpdateInt(listener, this, 2, (int) (tile.getItemChargeProportion() * 8000));
         PacketHandler.sendProgressBarUpdateInt(listener, this, 3, (int) (tile.getFuelProgress() * 8000));
-        PacketHandler.sendProgressBarUpdateBigInteger(listener, this, 4, tile.getItemCharge());
+        PacketHandler.sendProgressBarUpdateBigInt(listener, this, 4, tile.getItemCharge());
     }
 
     @Nonnull
@@ -78,9 +78,8 @@ public class CollectorMK1Container extends BigIntegerContainer {
         if (slot >= 0 && getSlot(slot) instanceof SlotGhost && !getSlot(slot).getStack().isEmpty()) {
             getSlot(slot).putStack(ItemStack.EMPTY);
             return ItemStack.EMPTY;
-        } else {
+        } else
             return super.slotClick(slot, button, flag, player);
-        }
     }
 
     @Override
@@ -88,41 +87,36 @@ public class CollectorMK1Container extends BigIntegerContainer {
         super.detectAndSendChanges();
 
         if (sunLevel != tile.getSunLevel()) {
-            for (IContainerListener icrafting : this.listeners) {
+            for (IContainerListener icrafting : this.listeners)
                 PacketHandler.sendProgressBarUpdateInt(icrafting, this, 0, tile.getSunLevel());
-            }
 
             sunLevel = tile.getSunLevel();
         }
 
         if (!emc.equals(tile.getStoredEmc())) {
-            for (IContainerListener icrafting : this.listeners) {
-                PacketHandler.sendProgressBarUpdateBigInteger(icrafting, this, 1, tile.getStoredEmc());
-            }
+            for (IContainerListener icrafting : this.listeners)
+                PacketHandler.sendProgressBarUpdateBigInt(icrafting, this, 1, tile.getStoredEmc());
 
             emc = tile.getStoredEmc();
         }
 
         if (kleinChargeProgress != tile.getItemChargeProportion()) {
-            for (IContainerListener icrafting : this.listeners) {
+            for (IContainerListener icrafting : this.listeners)
                 PacketHandler.sendProgressBarUpdateInt(icrafting, this, 2, (int) (tile.getItemChargeProportion() * 8000));
-            }
 
             kleinChargeProgress = tile.getItemChargeProportion();
         }
 
         if (fuelProgress != tile.getFuelProgress()) {
-            for (IContainerListener icrafting : this.listeners) {
+            for (IContainerListener icrafting : this.listeners)
                 PacketHandler.sendProgressBarUpdateInt(icrafting, this, 3, (int) (tile.getFuelProgress() * 8000));
-            }
 
             fuelProgress = tile.getFuelProgress();
         }
 
         if (!kleinEmc.equals(tile.getItemCharge())) {
-            for (IContainerListener icrafting : this.listeners) {
-                PacketHandler.sendProgressBarUpdateBigInteger(icrafting, this, 4, tile.getItemCharge());
-            }
+            for (IContainerListener icrafting : this.listeners)
+                PacketHandler.sendProgressBarUpdateBigInt(icrafting, this, 4, tile.getItemCharge());
 
             kleinEmc = tile.getItemCharge();
         }
@@ -153,7 +147,7 @@ public class CollectorMK1Container extends BigIntegerContainer {
 
     @Override
     @SideOnly(Side.CLIENT)
-    public void updateProgressBarBigInteger(int id, BigInteger data) {
+    public void updateProgressBarBigInt(int id, BigInteger data) {
         switch (id) {
             case 1:
                 emc = data;
@@ -171,30 +165,25 @@ public class CollectorMK1Container extends BigIntegerContainer {
     public ItemStack transferStackInSlot(EntityPlayer player, int slotIndex) {
         Slot slot = this.getSlot(slotIndex);
 
-        if (slot == null || !slot.getHasStack()) {
+        if (slot == null || !slot.getHasStack())
             return ItemStack.EMPTY;
-        }
 
         ItemStack stack = slot.getStack();
         ItemStack newStack = stack.copy();
 
         if (slotIndex <= 10) {
-            if (!this.mergeItemStack(stack, 11, 46, false)) {
+            if (!this.mergeItemStack(stack, 11, 46, false))
                 return ItemStack.EMPTY;
-            }
         } else if (slotIndex <= 46) {
-            if (!FuelMapper.isStackFuel(stack) || FuelMapper.isStackMaxFuel(stack) || !this.mergeItemStack(stack, 1, 8, false)) {
+            if (!FuelMapper.isStackFuel(stack) || FuelMapper.isStackMaxFuel(stack) || !this.mergeItemStack(stack, 1, 8, false))
                 return ItemStack.EMPTY;
-            }
-        } else {
+        } else
             return ItemStack.EMPTY;
-        }
 
-        if (stack.isEmpty()) {
+        if (stack.isEmpty())
             slot.putStack(ItemStack.EMPTY);
-        } else {
+        else
             slot.onSlotChanged();
-        }
 
         return slot.onTake(player, stack);
     }

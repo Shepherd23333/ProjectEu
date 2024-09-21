@@ -181,6 +181,7 @@ public class ClientProxy implements IProxy {
 
         // Item models for blocks
         registerBlock(ObjHandler.alchChest);
+        registerBlock(ObjHandler.collectorMK1);
         registerBlock(ObjHandler.collectorMK2);
         registerBlock(ObjHandler.collectorMK3);
         registerBlock(ObjHandler.condenser);
@@ -188,7 +189,6 @@ public class ClientProxy implements IProxy {
         registerBlock(ObjHandler.interdictionTorch);
         registerBlock(ObjHandler.dmFurnaceOff);
         registerBlock(ObjHandler.dmPedestal);
-        registerBlock(ObjHandler.collectorMK1);
         registerBlock(ObjHandler.novaCatalyst);
         registerBlock(ObjHandler.novaCataclysm);
         registerBlock(ObjHandler.relay);

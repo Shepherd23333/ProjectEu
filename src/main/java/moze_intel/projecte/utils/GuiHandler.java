@@ -38,7 +38,7 @@ public class GuiHandler implements IGuiHandler {
 
         switch (ID) {
             case Constants.ALCH_CHEST_GUI:
-                if (tile != null && tile instanceof AlchChestTile)
+                if (tile instanceof AlchChestTile)
                     return new AlchChestContainer(player.inventory, (AlchChestTile) tile);
                 break;
             case Constants.ALCH_BAG_GUI: {
@@ -47,41 +47,41 @@ public class GuiHandler implements IGuiHandler {
                 return new AlchBagContainer(player.inventory, hand, inventory);
             }
             case Constants.CONDENSER_GUI:
-                if (tile != null && tile instanceof CondenserTile)
+                if (tile instanceof CondenserTile)
                     return new CondenserContainer(player.inventory, (CondenserTile) tile);
                 break;
             case Constants.TRANSMUTE_STONE_GUI:
                 return new TransmutationContainer(player.inventory, new TransmutationInventory(player), null);
             case Constants.RM_FURNACE_GUI:
-                if (tile != null && tile instanceof RMFurnaceTile)
+                if (tile instanceof RMFurnaceTile)
                     return new RMFurnaceContainer(player.inventory, (RMFurnaceTile) tile);
                 break;
             case Constants.DM_FURNACE_GUI:
-                if (tile != null && tile instanceof DMFurnaceTile)
+                if (tile instanceof DMFurnaceTile)
                     return new DMFurnaceContainer(player.inventory, (DMFurnaceTile) tile);
                 break;
             case Constants.COLLECTOR1_GUI:
-                if (tile != null && tile instanceof CollectorMK1Tile)
+                if (tile instanceof CollectorMK1Tile)
                     return new CollectorMK1Container(player.inventory, (CollectorMK1Tile) tile);
                 break;
             case Constants.COLLECTOR2_GUI:
-                if (tile != null && tile instanceof CollectorMK2Tile)
+                if (tile instanceof CollectorMK2Tile)
                     return new CollectorMK2Container(player.inventory, (CollectorMK2Tile) tile);
                 break;
             case Constants.COLLECTOR3_GUI:
-                if (tile != null && tile instanceof CollectorMK3Tile)
+                if (tile instanceof CollectorMK3Tile)
                     return new CollectorMK3Container(player.inventory, (CollectorMK3Tile) tile);
                 break;
             case Constants.RELAY1_GUI:
-                if (tile != null && tile instanceof RelayMK1Tile)
+                if (tile instanceof RelayMK1Tile)
                     return new RelayMK1Container(player.inventory, (RelayMK1Tile) tile);
                 break;
             case Constants.RELAY2_GUI:
-                if (tile != null && tile instanceof RelayMK2Tile)
+                if (tile instanceof RelayMK2Tile)
                     return new RelayMK2Container(player.inventory, (RelayMK2Tile) tile);
                 break;
             case Constants.RELAY3_GUI:
-                if (tile != null && tile instanceof RelayMK3Tile)
+                if (tile instanceof RelayMK3Tile)
                     return new RelayMK3Container(player.inventory, (RelayMK3Tile) tile);
                 break;
             case Constants.MERCURIAL_GUI:
@@ -108,50 +108,49 @@ public class GuiHandler implements IGuiHandler {
 
         switch (ID) {
             case Constants.ALCH_CHEST_GUI:
-                if (tile != null && tile instanceof AlchChestTile)
+                if (tile instanceof AlchChestTile)
                     return new GUIAlchChest(player.inventory, (AlchChestTile) tile);
                 break;
-            case Constants.ALCH_BAG_GUI: {
+            case Constants.ALCH_BAG_GUI:
                 EnumDyeColor color = EnumDyeColor.byMetadata(player.getHeldItem(hand).getItemDamage());
                 IItemHandlerModifiable inventory = (IItemHandlerModifiable) player.getCapability(ProjectEAPI.ALCH_BAG_CAPABILITY, null).getBag(color);
                 return new GUIAlchChest(player.inventory, hand, inventory);
-            }
             case Constants.CONDENSER_GUI:
-                if (tile != null && tile instanceof CondenserTile)
+                if (tile instanceof CondenserTile)
                     return new GUICondenser(player.inventory, (CondenserTile) tile);
                 break;
             case Constants.TRANSMUTE_STONE_GUI:
                 return new GUITransmutation(player.inventory, new TransmutationInventory(player), null);
             case Constants.RM_FURNACE_GUI:
-                if (tile != null && tile instanceof RMFurnaceTile)
+                if (tile instanceof RMFurnaceTile)
                     return new GUIRMFurnace(player.inventory, (RMFurnaceTile) tile);
                 break;
             case Constants.DM_FURNACE_GUI:
-                if (tile != null && tile instanceof DMFurnaceTile)
+                if (tile instanceof DMFurnaceTile)
                     return new GUIDMFurnace(player.inventory, (DMFurnaceTile) tile);
                 break;
             case Constants.COLLECTOR1_GUI:
-                if (tile != null && tile instanceof CollectorMK1Tile)
+                if (tile instanceof CollectorMK1Tile)
                     return new GUICollectorMK1(player.inventory, (CollectorMK1Tile) tile);
                 break;
             case Constants.COLLECTOR2_GUI:
-                if (tile != null && tile instanceof CollectorMK2Tile)
+                if (tile instanceof CollectorMK2Tile)
                     return new GUICollectorMK2(player.inventory, (CollectorMK2Tile) tile);
                 break;
             case Constants.COLLECTOR3_GUI:
-                if (tile != null && tile instanceof CollectorMK3Tile)
+                if (tile instanceof CollectorMK3Tile)
                     return new GUICollectorMK3(player.inventory, (CollectorMK3Tile) tile);
                 break;
             case Constants.RELAY1_GUI:
-                if (tile != null && tile instanceof RelayMK1Tile)
+                if (tile instanceof RelayMK1Tile)
                     return new GUIRelayMK1(player.inventory, (RelayMK1Tile) tile);
                 break;
             case Constants.RELAY2_GUI:
-                if (tile != null && tile instanceof RelayMK2Tile)
+                if (tile instanceof RelayMK2Tile)
                     return new GUIRelayMK2(player.inventory, (RelayMK2Tile) tile);
                 break;
             case Constants.RELAY3_GUI:
-                if (tile != null && tile instanceof RelayMK3Tile)
+                if (tile instanceof RelayMK3Tile)
                     return new GUIRelayMK3(player.inventory, (RelayMK3Tile) tile);
                 break;
             case Constants.MERCURIAL_GUI:

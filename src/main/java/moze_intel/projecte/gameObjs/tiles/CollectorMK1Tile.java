@@ -159,25 +159,21 @@ public class CollectorMK1Tile extends TileEmc implements IEmcProvider, IEmcAccep
             }
         }
 
-        if (this.getStoredEmc().equals(BigInteger.ZERO)) {
-            return;
-        } else if (hasChargeableItem) {
+        if (this.getStoredEmc().equals(BigInteger.ZERO)) ;
+        else if (hasChargeableItem) {
             BigInteger toSend = this.getStoredEmc().compareTo(emcGen) < 0 ? this.getStoredEmc() : emcGen;
             IItemEmc item = (IItemEmc) getUpgrading().getItem();
 
-            BigInteger itemEmc = item.getStoredEMC(getUpgrading());
-            BigInteger maxItemEmc = item.getMaximumEMC(getUpgrading());
+            BigInteger itemEmc = item.getStoredEMC(getUpgrading()), maxItemEmc = item.getMaximumEMC(getUpgrading());
 
-            if ((itemEmc.add(toSend)).compareTo(maxItemEmc) > 0) {
+            if ((itemEmc.add(toSend)).compareTo(maxItemEmc) > 0)
                 toSend = maxItemEmc.subtract(itemEmc);
-            }
 
             item.addEmc(getUpgrading(), toSend);
             this.removeEMC(toSend);
         } else if (hasFuel) {
-            if (FuelMapper.getFuelUpgrade(getUpgrading()).isEmpty()) {
+            if (FuelMapper.getFuelUpgrade(getUpgrading()).isEmpty())
                 auxSlots.setStackInSlot(UPGRADING_SLOT, ItemStack.EMPTY);
-            }
 
             ItemStack result = getLock().isEmpty() ? FuelMapper.getFuelUpgrade(getUpgrading()) : getLock().copy();
 
@@ -205,17 +201,15 @@ public class CollectorMK1Tile extends TileEmc implements IEmcProvider, IEmcAccep
     }
 
     public BigInteger getEmcToNextGoal() {
-        if (!getLock().isEmpty()) {
+        if (!getLock().isEmpty())
             return EMCHelper.getEmcValue(getLock()).subtract(EMCHelper.getEmcValue(getUpgrading()));
-        } else {
+        else
             return EMCHelper.getEmcValue(FuelMapper.getFuelUpgrade(getUpgrading())).subtract(EMCHelper.getEmcValue(getUpgrading()));
-        }
     }
 
     public BigInteger getItemCharge() {
-        if (!getUpgrading().isEmpty() && getUpgrading().getItem() instanceof IItemEmc) {
+        if (!getUpgrading().isEmpty() && getUpgrading().getItem() instanceof IItemEmc)
             return ((IItemEmc) getUpgrading().getItem()).getStoredEMC(getUpgrading());
-        }
 
         return BigInteger.ONE.negate();
     }
@@ -223,51 +217,43 @@ public class CollectorMK1Tile extends TileEmc implements IEmcProvider, IEmcAccep
     public double getItemChargeProportion() {
         BigInteger charge = getItemCharge();
 
-        if (getUpgrading().isEmpty() || charge.compareTo(BigInteger.ZERO) <= 0 || !(getUpgrading().getItem() instanceof IItemEmc)) {
+        if (getUpgrading().isEmpty() || charge.compareTo(BigInteger.ZERO) <= 0 || !(getUpgrading().getItem() instanceof IItemEmc))
             return -1;
-        }
 
         BigInteger max = ((IItemEmc) getUpgrading().getItem()).getMaximumEMC(getUpgrading());
-        if (charge.compareTo(max) >= 0) {
+        if (charge.compareTo(max) >= 0)
             return 1;
-        }
 
         return new BigDecimal(charge).divide(new BigDecimal(max)).doubleValue();
     }
 
     public int getSunLevel() {
-        if (world.provider.doesWaterVaporize()) {
+        if (world.provider.doesWaterVaporize())
             return 16;
-        }
         return world.getLight(getPos().up()) + 1;
     }
 
     public double getFuelProgress() {
-        if (getUpgrading().isEmpty() || !FuelMapper.isStackFuel(getUpgrading())) {
+        if (getUpgrading().isEmpty() || !FuelMapper.isStackFuel(getUpgrading()))
             return 0;
-        }
 
         BigInteger reqEmc;
 
         if (!getLock().isEmpty()) {
             reqEmc = EMCHelper.getEmcValue(getLock()).subtract(EMCHelper.getEmcValue(getUpgrading()));
 
-            if (reqEmc.compareTo(BigInteger.ZERO) < 0) {
+            if (reqEmc.compareTo(BigInteger.ZERO) < 0)
                 return 0;
-            }
         } else {
             if (FuelMapper.getFuelUpgrade(getUpgrading()).isEmpty()) {
                 auxSlots.setStackInSlot(UPGRADING_SLOT, ItemStack.EMPTY);
                 return 0;
-            } else {
+            } else
                 reqEmc = EMCHelper.getEmcValue(FuelMapper.getFuelUpgrade(getUpgrading())).subtract(EMCHelper.getEmcValue(getUpgrading()));
-            }
-
         }
 
-        if (getStoredEmc().compareTo(reqEmc) >= 0) {
+        if (getStoredEmc().compareTo(reqEmc) >= 0)
             return 1;
-        }
 
         return new BigDecimal(getStoredEmc()).divide(new BigDecimal(reqEmc), 4, RoundingMode.HALF_DOWN).doubleValue();
     }
@@ -297,13 +283,12 @@ public class CollectorMK1Tile extends TileEmc implements IEmcProvider, IEmcAccep
             EnumFacing dir = entry.getKey();
             TileEntity tile = entry.getValue();
 
-            if (tile instanceof RelayMK3Tile) {
+            if (tile instanceof RelayMK3Tile)
                 ((RelayMK3Tile) tile).addBonus(dir, BigDecimal.valueOf(0.5));
-            } else if (tile instanceof RelayMK2Tile) {
+            else if (tile instanceof RelayMK2Tile)
                 ((RelayMK2Tile) tile).addBonus(dir, BigDecimal.valueOf(0.15));
-            } else if (tile instanceof RelayMK1Tile) {
+            else if (tile instanceof RelayMK1Tile)
                 ((RelayMK1Tile) tile).addBonus(dir, BigDecimal.valueOf(0.05));
-            }
         }
     }
 

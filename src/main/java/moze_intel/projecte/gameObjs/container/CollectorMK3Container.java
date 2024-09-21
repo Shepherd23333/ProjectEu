@@ -20,9 +20,8 @@ public class CollectorMK3Container extends CollectorMK1Container {
     }
 
     @Override
-    void initSlots(InventoryPlayer invPlayer) {
-        IItemHandler aux = tile.getAux();
-        IItemHandler main = tile.getInput();
+    public void initSlots(InventoryPlayer invPlayer) {
+        IItemHandler aux = tile.getAux(), main = tile.getInput();
 
         //Klein Star Slot
         this.addSlotToContainer(new ValidatedSlot(aux, CollectorMK3Tile.UPGRADING_SLOT, 158, 58, SlotPredicates.COLLECTOR_INV));
@@ -54,30 +53,25 @@ public class CollectorMK3Container extends CollectorMK1Container {
     public ItemStack transferStackInSlot(EntityPlayer player, int slotIndex) {
         Slot slot = this.getSlot(slotIndex);
 
-        if (slot == null || !slot.getHasStack()) {
+        if (slot == null || !slot.getHasStack())
             return ItemStack.EMPTY;
-        }
 
         ItemStack stack = slot.getStack();
         ItemStack newStack = stack.copy();
 
         if (slotIndex <= 18) {
-            if (!this.mergeItemStack(stack, 19, 54, false)) {
+            if (!this.mergeItemStack(stack, 19, 54, false))
                 return ItemStack.EMPTY;
-            }
         } else if (slotIndex <= 54) {
-            if (!FuelMapper.isStackFuel(stack) || FuelMapper.isStackMaxFuel(stack) || !this.mergeItemStack(stack, 1, 16, false)) {
+            if (!FuelMapper.isStackFuel(stack) || FuelMapper.isStackMaxFuel(stack) || !this.mergeItemStack(stack, 1, 16, false))
                 return ItemStack.EMPTY;
-            }
-        } else {
+        } else
             return ItemStack.EMPTY;
-        }
 
-        if (stack.isEmpty()) {
+        if (stack.isEmpty())
             slot.putStack(ItemStack.EMPTY);
-        } else {
+        else
             slot.onSlotChanged();
-        }
 
         return slot.onTake(player, stack);
     }

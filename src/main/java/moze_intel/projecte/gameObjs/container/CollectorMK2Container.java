@@ -21,7 +21,7 @@ public class CollectorMK2Container extends CollectorMK1Container {
     }
 
     @Override
-    void initSlots(InventoryPlayer invPlayer) {
+    public void initSlots(InventoryPlayer invPlayer) {
         IItemHandler aux = tile.getAux();
         IItemHandler main = tile.getInput();
 

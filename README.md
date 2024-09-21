@@ -2,9 +2,10 @@
 
 A fork of [ProjectE](https://github.com/sinkillerj/ProjectE).
 
-With some breaking changes, it doesn't have any compatibility.
+It may break the compatibility.
 
 ## New features
 
 * EMC in BigInteger
 * new EMC formatter(from [Project EX](https://github.com/FTBTeam/FTB-ProjectEX))
+* Energy Collector recipes rework
