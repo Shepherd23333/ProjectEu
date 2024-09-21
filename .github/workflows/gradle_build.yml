@@ -1,6 +1,6 @@
 name: Build Mod
 
-on: [ push, pull_request,workflow_dispatch ]
+on: [ push, pull_request, workflow_dispatch ]
 
 jobs:
   build:
@@ -13,7 +13,7 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '11'
-          distribution: 'temurin'
+          distribution: 'adopt'
           cache: gradle
 
       - name: Setup Gradle
@@ -26,7 +26,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew build -s
+        run: ./gradlew -no-daemon build -Pnet.minecraftforge.gradle.disableUpdateChecker=true
 
       - name: Cleanup Gradle Cache
         # Remove some files from the Gradle cache, so they aren't cached by GitHub Actions.
