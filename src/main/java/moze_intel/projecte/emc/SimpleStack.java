@@ -5,8 +5,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.oredict.OreDictionary;
 
-import java.util.Objects;
-
 public class SimpleStack {
     public final ResourceLocation id;
     public final int damage;
@@ -38,9 +36,8 @@ public class SimpleStack {
         if (isValid()) {
             Item item = Item.REGISTRY.getObject(id);
 
-            if (item != null) {
+            if (item != null)
                 return new ItemStack(item, 1, damage);
-            }
         }
 
         return ItemStack.EMPTY;
@@ -59,11 +56,10 @@ public class SimpleStack {
         if (obj instanceof SimpleStack) {
             SimpleStack other = (SimpleStack) obj;
 
-            if (this.damage == OreDictionary.WILDCARD_VALUE || other.damage == OreDictionary.WILDCARD_VALUE) {
-                return Objects.equals(this.id, other.id);
-            }
+            if (this.damage == OreDictionary.WILDCARD_VALUE || other.damage == OreDictionary.WILDCARD_VALUE)
+                return this.id.equals(other.id);
 
-            return Objects.equals(this.id, other.id) && this.damage == other.damage;
+            return this.id.equals(other.id) && this.damage == other.damage;
         }
 
         return false;
@@ -73,9 +69,8 @@ public class SimpleStack {
     public String toString() {
         Item obj = Item.REGISTRY.getObject(id);
 
-        if (obj != null) {
+        if (obj != null)
             return id + " " + damage;
-        }
 
         return "id:" + id + " damage:" + damage;
     }

@@ -76,9 +76,8 @@ public class Pedestal extends Block {
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         if (!world.isRemote) {
             TileEntity te = world.getTileEntity(pos);
-            if (!(te instanceof DMPedestalTile)) {
+            if (!(te instanceof DMPedestalTile))
                 return true;
-            }
 
             DMPedestalTile tile = ((DMPedestalTile) te);
             ItemStack item = tile.getInventory().getStackInSlot(0);
@@ -91,9 +90,8 @@ public class Pedestal extends Block {
                 world.notifyBlockUpdate(pos, state, state, 8);
             } else if (!stack.isEmpty() && item.isEmpty()) {
                 tile.getInventory().setStackInSlot(0, stack.splitStack(1));
-                if (stack.getCount() <= 0) {
+                if (stack.getCount() <= 0)
                     player.setHeldItem(hand, ItemStack.EMPTY);
-                }
                 world.notifyBlockUpdate(pos, state, state, 8);
             }
         }

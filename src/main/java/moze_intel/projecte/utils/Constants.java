@@ -1,7 +1,5 @@
 package moze_intel.projecte.utils;
 
-import moze_intel.projecte.PECore;
-import net.minecraft.util.ResourceLocation;
 import org.apache.commons.math3.fraction.BigFraction;
 
 import java.math.BigInteger;
@@ -16,7 +14,7 @@ public final class Constants {
     public static final BigInteger MAX_KLEIN_EMC = BigInteger.valueOf(50000);
     public static final BigInteger RELAY_KLEIN_CHARGE_RATE = BigInteger.valueOf(16);
     public static final float[] COLLECTOR_LIGHT_VALS = new float[]{0.4375F, 0.6875F, 1.0F};
-    public static final BigInteger TILE_MAX_EMC = BigInteger.valueOf(Long.MAX_VALUE);
+    public static final BigInteger TILE_MAX_EMC = BigInteger.TEN.pow(100);
     public static final int loopTimes = 1 << 5;
 
     public static final float[] EXPLOSIVE_LENS_RADIUS = new float[]{4.0F, 8.0F, 12.0F, 16.0F, 16.0F, 16.0F, 16.0F, 16.0F};
@@ -59,7 +57,6 @@ public final class Constants {
     public static final int ETERNAL_DENSITY_GUI = 15;
     public static final int CONDENSER_MK2_GUI = 16;
     public static final int MAX_CONDENSER_PROGRESS = 102;
-    public static final ResourceLocation gui = new ResourceLocation(PECore.MODID.toLowerCase(), "textures/gui/collector3.png");
 
     public static final int MAX_VEIN_SIZE = 250;
 

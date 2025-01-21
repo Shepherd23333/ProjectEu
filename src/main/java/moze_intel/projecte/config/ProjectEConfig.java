@@ -14,7 +14,7 @@ public final class ProjectEConfig {
         @Config.Comment("Set to false to disable Gem Armor offensive abilities (helmet zap and chestplate explosion)")
         public boolean offensiveAbilities = true;
 
-        @Config.RangeDouble(min = 0, max = Integer.MAX_VALUE)
+        @Config.RangeDouble(min = 0, max = Float.MAX_VALUE)
         @Config.Comment("Amount of damage Katar 'C' key deals")
         public float katarDeathAura = 10000F;
 

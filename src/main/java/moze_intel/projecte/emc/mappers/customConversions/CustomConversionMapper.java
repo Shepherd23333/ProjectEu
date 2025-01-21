@@ -48,26 +48,53 @@ public class CustomConversionMapper implements IEMCMapper<NormalizedSimpleStack,
         return true;
     }
 
-    @Override
-    public void addMappings(IMappingCollector<NormalizedSimpleStack, BigInteger> mapper, Configuration config) {
-        File customConversionFolder = getCustomConversionFolder();
-        if (customConversionFolder.isDirectory() || customConversionFolder.mkdir()) {
-            tryToWriteDefaultFiles();
-
-            for (String defaultFile : defaultFilenames) {
-                readFile(new File(customConversionFolder, defaultFile + ".json"), config, mapper, true);
+    private static void addMappingsFromFile(CustomConversionFile file, IMappingCollector<NormalizedSimpleStack, BigInteger> mapper) {
+        //TODO implement buffered IMappingCollector to recover from failures
+        for (Map.Entry<String, ConversionGroup> entry : file.groups.entrySet()) {
+            PECore.debugLog("Adding conversions from group '{}' with comment '{}'", entry.getKey(), entry.getValue().comment);
+            try {
+                for (CustomConversion conversion : entry.getValue().conversions)
+                    mapper.addConversion(conversion.count, conversion.output, conversion.ingredients);
+            } catch (Exception e) {
+                PECore.LOGGER.fatal("ERROR reading custom conversion from group {}!", entry.getKey());
+                e.printStackTrace();
             }
+        }
 
-            List<File> sortedFiles = Arrays.asList(customConversionFolder.listFiles());
-            Collections.sort(sortedFiles);
-
-            for (File f : sortedFiles) {
-                readFile(f, config, mapper, false);
-            }
-
-            NSSFake.resetNamespace();
-        } else {
-            PECore.LOGGER.fatal("COULD NOT CREATE customConversions FOLDER IN config/ProjectE");
+        try {
+            if (file.values.setValueBefore != null)
+                for (Map.Entry<NormalizedSimpleStack, BigInteger> entry : file.values.setValueBefore.entrySet()) {
+                    NormalizedSimpleStack something = entry.getKey();
+                    mapper.setValueBefore(something, entry.getValue());
+                    if (something instanceof NSSOreDictionary) {
+                        String odName = ((NSSOreDictionary) something).od;
+                        for (ItemStack itemStack : OreDictionary.getOres(odName))
+                            mapper.setValueBefore(NSSItem.create(itemStack), entry.getValue());
+                    }
+                }
+            if (file.values.setValueAfter != null)
+                for (Map.Entry<NormalizedSimpleStack, BigInteger> entry : file.values.setValueAfter.entrySet()) {
+                    NormalizedSimpleStack something = entry.getKey();
+                    mapper.setValueAfter(something, entry.getValue());
+                    if (something instanceof NSSOreDictionary) {
+                        String odName = ((NSSOreDictionary) something).od;
+                        for (ItemStack itemStack : OreDictionary.getOres(odName))
+                            mapper.setValueAfter(NSSItem.create(itemStack), entry.getValue());
+                    }
+                }
+            if (file.values.conversion != null)
+                for (CustomConversion conversion : file.values.conversion) {
+                    NormalizedSimpleStack out = conversion.output;
+                    if (conversion.evalOD && out instanceof NSSOreDictionary) {
+                        String odName = ((NSSOreDictionary) out).od;
+                        for (ItemStack itemStack : OreDictionary.getOres(odName))
+                            mapper.setValueFromConversion(conversion.count, NSSItem.create(itemStack), conversion.ingredients);
+                    }
+                    mapper.setValueFromConversion(conversion.count, out, conversion.ingredients);
+                }
+        } catch (Exception e) {
+            PECore.LOGGER.fatal("ERROR reading custom conversion values!");
+            e.printStackTrace();
         }
     }
 
@@ -99,82 +126,22 @@ public class CustomConversionMapper implements IEMCMapper<NormalizedSimpleStack,
         addMappingsFromFile(parseJson(json), mapper);
     }
 
-    private static void addMappingsFromFile(CustomConversionFile file, IMappingCollector<NormalizedSimpleStack, BigInteger> mapper) {
-        //TODO implement buffered IMappingCollector to recover from failures
-        for (Map.Entry<String, ConversionGroup> entry : file.groups.entrySet()) {
-            PECore.debugLog("Adding conversions from group '{}' with comment '{}'", entry.getKey(), entry.getValue().comment);
-            try {
-                for (CustomConversion conversion : entry.getValue().conversions) {
-                    mapper.addConversion(conversion.count, conversion.output, conversion.ingredients);
-                }
-            } catch (Exception e) {
-                PECore.LOGGER.fatal("ERROR reading custom conversion from group {}!", entry.getKey());
-                e.printStackTrace();
-            }
-        }
+    private static void tryToWriteDefaultFiles() {
+        writeDefaultFile(EXAMPLE_FILENAME);
 
-        try {
-            if (file.values.setValueBefore != null) {
-                for (Map.Entry<NormalizedSimpleStack, BigInteger> entry : file.values.setValueBefore.entrySet()) {
-                    NormalizedSimpleStack something = entry.getKey();
-                    mapper.setValueBefore(something, entry.getValue());
-                    if (something instanceof NSSOreDictionary) {
-                        String odName = ((NSSOreDictionary) something).od;
-                        for (ItemStack itemStack : OreDictionary.getOres(odName)) {
-                            mapper.setValueBefore(NSSItem.create(itemStack), entry.getValue());
-                        }
-                    }
-                }
-            }
-            if (file.values.setValueAfter != null) {
-                for (Map.Entry<NormalizedSimpleStack, BigInteger> entry : file.values.setValueAfter.entrySet()) {
-                    NormalizedSimpleStack something = entry.getKey();
-                    mapper.setValueAfter(something, entry.getValue());
-                    if (something instanceof NSSOreDictionary) {
-                        String odName = ((NSSOreDictionary) something).od;
-                        for (ItemStack itemStack : OreDictionary.getOres(odName)) {
-                            mapper.setValueAfter(NSSItem.create(itemStack), entry.getValue());
-                        }
-                    }
-                }
-            }
-            if (file.values.conversion != null) {
-                for (CustomConversion conversion : file.values.conversion) {
-                    NormalizedSimpleStack out = conversion.output;
-                    if (conversion.evalOD && out instanceof NSSOreDictionary) {
-                        String odName = ((NSSOreDictionary) out).od;
-                        for (ItemStack itemStack : OreDictionary.getOres(odName)) {
-                            mapper.setValueFromConversion(conversion.count, NSSItem.create(itemStack), conversion.ingredients);
-                        }
-                    }
-                    mapper.setValueFromConversion(conversion.count, out, conversion.ingredients);
-                }
-            }
-        } catch (Exception e) {
-            PECore.LOGGER.fatal("ERROR reading custom conversion values!");
-            e.printStackTrace();
-        }
+        for (String filename : defaultFilenames)
+            writeDefaultFile(filename);
     }
 
     public static CustomConversionFile parseJson(Reader json) {
         return GSON.fromJson(new BufferedReader(json), CustomConversionFile.class);
     }
 
-
-    private static void tryToWriteDefaultFiles() {
-        writeDefaultFile(EXAMPLE_FILENAME);
-
-        for (String filename : defaultFilenames) {
-            writeDefaultFile(filename);
-        }
-    }
-
     private static void writeDefaultFile(String filename) {
         File f = new File(getCustomConversionFolder(), filename + ".json");
 
-        if (f.exists()) {
+        if (f.exists())
             f.delete();
-        }
 
         try {
             if (f.createNewFile() && f.canWrite()) {
@@ -188,5 +155,25 @@ public class CustomConversionMapper implements IEMCMapper<NormalizedSimpleStack,
             e.printStackTrace();
         }
 
+    }
+
+    @Override
+    public void addMappings(IMappingCollector<NormalizedSimpleStack, BigInteger> mapper, Configuration config) {
+        File customConversionFolder = getCustomConversionFolder();
+        if (customConversionFolder.isDirectory() || customConversionFolder.mkdir()) {
+            tryToWriteDefaultFiles();
+
+            for (String defaultFile : defaultFilenames)
+                readFile(new File(customConversionFolder, defaultFile + ".json"), config, mapper, true);
+
+            List<File> sortedFiles = Arrays.asList(customConversionFolder.listFiles());
+            Collections.sort(sortedFiles);
+
+            for (File f : sortedFiles)
+                readFile(f, config, mapper, false);
+
+            NSSFake.resetNamespace();
+        } else
+            PECore.LOGGER.fatal("COULD NOT CREATE customConversions FOLDER IN config/ProjectE");
     }
 }

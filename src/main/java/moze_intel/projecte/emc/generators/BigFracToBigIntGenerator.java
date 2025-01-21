@@ -25,9 +25,8 @@ public class BigFracToBigIntGenerator<T> implements IValueGenerator<T, BigIntege
         Map<T, BigInteger> myResult = new HashMap<>();
         for (Map.Entry<T, BigFraction> entry : innerResult.entrySet()) {
             BigFraction value = entry.getValue();
-            if (value.compareTo(BigFraction.ZERO) > 0) {
+            if (value.compareTo(BigFraction.ZERO) > 0)
                 myResult.put(entry.getKey(), value.bigDecimalValue(6, BigDecimal.ROUND_HALF_DOWN).toBigInteger());
-            }
         }
         return myResult;
     }

@@ -27,14 +27,10 @@ public class APICustomConversionMapper implements IEMCMapper<NormalizedSimpleSta
 
     @Override
     public void addMappings(IMappingCollector<NormalizedSimpleStack, BigInteger> mapper, Configuration config) {
-        for (Map.Entry<String, List<ConversionProxyImpl.APIConversion>> entry : ConversionProxyImpl.instance.storedConversions.entrySet()) {
+        for (Map.Entry<String, List<ConversionProxyImpl.APIConversion>> entry : ConversionProxyImpl.instance.storedConversions.entrySet())
             if (config.getBoolean(entry.getKey(), "allow", true,
-                    String.format("Allow Mod %s to add its %d Recipes to the EMC Calculation", entry.getKey(), entry.getValue().size()))) {
-                for (ConversionProxyImpl.APIConversion apiConversion : entry.getValue()) {
+                    String.format("Allow Mod %s to add its %d Recipes to the EMC Calculation", entry.getKey(), entry.getValue().size())))
+                for (ConversionProxyImpl.APIConversion apiConversion : entry.getValue())
                     mapper.addConversion(apiConversion.amount, apiConversion.output, apiConversion.ingredients);
-                }
-            }
-        }
-
     }
 }

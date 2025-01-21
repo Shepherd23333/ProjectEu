@@ -47,18 +47,16 @@ public class DarkPick extends PEToolBase {
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, @Nonnull EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
-        if (world.isRemote) {
+        if (world.isRemote)
             return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
-        }
 
-        if (ProjectEConfig.items.pickaxeAoeVeinMining) {
+        if (ProjectEConfig.items.pickaxeAoeVeinMining)
             mineOreVeinsInAOE(stack, player, hand);
-        } else {
+        else {
             RayTraceResult mop = this.rayTrace(world, player, false);
             if (mop != null && mop.typeOfHit == RayTraceResult.Type.BLOCK) {
-                if (ItemHelper.isOre(world.getBlockState(mop.getBlockPos()))) {
+                if (ItemHelper.isOre(world.getBlockState(mop.getBlockPos())))
                     tryVeinMine(stack, player, mop);
-                }
             }
         }
 
@@ -75,10 +73,8 @@ public class DarkPick extends PEToolBase {
     public float getDestroySpeed(ItemStack stack, IBlockState state) {
         Block block = state.getBlock();
         if (block == ObjHandler.matterBlock && state.getValue(PEStateProps.TIER_PROP) == EnumMatterType.DARK_MATTER
-                || block == ObjHandler.dmFurnaceOff
-                || block == ObjHandler.dmFurnaceOn) {
+                || block == ObjHandler.dmFurnaceOff || block == ObjHandler.dmFurnaceOn)
             return 1200000.0F;
-        }
 
         return super.getDestroySpeed(stack, state);
     }

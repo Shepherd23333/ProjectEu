@@ -18,9 +18,8 @@ public class SmeltingMapper implements IEMCMapper<NormalizedSimpleStack, BigInte
         for (Map.Entry<ItemStack, ItemStack> entry : smelting.entrySet()) {
             ItemStack input = entry.getKey();
             ItemStack output = entry.getValue();
-            if (input.isEmpty() || output.isEmpty()) {
+            if (input.isEmpty() || output.isEmpty())
                 continue;
-            }
             IngredientMap<NormalizedSimpleStack> map = new IngredientMap<>();
             NormalizedSimpleStack normInput = NSSItem.create(input);
             NormalizedSimpleStack normOutput = NSSItem.create(output);
@@ -31,7 +30,6 @@ public class SmeltingMapper implements IEMCMapper<NormalizedSimpleStack, BigInte
                 map.addIngredient(normOutput, output.getCount());
                 mapper.addConversion(input.getCount(), normInput, map.getMap());
             }
-
         }
     }
 

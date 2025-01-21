@@ -34,9 +34,9 @@ public class ConversionProxyImpl implements IConversionProxy {
         }
         List<APIConversion> conversionsFromMod;
         String modId = getActiveMod();
-        if (storedConversions.containsKey(modId)) {
+        if (storedConversions.containsKey(modId))
             conversionsFromMod = storedConversions.get(modId);
-        } else {
+        else {
             conversionsFromMod = Lists.newLinkedList();
             storedConversions.put(modId, conversionsFromMod);
         }
@@ -44,27 +44,26 @@ public class ConversionProxyImpl implements IConversionProxy {
     }
 
     public NormalizedSimpleStack objectToNSS(Object object) {
-        if (object instanceof Ingredient) {
+        if (object instanceof Ingredient)
             return NSSItem.create((Ingredient) object);
-        } else if (object instanceof Block) {
+        else if (object instanceof Block)
             return NSSItem.create((Block) object);
-        } else if (object instanceof Item) {
+        else if (object instanceof Item)
             return NSSItem.create((Item) object);
-        } else if (object instanceof ItemStack) {
+        else if (object instanceof ItemStack)
             return NSSItem.create((ItemStack) object);
-        } else if (object instanceof FluidStack) {
+        else if (object instanceof FluidStack)
             return NSSFluid.create((FluidStack) object);
-        } else if (object instanceof String) {
+        else if (object instanceof String)
             return NSSOreDictionary.create((String) object);
-        } else if (object != null && object.getClass().equals(Object.class)) {
+        else if (object != null && object.getClass().equals(Object.class)) {
             if (fakes.containsKey(object))
                 return fakes.get(object);
             NormalizedSimpleStack nss = NSSFake.create("" + fakes.size() + " by " + getActiveMod());
             fakes.put(object, nss);
             return nss;
-        } else {
+        } else
             throw new IllegalArgumentException("Can not turn " + object + " (" + ClassUtils.getPackageCanonicalName(object, "") + ") into NormalizedSimpleStack. need ItemStack, FluidStack, String or 'Object'");
-        }
     }
 
     private String getActiveMod() {

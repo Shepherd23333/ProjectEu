@@ -20,30 +20,26 @@ public class OreDictionaryMapper implements IEMCMapper<NormalizedSimpleStack, Bi
 
     @Override
     public void addMappings(IMappingCollector<NormalizedSimpleStack, BigInteger> mapper, Configuration config) {
-        if (config.getBoolean("blacklistOres", "", true, "Set EMC=0 for everything that has an OD Name that starts with `ore` or `crushed`")) {
+        if (config.getBoolean("blacklistOres", "", true, "Set EMC=0 for everything that has an OD Name that starts with `ore` or `crushed`"))
             //Black-list all ores/dusts
             for (String s : OreDictionary.getOreNames()) {
-                if (s == null) {
+                if (s == null)
                     continue;
-                }
 
                 if (s.startsWith("ore") || s.startsWith("crushed")) {
                     //Some exceptions in the black-listing
-                    if (BLACKLIST_EXCEPTIONS.contains(s)) {
+                    if (BLACKLIST_EXCEPTIONS.contains(s))
                         continue;
-                    }
 
                     for (ItemStack stack : ItemHelper.getODItems(s)) {
-                        if (stack.isEmpty()) {
+                        if (stack.isEmpty())
                             continue;
-                        }
 
                         mapper.setValueBefore(NSSItem.create(stack), BigInteger.ZERO);
                         mapper.setValueAfter(NSSItem.create(stack), BigInteger.ZERO);
                     }
                 }
             }
-        }
     }
 
     @Override

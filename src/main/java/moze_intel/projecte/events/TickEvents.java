@@ -36,9 +36,8 @@ public class TickEvents {
                 for (int i = 0; i < inv.getSlots(); i++) {
                     ItemStack current = inv.getStackInSlot(i);
                     if (!current.isEmpty() && current.getItem() instanceof IAlchBagItem
-                            && ((IAlchBagItem) current.getItem()).updateInAlchBag(inv, event.player, current)) {
+                            && ((IAlchBagItem) current.getItem()).updateInAlchBag(inv, event.player, current))
                         colorsChanged.add(color);
-                    }
                 }
             }
 
@@ -46,10 +45,11 @@ public class TickEvents {
                 for (EnumDyeColor e : colorsChanged) {
                     if (event.player.openContainer instanceof AlchBagContainer
                             && event.player.getHeldItem(((AlchBagContainer) event.player.openContainer).hand).getItemDamage() == e.getMetadata())
+                        ;
                         // Do not sync if this color is open, the container system does it for us
                         // and we'll stay out of its way.
-                        continue;
-                    else provider.sync(e, (EntityPlayerMP) event.player);
+                    else
+                        provider.sync(e, (EntityPlayerMP) event.player);
                 }
 
                 event.player.getCapability(InternalAbilities.CAPABILITY, null).tick();
@@ -64,9 +64,8 @@ public class TickEvents {
         IItemHandler inv = player.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, EnumFacing.UP);
         for (int i = 0; i < inv.getSlots(); i++) {
             ItemStack stack = inv.getStackInSlot(i);
-            if (!stack.isEmpty() && stack.getItem() == ObjHandler.alchBag) {
+            if (!stack.isEmpty() && stack.getItem() == ObjHandler.alchBag)
                 bagsPresent.add(EnumDyeColor.byMetadata(stack.getItemDamage()));
-            }
         }
 
         return bagsPresent;

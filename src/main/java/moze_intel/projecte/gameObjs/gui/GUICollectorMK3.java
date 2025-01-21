@@ -1,8 +1,8 @@
 package moze_intel.projecte.gameObjs.gui;
 
+import moze_intel.projecte.PECore;
 import moze_intel.projecte.gameObjs.container.CollectorMK3Container;
 import moze_intel.projecte.gameObjs.tiles.CollectorMK3Tile;
-import moze_intel.projecte.utils.Constants;
 import moze_intel.projecte.utils.EMCFormat;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -13,7 +13,7 @@ import net.minecraft.util.ResourceLocation;
 import java.math.BigInteger;
 
 public class GUICollectorMK3 extends GuiContainer {
-    private static final ResourceLocation texture = Constants.gui;
+    private static final ResourceLocation texture = new ResourceLocation(PECore.MODID.toLowerCase(), "textures/gui/collector3.png");
     private final CollectorMK3Container container;
 
     public GUICollectorMK3(InventoryPlayer invPlayer, CollectorMK3Tile tile) {

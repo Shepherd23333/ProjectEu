@@ -34,24 +34,20 @@ public class MatterBlock extends Block {
     public float getBlockHardness(IBlockState state, World world, BlockPos pos) {
         EnumMatterType type = state.getValue(PEStateProps.TIER_PROP);
 
-        if (type == EnumMatterType.DARK_MATTER) {
+        if (type == EnumMatterType.DARK_MATTER)
             return 1000000.0F;
-        } else {
+        else
             return 2000000.0F;
-        }
     }
 
     @Override
     public boolean canHarvestBlock(IBlockAccess world, @Nonnull BlockPos pos, @Nonnull EntityPlayer player) {
-        ItemStack stack = player.getHeldItem(EnumHand.MAIN_HAND);
-        EnumMatterType type = world.getBlockState(pos).getValue(PEStateProps.TIER_PROP);
+        ItemStack tool = player.getHeldItem(EnumHand.MAIN_HAND);
+        IBlockState blockState = world.getBlockState(pos);
 
-        if (!stack.isEmpty()) {
-            if (type == EnumMatterType.RED_MATTER) {
-                return stack.getItem() == ObjHandler.rmPick || stack.getItem() == ObjHandler.rmStar || stack.getItem() == ObjHandler.rmHammer;
-            } else {
-                return stack.getItem() == ObjHandler.rmPick || stack.getItem() == ObjHandler.dmPick || stack.getItem() == ObjHandler.rmStar || stack.getItem() == ObjHandler.dmHammer || stack.getItem() == ObjHandler.rmHammer;
-            }
+        if (!tool.isEmpty()) {
+            int level = tool.getItem().getHarvestLevel(tool, "pickaxe", player, blockState);
+            return level >= (blockState.getValue(PEStateProps.TIER_PROP) == EnumMatterType.RED_MATTER ? 10 : 5);
         }
 
         return false;
@@ -82,9 +78,8 @@ public class MatterBlock extends Block {
     @Override
     @SideOnly(Side.CLIENT)
     public void getSubBlocks(CreativeTabs cTab, NonNullList<ItemStack> list) {
-        for (int i = 0; i <= 1; i++) {
+        for (int i = 0; i < 2; i++)
             list.add(new ItemStack(this, 1, i));
-        }
     }
 
 }

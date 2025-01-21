@@ -45,7 +45,7 @@ public final class CustomEMCParser {
             return o == this ||
                     o instanceof CustomEMCEntry
                             && nss.equals(((CustomEMCEntry) o).nss)
-                            && emc == ((CustomEMCEntry) o).emc;
+                            && emc.equals(((CustomEMCEntry) o).emc);
         }
 
         @Override

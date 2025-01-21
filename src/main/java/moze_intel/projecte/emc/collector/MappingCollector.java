@@ -43,7 +43,7 @@ public abstract class MappingCollector<T, V extends Comparable<V>, A extends IVa
     private void addConversionToIngredientUsages(Conversion conversion) {
         for (Map.Entry<T, Integer> ingredient : conversion.ingredientsWithAmount.entrySet()) {
             if (ingredient.getValue() == null)
-                throw new IllegalArgumentException("ingredient amount value has to be != null");
+                throw new IllegalArgumentException("ingredient amount value has to be not null");
             getUsesFor(ingredient.getKey()).add(conversion);
         }
     }
@@ -55,7 +55,7 @@ public abstract class MappingCollector<T, V extends Comparable<V>, A extends IVa
             return;
         }
         if (outnumber <= 0)
-            throw new IllegalArgumentException("outnumber has to be > 0!");
+            throw new IllegalArgumentException("outnumber has to be positive!");
         //Add the Conversions to the conversionsFor and usedIn Maps:
         Conversion conversion = new Conversion(output, outnumber, ingredientsWithAmount, arithmeticForConversion, arithmetic.getZero());
         if (!getConversionsFor(output).add(conversion)) {
@@ -91,7 +91,7 @@ public abstract class MappingCollector<T, V extends Comparable<V>, A extends IVa
             return;
         }
         if (outnumber <= 0)
-            throw new IllegalArgumentException("outnumber has to be > 0!");
+            throw new IllegalArgumentException("outnumber has to be positive!");
         Conversion conversion = new Conversion(something, outnumber, ingredientsWithAmount, this.arithmetic);
         if (overwriteConversion.containsKey(something)) {
             Conversion oldConversion = overwriteConversion.get(something);
@@ -142,9 +142,8 @@ public abstract class MappingCollector<T, V extends Comparable<V>, A extends IVa
                 return false;
             Conversion other = (Conversion) o;
 
-            return Objects.equals(output, other.output)
-                    && Objects.equals(value, other.value)
-                    && Objects.equals(ingredientsWithAmount, other.ingredientsWithAmount);
+            return output.equals(other.output) && value.equals(other.value)
+                    && ingredientsWithAmount.equals(other.ingredientsWithAmount);
         }
 
         @Override

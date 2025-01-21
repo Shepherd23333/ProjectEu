@@ -26,15 +26,18 @@ public class DumpToFileCollector<A extends IValueArithmetic> extends AbstractMap
     @Override
     public void setValueFromConversion(int outnumber, NormalizedSimpleStack something, Map<NormalizedSimpleStack, Integer> ingredientsWithAmount) {
         inner.setValueFromConversion(outnumber, something, ingredientsWithAmount);
-        if (something == null || ingredientsWithAmount.containsKey(null)) return;
+        if (something == null || ingredientsWithAmount.containsKey(null))
+            return;
         out.values.conversion.add(CustomConversion.getFor(outnumber, something, ingredientsWithAmount));
     }
 
     @Override
     public void addConversion(int outnumber, NormalizedSimpleStack output, Map<NormalizedSimpleStack, Integer> ingredientsWithAmount, A arithmeticForConversion) {
         inner.addConversion(outnumber, output, ingredientsWithAmount, arithmeticForConversion);
-        if (output == null || ingredientsWithAmount.containsKey(null)) return;
-        if (!out.groups.containsKey(currentGroupName)) out.groups.put(currentGroupName, new ConversionGroup());
+        if (output == null || ingredientsWithAmount.containsKey(null))
+            return;
+        if (!out.groups.containsKey(currentGroupName))
+            out.groups.put(currentGroupName, new ConversionGroup());
         ConversionGroup group = out.groups.get(currentGroupName);
         group.conversions.add(CustomConversion.getFor(outnumber, output, ingredientsWithAmount));
     }
@@ -42,14 +45,16 @@ public class DumpToFileCollector<A extends IValueArithmetic> extends AbstractMap
     @Override
     public void setValueBefore(NormalizedSimpleStack something, BigInteger value) {
         inner.setValueBefore(something, value);
-        if (something == null) return;
+        if (something == null)
+            return;
         out.values.setValueBefore.put(something, value);
     }
 
     @Override
     public void setValueAfter(NormalizedSimpleStack something, BigInteger value) {
         inner.setValueAfter(something, value);
-        if (something == null) return;
+        if (something == null)
+            return;
         out.values.setValueAfter.put(something, value);
     }
 

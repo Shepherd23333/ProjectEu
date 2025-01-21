@@ -20,17 +20,69 @@ import java.util.Set;
 
 public interface NormalizedSimpleStack {
 
+    // "Explode" a wildcarded item into all of its variants
+    static Iterable<NormalizedSimpleStack> getVariants(String id) {
+        Item i = Item.getByNameOrId(id);
+        if (i == null) {
+            PECore.LOGGER.error("null item in getVariants");
+            return Collections.emptyList();
+        }
+
+        // Adapted from JEI StackHelper.getSubtypes
+        NonNullList<ItemStack> variants = NonNullList.create();
+        for (CreativeTabs group : i.getCreativeTabs()) {
+            if (group == null)
+                variants.add(new ItemStack(i));
+            else {
+                NonNullList<ItemStack> subItems = NonNullList.create();
+                try {
+                    i.getSubItems(group, subItems);
+                } catch (RuntimeException | LinkageError e) {
+                    PECore.LOGGER.warn("couldn't get variants of {}: {}", i, e);
+                }
+
+                for (ItemStack sub : subItems)
+                    if (!sub.isEmpty())
+                        variants.add(sub);
+            }
+        }
+
+        // collapse by metadata
+        Set<NormalizedSimpleStack> ret = new HashSet<>();
+        for (ItemStack variant : variants)
+            ret.add(new NSSItem(variant.getItem().getRegistryName().toString(), variant.getItemDamage()));
+        return ret;
+    }
+
+    static <V extends Comparable<V>> void addMappings(IMappingCollector<NormalizedSimpleStack, V> mapper) {
+        // Add conversions for all variants -> wildcard variant
+        for (String id : NSSItem.seenIds) {
+            NormalizedSimpleStack stackWildcard = new NSSItem(id, OreDictionary.WILDCARD_VALUE);
+            for (NormalizedSimpleStack variant : getVariants(id))
+                mapper.addConversion(1, stackWildcard, Collections.singletonList(variant));
+        }
+
+        // Add conversions for all variants <-> NSSOreDict
+        for (Map.Entry<String, NormalizedSimpleStack> entry : NSSOreDictionary.oreDictStacks.entrySet()) {
+            NormalizedSimpleStack oreDictStack = entry.getValue();
+            for (ItemStack i : ItemHelper.getODItems(entry.getKey())) {
+                mapper.addConversion(1, oreDictStack, Collections.singletonList(NSSItem.create(i)));
+                mapper.addConversion(1, NSSItem.create(i), Collections.singletonList(oreDictStack));
+            }
+        }
+    }
+
     enum Serializer implements JsonSerializer<NormalizedSimpleStack>, JsonDeserializer<NormalizedSimpleStack> {
         INSTANCE;
 
         @Override
         public NormalizedSimpleStack deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             String s = json.getAsString();
-            if (s.startsWith("OD|")) {
+            if (s.startsWith("OD|"))
                 return NSSOreDictionary.create(s.substring("OD|".length()));
-            } else if (s.startsWith("FAKE|")) {
+            else if (s.startsWith("FAKE|"))
                 return NSSFake.create(s.substring("FAKE|".length()));
-            } else if (s.startsWith("FLUID|")) {
+            else if (s.startsWith("FLUID|")) {
                 String fluidName = s.substring("FLUID|".length());
                 Fluid fluid = FluidRegistry.getFluid(fluidName);
                 if (fluid == null)
@@ -38,15 +90,14 @@ public interface NormalizedSimpleStack {
                 return NSSFluid.create(fluid);
             } else {
                 int pipeIndex = s.lastIndexOf('|');
-                if (pipeIndex < 0) {
+                if (pipeIndex < 0)
                     throw new JsonParseException(String.format("Cannot parse '%s' as itemstack. Missing | to separate metadata.", s));
-                }
                 String itemName = s.substring(0, pipeIndex);
                 String itemDamageString = s.substring(pipeIndex + 1);
                 int itemDamage;
-                if (itemDamageString.equals("*")) {
+                if (itemDamageString.equals("*"))
                     itemDamage = OreDictionary.WILDCARD_VALUE;
-                } else {
+                else {
                     try {
                         itemDamage = Integer.parseInt(itemDamageString);
                     } catch (NumberFormatException e) {
@@ -61,62 +112,6 @@ public interface NormalizedSimpleStack {
         @Override
         public JsonElement serialize(NormalizedSimpleStack src, Type typeOfSrc, JsonSerializationContext context) {
             return new JsonPrimitive(src.json());
-        }
-    }
-
-    // "Explode" a wildcarded item into all of its variants
-    static Iterable<NormalizedSimpleStack> getVariants(String id) {
-        Item i = Item.getByNameOrId(id);
-        if (i == null) {
-            PECore.LOGGER.error("null item in getVariants");
-            return Collections.emptyList();
-        }
-
-        // Adapted from JEI StackHelper.getSubtypes
-        NonNullList<ItemStack> variants = NonNullList.create();
-        for (CreativeTabs group : i.getCreativeTabs()) {
-            if (group == null) {
-                variants.add(new ItemStack(i));
-            } else {
-                NonNullList<ItemStack> subItems = NonNullList.create();
-                try {
-                    i.getSubItems(group, subItems);
-                } catch (RuntimeException | LinkageError e) {
-                    PECore.LOGGER.warn("couldn't get variants of {}: {}", i, e);
-                }
-
-                for (ItemStack sub : subItems) {
-                    if (!sub.isEmpty()) {
-                        variants.add(sub);
-                    }
-                }
-            }
-        }
-
-        // collapse by metadata
-        Set<NormalizedSimpleStack> ret = new HashSet<>();
-        for (ItemStack variant : variants) {
-            ret.add(new NSSItem(variant.getItem().getRegistryName().toString(), variant.getItemDamage()));
-        }
-        return ret;
-    }
-
-    static <V extends Comparable<V>> void addMappings(IMappingCollector<NormalizedSimpleStack, V> mapper) {
-        // Add conversions for all variants -> wildcard variant
-        for (String id : NSSItem.seenIds) {
-            NormalizedSimpleStack stackWildcard = new NSSItem(id, OreDictionary.WILDCARD_VALUE);
-            for (NormalizedSimpleStack variant : getVariants(id)) {
-                mapper.addConversion(1, stackWildcard, Collections.singletonList(variant));
-            }
-        }
-
-        // Add conversions for all variants <-> NSSOreDict
-        for (Map.Entry<String, NormalizedSimpleStack> entry : NSSOreDictionary.oreDictStacks.entrySet()) {
-            NormalizedSimpleStack oreDictStack = entry.getValue();
-            for (ItemStack i : ItemHelper.getODItems(entry.getKey())) {
-                mapper.addConversion(1, oreDictStack, Collections.singletonList(NSSItem.create(i)));
-                mapper.addConversion(1, NSSItem.create(i), Collections.singletonList(oreDictStack));
-            }
         }
     }
 

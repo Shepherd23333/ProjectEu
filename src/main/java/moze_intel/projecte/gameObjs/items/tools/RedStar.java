@@ -70,33 +70,27 @@ public class RedStar extends PEToolBase {
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, @Nonnull EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
         if (!world.isRemote) {
-            if (ProjectEConfig.items.pickaxeAoeVeinMining) {
+            if (ProjectEConfig.items.pickaxeAoeVeinMining)
                 mineOreVeinsInAOE(stack, player, hand);
-            }
 
             RayTraceResult mop = this.rayTrace(world, player, true);
 
-            if (mop == null) {
+            if (mop == null)
                 return ActionResult.newResult(EnumActionResult.FAIL, stack);
-            } else if (mop.typeOfHit == Type.BLOCK) {
+            else if (mop.typeOfHit == Type.BLOCK) {
                 IBlockState state = world.getBlockState(mop.getBlockPos());
                 Block block = state.getBlock();
 
                 if (block instanceof BlockGravel || block instanceof BlockClay) {
-                    if (ProjectEConfig.items.pickaxeAoeVeinMining) {
+                    if (ProjectEConfig.items.pickaxeAoeVeinMining)
                         digAOE(stack, world, player, false, 0, hand);
-                    } else {
+                    else
                         tryVeinMine(stack, player, mop);
-                    }
                 } else if (ItemHelper.isOre(state)) {
-                    if (!ProjectEConfig.items.pickaxeAoeVeinMining) {
+                    if (!ProjectEConfig.items.pickaxeAoeVeinMining)
                         tryVeinMine(stack, player, mop);
-                    }
-                } else if (block instanceof BlockGrass || block instanceof BlockDirt || block instanceof BlockSand) {
-                    digAOE(stack, world, player, false, 0, hand);
-                } else {
-                    digAOE(stack, world, player, true, 0, hand);
-                }
+                } else
+                    digAOE(stack, world, player, !(block instanceof BlockGrass || block instanceof BlockDirt || block instanceof BlockSand), 0, hand);
             }
         }
 
@@ -106,9 +100,9 @@ public class RedStar extends PEToolBase {
     @Override
     public float getDestroySpeed(ItemStack stack, IBlockState state) {
         Block block = state.getBlock();
-        if (block == ObjHandler.matterBlock || block == ObjHandler.dmFurnaceOff || block == ObjHandler.dmFurnaceOn || block == ObjHandler.rmFurnaceOff || block == ObjHandler.rmFurnaceOn) {
+        if (block == ObjHandler.matterBlock || block == ObjHandler.dmFurnaceOff || block == ObjHandler.dmFurnaceOn
+                || block == ObjHandler.rmFurnaceOff || block == ObjHandler.rmFurnaceOn)
             return 1200000.0F;
-        }
 
         return super.getDestroySpeed(stack, state) + 48.0F;
     }
@@ -116,9 +110,8 @@ public class RedStar extends PEToolBase {
     @Nonnull
     @Override
     public Multimap<String, AttributeModifier> getAttributeModifiers(@Nonnull EntityEquipmentSlot slot, ItemStack stack) {
-        if (slot != EntityEquipmentSlot.MAINHAND) {
+        if (slot != EntityEquipmentSlot.MAINHAND)
             return super.getAttributeModifiers(slot, stack);
-        }
 
         int charge = getCharge(stack);
         float damage = STAR_BASE_ATTACK + charge;

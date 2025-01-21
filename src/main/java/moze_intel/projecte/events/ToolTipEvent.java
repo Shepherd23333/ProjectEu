@@ -32,9 +32,8 @@ public class ToolTipEvent {
     @SubscribeEvent
     public static void tTipEvent(ItemTooltipEvent event) {
         ItemStack current = event.getItemStack();
-        if (current.isEmpty()) {
+        if (current.isEmpty())
             return;
-        }
         Item currentItem = current.getItem();
         Block currentBlock = Block.getBlockFromItem(currentItem);
         EntityPlayer clientPlayer = Minecraft.getMinecraft().player;
@@ -43,40 +42,34 @@ public class ToolTipEvent {
                 && currentItem instanceof IPedestalItem) {
             event.getToolTip().add(TextFormatting.DARK_PURPLE + I18n.format("pe.pedestal.on_pedestal") + " ");
             List<String> description = ((IPedestalItem) currentItem).getPedestalDescription();
-            if (description.isEmpty()) {
+            if (description.isEmpty())
                 event.getToolTip().add(IPedestalItem.TOOLTIPDISABLED);
-            } else {
+            else
                 event.getToolTip().addAll(((IPedestalItem) currentItem).getPedestalDescription());
-            }
         }
 
         if (ProjectEConfig.misc.odToolTips) {
-            for (int id : OreDictionary.getOreIDs(current)) {
+            for (int id : OreDictionary.getOreIDs(current))
                 event.getToolTip().add("OD: " + OreDictionary.getOreName(id));
-            }
-            if (currentBlock instanceof BlockFluidBase) {
+            if (currentBlock instanceof BlockFluidBase)
                 event.getToolTip().add("Fluid: " + ((BlockFluidBase) currentBlock).getFluid().getName());
-            }
         }
 
         if (ProjectEConfig.misc.emcToolTips && EMCHelper.doesItemHaveEmc(current)) {
             BigInteger value = EMCHelper.getEmcValue(current);
 
             event.getToolTip().add(TextFormatting.YELLOW + I18n.format("pe.emc.emc_tooltip_prefix") + " " +
-                    TextFormatting.WHITE +
-                    EMCFormat.format(value) +
+                    TextFormatting.WHITE + EMCFormat.format(value) +
                     TextFormatting.BLUE + EMCHelper.getEmcSellString(current, 1));
 
-            if (current.getCount() > 1) {
+            if (current.getCount() > 1)
                 event.getToolTip().add(TextFormatting.YELLOW + I18n.format("pe.emc.stackemc_tooltip_prefix") + " " +
                         TextFormatting.WHITE + EMCFormat.format(value.multiply(BigInteger.valueOf(current.getCount()))) +
                         TextFormatting.BLUE + EMCHelper.getEmcSellString(current, current.getCount()));
-            }
 
             if (GuiScreen.isShiftKeyDown() && clientPlayer != null
-                    && clientPlayer.getCapability(ProjectEAPI.KNOWLEDGE_CAPABILITY, null).hasKnowledge(current)) {
+                    && clientPlayer.getCapability(ProjectEAPI.KNOWLEDGE_CAPABILITY, null).hasKnowledge(current))
                 event.getToolTip().add(TextFormatting.YELLOW + I18n.format("pe.emc.has_knowledge"));
-            }
         }
 
         if (ProjectEConfig.misc.statToolTips) {
@@ -146,11 +139,10 @@ public class ToolTipEvent {
         if (current.hasTagCompound()) {
             if (current.getItem() instanceof IItemEmc || current.getTagCompound().hasKey("StoredEMC")) {
                 BigInteger value;
-                if (current.getTagCompound().hasKey("StoredEMC")) {
+                if (current.getTagCompound().hasKey("StoredEMC"))
                     value = new BigInteger(current.getTagCompound().getString("StoredEMC"));
-                } else {
+                else
                     value = ((IItemEmc) current.getItem()).getStoredEMC(current);
-                }
 
                 event.getToolTip().add(TextFormatting.YELLOW + I18n.format("pe.emc.storedemc_tooltip") + " " +
                         TextFormatting.RESET + EMCFormat.format(value));

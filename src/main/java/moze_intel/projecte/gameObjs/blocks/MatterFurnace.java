@@ -61,11 +61,10 @@ public class MatterFurnace extends BlockDirection {
     @Override
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing side, float hitX, float hitY, float hitZ) {
         if (!world.isRemote) {
-            if (isHighTier) {
+            if (isHighTier)
                 player.openGui(PECore.instance, Constants.RM_FURNACE_GUI, world, pos.getX(), pos.getY(), pos.getZ());
-            } else {
+            else
                 player.openGui(PECore.instance, Constants.DM_FURNACE_GUI, world, pos.getX(), pos.getY(), pos.getZ());
-            }
         }
 
         return true;
@@ -75,9 +74,8 @@ public class MatterFurnace extends BlockDirection {
     public void breakBlock(@Nonnull World world, @Nonnull BlockPos pos, @Nonnull IBlockState state) {
         // isUpdating is true if this breakBlock is being called as a result of updateFurnaceBlockState
         // It prevents items from dropping out of the furnace when switching on/off state
-        if (!isUpdating) {
+        if (!isUpdating)
             super.breakBlock(world, pos, state);
-        }
     }
 
     public void updateFurnaceBlockState(boolean isActive, World world, BlockPos pos) {
@@ -86,17 +84,15 @@ public class MatterFurnace extends BlockDirection {
         isUpdating = true;
 
         if (isActive) {
-            if (isHighTier) {
+            if (isHighTier)
                 world.setBlockState(pos, ObjHandler.rmFurnaceOn.getDefaultState().withProperty(PEStateProps.FACING, state.getValue(PEStateProps.FACING)), 3);
-            } else {
+            else
                 world.setBlockState(pos, ObjHandler.dmFurnaceOn.getDefaultState().withProperty(PEStateProps.FACING, state.getValue(PEStateProps.FACING)), 3);
-            }
         } else {
-            if (isHighTier) {
+            if (isHighTier)
                 world.setBlockState(pos, ObjHandler.rmFurnaceOff.getDefaultState().withProperty(PEStateProps.FACING, state.getValue(PEStateProps.FACING)), 3);
-            } else {
+            else
                 world.setBlockState(pos, ObjHandler.dmFurnaceOff.getDefaultState().withProperty(PEStateProps.FACING, state.getValue(PEStateProps.FACING)), 3);
-            }
         }
 
         isUpdating = false;
@@ -117,28 +113,25 @@ public class MatterFurnace extends BlockDirection {
     public void randomDisplayTick(IBlockState state, World world, BlockPos pos, Random rand) {
         if (isActive) {
             EnumFacing facing = state.getValue(PEStateProps.FACING);
-            float f = (float) pos.getX() + 0.5F;
-            float f1 = (float) pos.getY() + 0.0F + rand.nextFloat() * 6.0F / 16.0F;
-            float f2 = (float) pos.getZ() + 0.5F;
-            float f3 = 0.52F;
-            float f4 = rand.nextFloat() * 0.6F - 0.3F;
+            double f = pos.getX() + 0.5D, f1 = 1.0D * pos.getY() + rand.nextDouble() * 6 / 16, f2 = pos.getZ() + 0.5D,
+                    f3 = 0.52D, f4 = rand.nextDouble() * 0.6 - 0.3;
 
             switch (facing) {
                 case WEST:
-                    world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, (double) (f - f3), (double) f1, (double) (f2 + f4), 0.0D, 0.0D, 0.0D);
-                    world.spawnParticle(EnumParticleTypes.FLAME, (double) (f - f3), (double) f1, (double) (f2 + f4), 0.0D, 0.0D, 0.0D);
+                    world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, f - f3, f1, f2 + f4, 0.0D, 0.0D, 0.0D);
+                    world.spawnParticle(EnumParticleTypes.FLAME, f - f3, f1, f2 + f4, 0.0D, 0.0D, 0.0D);
                     break;
                 case EAST:
-                    world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, (double) (f + f3), (double) f1, (double) (f2 + f4), 0.0D, 0.0D, 0.0D);
-                    world.spawnParticle(EnumParticleTypes.FLAME, (double) (f + f3), (double) f1, (double) (f2 + f4), 0.0D, 0.0D, 0.0D);
+                    world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, f + f3, f1, f2 + f4, 0.0D, 0.0D, 0.0D);
+                    world.spawnParticle(EnumParticleTypes.FLAME, f + f3, f1, f2 + f4, 0.0D, 0.0D, 0.0D);
                     break;
                 case NORTH:
-                    world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, (double) (f + f4), (double) f1, (double) (f2 - f3), 0.0D, 0.0D, 0.0D);
-                    world.spawnParticle(EnumParticleTypes.FLAME, (double) (f + f4), (double) f1, (double) (f2 - f3), 0.0D, 0.0D, 0.0D);
+                    world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, f + f4, f1, f2 - f3, 0.0D, 0.0D, 0.0D);
+                    world.spawnParticle(EnumParticleTypes.FLAME, f + f4, f1, f2 - f3, 0.0D, 0.0D, 0.0D);
                     break;
                 case SOUTH:
-                    world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, (double) (f + f4), (double) f1, (double) (f2 + f3), 0.0D, 0.0D, 0.0D);
-                    world.spawnParticle(EnumParticleTypes.FLAME, (double) (f + f4), (double) f1, (double) (f2 + f3), 0.0D, 0.0D, 0.0D);
+                    world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, f + f4, f1, f2 + f3, 0.0D, 0.0D, 0.0D);
+                    world.spawnParticle(EnumParticleTypes.FLAME, f + f4, f1, f2 + f3, 0.0D, 0.0D, 0.0D);
                     break;
             }
         }

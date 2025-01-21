@@ -26,7 +26,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew -no-daemon build -Pnet.minecraftforge.gradle.disableUpdateChecker=true
+        run: ./gradlew build -Pnet.minecraftforge.gradle.disableUpdateChecker=true
 
       - name: Cleanup Gradle Cache
         # Remove some files from the Gradle cache, so they aren't cached by GitHub Actions.

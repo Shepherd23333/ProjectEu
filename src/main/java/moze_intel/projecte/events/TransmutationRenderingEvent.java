@@ -63,8 +63,8 @@ public class TransmutationRenderingEvent {
                 } else {
                     RenderHelper.enableStandardItemLighting();
 
-                    IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getModelForState(transmutationResult);
-                    Minecraft.getMinecraft().getRenderItem().renderItemModelIntoGUI(ItemHelper.stateToDroppedStack(transmutationResult, 1), 0, 0, model);
+                    IBakedModel model = mc.getBlockRendererDispatcher().getModelForState(transmutationResult);
+                    mc.getRenderItem().renderItemModelIntoGUI(ItemHelper.stateToDroppedStack(transmutationResult, 1), 0, 0, model);
 
                     RenderHelper.disableStandardItemLighting();
                 }
@@ -74,7 +74,7 @@ public class TransmutationRenderingEvent {
 
     @SubscribeEvent
     public static void onOverlay(DrawBlockHighlightEvent event) {
-        EntityPlayer player = Minecraft.getMinecraft().player;
+        EntityPlayer player = mc.player;
         World world = player.getEntityWorld();
         ItemStack stack = player.getHeldItem(EnumHand.MAIN_HAND);
 
@@ -100,16 +100,14 @@ public class TransmutationRenderingEvent {
                 int charge = ((ItemMode) stack.getItem()).getCharge(stack);
                 byte mode = ((ItemMode) stack.getItem()).getMode(stack);
 
-                for (BlockPos pos : PhilosophersStone.getAffectedPositions(world, mop.getBlockPos(), player, mop.sideHit, mode, charge)) {
+                for (BlockPos pos : PhilosophersStone.getAffectedPositions(world, mop.getBlockPos(), player, mop.sideHit, mode, charge))
                     addBlockToRenderList(world, pos);
-                }
 
                 drawAll();
                 renderList.clear();
             }
-        } else {
+        } else
             transmutationResult = null;
-        }
     }
 
     private static void drawAll() {

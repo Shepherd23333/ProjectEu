@@ -57,10 +57,8 @@ public class DarkHammer extends PEToolBase {
     public float getDestroySpeed(ItemStack stack, IBlockState state) {
         Block block = state.getBlock();
         if ((block == ObjHandler.matterBlock && state.getValue(PEStateProps.TIER_PROP) == EnumMatterType.DARK_MATTER)
-                || block == ObjHandler.dmFurnaceOff
-                || block == ObjHandler.dmFurnaceOn) {
+                || block == ObjHandler.dmFurnaceOff || block == ObjHandler.dmFurnaceOn)
             return 1200000.0F;
-        }
 
         return super.getDestroySpeed(stack, state);
     }
@@ -68,9 +66,8 @@ public class DarkHammer extends PEToolBase {
     @Nonnull
     @Override
     public Multimap<String, AttributeModifier> getAttributeModifiers(@Nonnull EntityEquipmentSlot slot, ItemStack stack) {
-        if (slot != EntityEquipmentSlot.MAINHAND) {
+        if (slot != EntityEquipmentSlot.MAINHAND)
             return super.getAttributeModifiers(slot, stack);
-        }
 
         int charge = getCharge(stack);
         float damage = HAMMER_BASE_ATTACK + charge;
