@@ -16,6 +16,7 @@ import moze_intel.projecte.emc.json.NormalizedSimpleStack;
 import moze_intel.projecte.emc.mappers.*;
 import moze_intel.projecte.emc.mappers.customConversions.CustomConversionMapper;
 import moze_intel.projecte.emc.pregenerated.PregeneratedEMC;
+import moze_intel.projecte.integration.mekanism.GasMapper;
 import moze_intel.projecte.playerData.Transmutation;
 import moze_intel.projecte.utils.PrefixConfiguration;
 import net.minecraft.item.Item;
@@ -44,6 +45,7 @@ public final class EMCMapper {
                 new CraftingMapper(),
                 new FluidMapper(),
                 new SmeltingMapper(),
+                new GasMapper(),
                 new APICustomConversionMapper()
         );
         SimpleGraphMapper<NormalizedSimpleStack, BigFraction, IValueArithmetic<BigFraction>> mapper = new SimpleGraphMapper<>(new FullBigFracArithmetic());
@@ -63,7 +65,7 @@ public final class EMCMapper {
 
         Map<NormalizedSimpleStack, BigInteger> graphMapperValues;
         if (shouldUsePregenerated && PECore.PREGENERATED_EMC_FILE.canRead() && PregeneratedEMC.tryRead(PECore.PREGENERATED_EMC_FILE, graphMapperValues = new HashMap<>())) {
-            PECore.LOGGER.info(String.format("Loaded %d values from pregenerated EMC File", graphMapperValues.size()));
+            PECore.LOGGER.info("Loaded {} values from pregenerated EMC File", graphMapperValues.size());
         } else {
             SimpleGraphMapper.setLogFoundExploits(config.getBoolean("logEMCExploits", "general", true,
                     "Log known EMC Exploits. This can not and will not find all possible exploits. " +
@@ -114,11 +116,10 @@ public final class EMCMapper {
         for (Map.Entry<NormalizedSimpleStack, BigInteger> entry : graphMapperValues.entrySet()) {
             NSSItem normStackItem = (NSSItem) entry.getKey();
             Item obj = Item.REGISTRY.getObject(new ResourceLocation(normStackItem.itemName));
-            if (obj != null) {
-                emc.put(new SimpleStack(obj.getRegistryName(), normStackItem.damage), entry.getValue());
-            } else {
-                PECore.LOGGER.warn("Could not add EMC value for {}|{}. Can not get ItemID!", normStackItem.itemName, normStackItem.damage);
-            }
+            if (obj != null)
+                emc.put(new SimpleStack(obj.getRegistryName(), normStackItem.meta), entry.getValue());
+            else
+                PECore.LOGGER.warn("Could not add EMC value for {}|{}. Can not get ItemID!", normStackItem.itemName, normStackItem.meta);
         }
 
         MinecraftForge.EVENT_BUS.post(new EMCRemapEvent());
@@ -129,7 +130,7 @@ public final class EMCMapper {
 
     private static void filterEMCMap(Map<NormalizedSimpleStack, BigInteger> map) {
         map.entrySet().removeIf(e -> !(e.getKey() instanceof NSSItem)
-                || ((NSSItem) e.getKey()).damage == OreDictionary.WILDCARD_VALUE
+                || ((NSSItem) e.getKey()).meta == OreDictionary.WILDCARD_VALUE
                 || e.getValue().compareTo(BigInteger.ZERO) <= 0);
     }
 

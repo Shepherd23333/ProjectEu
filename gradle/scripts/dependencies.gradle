@@ -68,5 +68,6 @@ dependencies {
     implementation rfg.deobf("CraftTweaker2:CraftTweaker2-API:1.12-${version_crt}")
     implementation rfg.deobf("CraftTweaker2:ZenScript:1.12-${version_crt}")
     implementation rfg.deobf("CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-${version_crt}")
+    compileOnly rfg.deobf("curse.maven:MekanismCEu-840735:${curse_mekanism}")
     implementation 'org.apache.commons:commons-math3:3.6.1'
 }

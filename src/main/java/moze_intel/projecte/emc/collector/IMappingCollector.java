@@ -1,5 +1,6 @@
 package moze_intel.projecte.emc.collector;
 
+import com.google.common.collect.Maps;
 import moze_intel.projecte.emc.arithmetics.IValueArithmetic;
 
 import java.util.Map;
@@ -21,6 +22,23 @@ public interface IMappingCollector<T, V extends Comparable<V>> {
      * @param ingredientsWithAmount What is consumed and how many of it
      */
     void addConversion(int outnumber, T output, Map<T, Integer> ingredientsWithAmount);
+
+    /**
+     * Multiple output support
+     *
+     * @param outputsWithAmount
+     * @param ingredientsWithAmount
+     */
+    default void addConversion(Map<T, Integer> outputsWithAmount, Map<T, Integer> ingredientsWithAmount) {
+        for (Map.Entry<T, Integer> output : outputsWithAmount.entrySet()) {
+            Map<T, Integer> newIngredient = Maps.newHashMap(ingredientsWithAmount);
+            outputsWithAmount.forEach((key, value) -> {
+                if (!key.equals(output.getKey()))
+                    newIngredient.put(key, -value);
+            });
+            addConversion(output.getValue(), output.getKey(), newIngredient);
+        }
+    }
 
     /**
      * Add a Conversion that produced {@code outnumber} items of {@code output} by consuming the {@code ingredients}. <br/>

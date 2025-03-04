@@ -2,13 +2,18 @@ package moze_intel.projecte.impl;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
+import mekanism.api.gas.Gas;
+import mekanism.api.gas.GasStack;
 import moze_intel.projecte.api.proxy.IConversionProxy;
 import moze_intel.projecte.emc.IngredientMap;
 import moze_intel.projecte.emc.json.*;
+import moze_intel.projecte.integration.mekanism.NSSGas;
+import moze_intel.projecte.utils.Constants;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
+import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.ModContainer;
@@ -44,14 +49,20 @@ public class ConversionProxyImpl implements IConversionProxy {
     }
 
     public NormalizedSimpleStack objectToNSS(Object object) {
-        if (object instanceof Ingredient)
-            return NSSItem.create((Ingredient) object);
+        if (Constants.loadMek && object instanceof Gas)
+            return NSSGas.create((Gas) object);
+        else if (Constants.loadMek && object instanceof GasStack)
+            return NSSGas.create((GasStack) object);
+        else if (object instanceof Ingredient)
+            return fakes.get(getIngredient((Ingredient) object));
         else if (object instanceof Block)
             return NSSItem.create((Block) object);
         else if (object instanceof Item)
             return NSSItem.create((Item) object);
         else if (object instanceof ItemStack)
             return NSSItem.create((ItemStack) object);
+        else if (object instanceof Fluid)
+            return NSSFluid.create((Fluid) object);
         else if (object instanceof FluidStack)
             return NSSFluid.create((FluidStack) object);
         else if (object instanceof String)
@@ -59,7 +70,7 @@ public class ConversionProxyImpl implements IConversionProxy {
         else if (object != null && object.getClass().equals(Object.class)) {
             if (fakes.containsKey(object))
                 return fakes.get(object);
-            NormalizedSimpleStack nss = NSSFake.create("" + fakes.size() + " by " + getActiveMod());
+            NormalizedSimpleStack nss = NSSFake.create(fakes.size() + " by " + getActiveMod());
             fakes.put(object, nss);
             return nss;
         } else

@@ -7,20 +7,20 @@ import net.minecraftforge.oredict.OreDictionary;
 
 public class SimpleStack {
     public final ResourceLocation id;
-    public final int damage;
+    public final int meta;
 
-    public SimpleStack(ResourceLocation id, int damage) {
+    public SimpleStack(ResourceLocation id, int meta) {
         this.id = id;
-        this.damage = damage;
+        this.meta = meta;
     }
 
     public SimpleStack(ItemStack stack) {
         if (stack.isEmpty()) {
             id = new ResourceLocation("minecraft", "air");
-            damage = 0;
+            meta = 0;
         } else {
             id = stack.getItem().getRegistryName();
-            damage = stack.getItemDamage();
+            meta = stack.getItemDamage();
         }
     }
 
@@ -37,7 +37,7 @@ public class SimpleStack {
             Item item = Item.REGISTRY.getObject(id);
 
             if (item != null)
-                return new ItemStack(item, 1, damage);
+                return new ItemStack(item, 1, meta);
         }
 
         return ItemStack.EMPTY;
@@ -46,20 +46,19 @@ public class SimpleStack {
     @Override
     public int hashCode() {
         int hash = 31 * id.hashCode();
-        if (this.damage == OreDictionary.WILDCARD_VALUE)
-            hash = hash * 57 ^ this.damage;
+        if (this.meta == OreDictionary.WILDCARD_VALUE)
+            hash = hash * 57 ^ this.meta;
         return hash;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof SimpleStack) {
-            SimpleStack other = (SimpleStack) obj;
+        if (obj instanceof SimpleStack other) {
 
-            if (this.damage == OreDictionary.WILDCARD_VALUE || other.damage == OreDictionary.WILDCARD_VALUE)
+            if (this.meta == OreDictionary.WILDCARD_VALUE || other.meta == OreDictionary.WILDCARD_VALUE)
                 return this.id.equals(other.id);
 
-            return this.id.equals(other.id) && this.damage == other.damage;
+            return this.id.equals(other.id) && this.meta == other.meta;
         }
 
         return false;
@@ -70,8 +69,8 @@ public class SimpleStack {
         Item obj = Item.REGISTRY.getObject(id);
 
         if (obj != null)
-            return id + " " + damage;
+            return id + " " + meta;
 
-        return "id:" + id + " damage:" + damage;
+        return "id:" + id + " damage:" + meta;
     }
 }

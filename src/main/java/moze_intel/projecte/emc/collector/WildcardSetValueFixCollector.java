@@ -20,40 +20,34 @@ public class WildcardSetValueFixCollector<V extends Comparable<V>, A extends IVa
     }
 
     private boolean isWildCard(NormalizedSimpleStack nss) {
-        return nss instanceof NSSItem && ((NSSItem) nss).damage == OreDictionary.WILDCARD_VALUE;
+        return nss instanceof NSSItem && ((NSSItem) nss).meta == OreDictionary.WILDCARD_VALUE;
     }
 
     @Override
     public void setValueBefore(NormalizedSimpleStack something, V value) {
-        if (this.isWildCard(something)) {
-            for (NormalizedSimpleStack nss : NormalizedSimpleStack.getVariants(((NSSItem) something).itemName)) {
+        if (this.isWildCard(something))
+            for (NormalizedSimpleStack nss : NormalizedSimpleStack.getVariants(((NSSItem) something).itemName))
                 inner.setValueBefore(nss, value);
-            }
-        } else {
+        else
             inner.setValueBefore(something, value);
-        }
     }
 
     @Override
     public void setValueAfter(NormalizedSimpleStack something, V value) {
-        if (this.isWildCard(something)) {
-            for (NormalizedSimpleStack nss : NormalizedSimpleStack.getVariants(((NSSItem) something).itemName)) {
+        if (this.isWildCard(something))
+            for (NormalizedSimpleStack nss : NormalizedSimpleStack.getVariants(((NSSItem) something).itemName))
                 inner.setValueAfter(nss, value);
-            }
-        } else {
+        else
             inner.setValueAfter(something, value);
-        }
     }
 
     @Override
     public void setValueFromConversion(int outnumber, NormalizedSimpleStack something, Map<NormalizedSimpleStack, Integer> ingredientsWithAmount) {
-        if (this.isWildCard(something)) {
-            for (NormalizedSimpleStack nss : NormalizedSimpleStack.getVariants(((NSSItem) something).itemName)) {
+        if (this.isWildCard(something))
+            for (NormalizedSimpleStack nss : NormalizedSimpleStack.getVariants(((NSSItem) something).itemName))
                 inner.setValueFromConversion(outnumber, nss, ingredientsWithAmount);
-            }
-        } else {
+        else
             inner.setValueFromConversion(outnumber, something, ingredientsWithAmount);
-        }
     }
 
     @Override

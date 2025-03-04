@@ -43,5 +43,6 @@ public interface IEMCMapper<T, V extends Comparable<V>> {
      * so you can use {@code ""} (Empty String) as a Category to write into the root-Category that is created for your IEMCMapper.
      *
      */
-    void addMappings(IMappingCollector<T, V> mapper, Configuration config);
+    default void addMappings(IMappingCollector<T, V> mapper, Configuration config) {
+    }
 }

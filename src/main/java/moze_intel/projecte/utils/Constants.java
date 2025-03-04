@@ -1,10 +1,12 @@
 package moze_intel.projecte.utils;
 
+import net.minecraftforge.fml.common.Loader;
 import org.apache.commons.math3.fraction.BigFraction;
 
 import java.math.BigInteger;
 
 public final class Constants {
+    public static final boolean loadMek = Loader.isModLoaded("mekanism");
     public static final BigInteger MAX_EXACT_TRANSMUTATION_DISPLAY = BigInteger.valueOf(1_000_000_000_000L);
     public static final BigInteger MAX_INTEGER = BigInteger.valueOf(Integer.MAX_VALUE);
     public static final BigInteger FREE = BigInteger.valueOf(Long.MIN_VALUE);

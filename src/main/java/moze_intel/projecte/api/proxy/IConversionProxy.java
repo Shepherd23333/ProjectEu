@@ -1,15 +1,21 @@
 package moze_intel.projecte.api.proxy;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraftforge.fluids.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 
 import javax.annotation.Nonnull;
+import java.util.HashMap;
 import java.util.Map;
 
 public interface IConversionProxy {
+    static final Map<Ingredient, Object> INGREDIENT_CACHE = new HashMap<>();
+
     /**
      * Add a Conversion to the EMC Calculation.
      * <p>
@@ -62,4 +68,38 @@ public interface IConversionProxy {
      * @param ingredients
      */
     void addConversion(int amount, @Nonnull Object output, @Nonnull Map<Object, Integer> ingredients);
+
+    /**
+     * Multiple output support
+     *
+     * @param outputs
+     * @param ingredients
+     */
+    default void addConversion(@Nonnull Map<Object, Integer> outputs, @Nonnull Map<Object, Integer> ingredients) {
+        for (Map.Entry<Object, Integer> output : outputs.entrySet()) {
+            Map<Object, Integer> newIngredient = Maps.newHashMap(ingredients);
+            outputs.forEach((key, value) -> {
+                if (!key.equals(output.getKey()))
+                    newIngredient.put(key, -value);
+            });
+            addConversion(output.getValue(), output.getKey(), newIngredient);
+        }
+    }
+
+    default Object getIngredient(Ingredient ingredient) {
+        if (ingredient == null || ingredient == Ingredient.EMPTY)
+            return null;
+
+        if (INGREDIENT_CACHE.containsKey(ingredient))
+            return INGREDIENT_CACHE.get(ingredient);
+
+        Object obj = new Object();
+        for (ItemStack stack : ingredient.getMatchingStacks()) {
+            if (stack == null || stack.isEmpty())
+                continue;
+            addConversion(1, obj, ImmutableMap.of(stack, 1));
+        }
+        INGREDIENT_CACHE.put(ingredient, obj);
+        return obj;
+    }
 }

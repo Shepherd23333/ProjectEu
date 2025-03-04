@@ -48,7 +48,7 @@ public class FluidMapper implements IEMCMapper<NormalizedSimpleStack, BigInteger
     }
 
     static {
-        addMelting(Blocks.OBSIDIAN, "obisidan.molten", 288);
+        addMelting(Blocks.OBSIDIAN, "obsidian.molten", 288);
         addMelting(Blocks.GLASS, "glass.molten", 1000);
         addMelting(Blocks.GLASS_PANE, "glass.molten", 250);
         addMelting(Items.ENDER_PEARL, "ender", 250);
@@ -81,40 +81,51 @@ public class FluidMapper implements IEMCMapper<NormalizedSimpleStack, BigInteger
         addMelting("dustRedstone", "redstone", 100);
         addMelting("dustGlowstone", "glowstone", 250);
 
-        addMelting("dustCryotheum", "cryotheum", 100);
-        addMelting("dustPryotheum", "pryotheum", 100);
+        addMelting("dustCryotheum", "cryotheum", 250);
+        addMelting("dustPyrotheum", "pyrotheum", 250);
     }
 
     @Override
     public void addMappings(IMappingCollector<NormalizedSimpleStack, BigInteger> mapper, Configuration config) {
-        mapper.setValueBefore(NSSFluid.create(FluidRegistry.WATER), Constants.FREE/*=Free. TODO: Use IntArithmetic*/);
+        BigInteger we = config.getBoolean("isInfiniteWater", "", true, "") ? Constants.FREE : BigInteger.ONE;
+        mapper.setValueBefore(NSSFluid.create(FluidRegistry.WATER), we);
         //1 Bucket of Lava = 1 Block of Obsidian
         mapper.addConversion(1000, NSSFluid.create(FluidRegistry.LAVA), Collections.singletonList(NSSItem.create(Blocks.OBSIDIAN)));
 
         //Add Conversion in case MFR is not present and milk is not an actual fluid
         NormalizedSimpleStack fakeMilkFluid = NSSFake.create("fakeMilkFluid");
         mapper.setValueBefore(fakeMilkFluid, BigInteger.valueOf(16));
-        mapper.addConversion(1, NSSItem.create(Items.MILK_BUCKET), Arrays.asList(NSSItem.create(Items.BUCKET), fakeMilkFluid));
+        mapper.addConversion(1, NSSItem.create(Items.MILK_BUCKET), Arrays.asList(
+                NSSItem.create(Items.BUCKET), fakeMilkFluid
+        ));
 
         Fluid milkFluid = FluidRegistry.getFluid("milk");
         if (milkFluid != null) {
             mapper.addConversion(1000, NSSFluid.create(milkFluid), Collections.singletonList(fakeMilkFluid));
         }
 
-        if (!(mapper instanceof IExtendedMappingCollector))
+        if (!(mapper instanceof IExtendedMappingCollector emapper))
             throw new RuntimeException("Cannot add Extended Fluid Mappings to mapper!");
-        IExtendedMappingCollector emapper = (IExtendedMappingCollector) mapper;
         FullBigFracArithmetic fluidArithmetic = new FullBigFracArithmetic();
 
         for (Pair<NormalizedSimpleStack, FluidStack> pair : melting) {
-            emapper.addConversion(pair.getValue().amount, NSSFluid.create(pair.getValue().getFluid()), Collections.singletonList(pair.getKey()), fluidArithmetic);
+            emapper.addConversion(pair.getValue().amount, NSSFluid.create(pair.getValue()), Collections.singletonList(pair.getKey()), fluidArithmetic);
         }
 
         // TODO figure out a way to get all containers again since FluidContainerRegistry disappeared after fluid caps
-        mapper.addConversion(1, NSSItem.create(Items.WATER_BUCKET), ImmutableMap.of(NSSItem.create(Items.BUCKET), 1, NSSFluid.create(FluidRegistry.WATER), 1000));
-        mapper.addConversion(1, NSSItem.create(Items.LAVA_BUCKET), ImmutableMap.of(NSSItem.create(Items.BUCKET), 1, NSSFluid.create(FluidRegistry.LAVA), 1000));
+        mapper.addConversion(1, NSSItem.create(Items.WATER_BUCKET), ImmutableMap.of(
+                NSSItem.create(Items.BUCKET), 1,
+                NSSFluid.create(FluidRegistry.WATER), 1000
+        ));
+        mapper.addConversion(1, NSSItem.create(Items.LAVA_BUCKET), ImmutableMap.of(
+                NSSItem.create(Items.BUCKET), 1,
+                NSSFluid.create(FluidRegistry.LAVA), 1000
+        ));
         if (milkFluid != null) {
-            mapper.addConversion(1, NSSItem.create(Items.MILK_BUCKET), ImmutableMap.of(NSSItem.create(Items.BUCKET), 1, NSSFluid.create(milkFluid), 1000));
+            mapper.addConversion(1, NSSItem.create(Items.MILK_BUCKET), ImmutableMap.of(
+                    NSSItem.create(Items.BUCKET), 1,
+                    NSSFluid.create(milkFluid), 1000
+            ));
         }
     }
 

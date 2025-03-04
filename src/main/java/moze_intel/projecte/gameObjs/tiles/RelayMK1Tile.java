@@ -18,6 +18,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import javax.annotation.Nonnull;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 
 public class RelayMK1Tile extends TileEmc implements IEmcAcceptor, IEmcProvider {
     private final ItemStackHandler input;
@@ -36,8 +37,7 @@ public class RelayMK1Tile extends TileEmc implements IEmcAcceptor, IEmcProvider 
         @Override
         public ItemStack extractItem(int slot, int amount, boolean simulate) {
             ItemStack stack = getStackInSlot(slot);
-            if (!stack.isEmpty() && stack.getItem() instanceof IItemEmc) {
-                IItemEmc item = ((IItemEmc) stack.getItem());
+            if (!stack.isEmpty() && stack.getItem() instanceof IItemEmc item) {
                 if (item.getStoredEMC(stack).compareTo(item.getMaximumEMC(stack)) >= 0) {
                     return super.extractItem(slot, amount, simulate);
                 } else {
@@ -49,7 +49,7 @@ public class RelayMK1Tile extends TileEmc implements IEmcAcceptor, IEmcProvider 
         }
     };
     private final BigInteger chargeRate;
-    private BigDecimal bonusEMC;
+    private BigDecimal bonusEMC = BigDecimal.ZERO;
 
     public RelayMK1Tile() {
         this(7, Constants.RELAY_MK1_MAX, Constants.RELAY_MK1_OUTPUT);
@@ -113,8 +113,7 @@ public class RelayMK1Tile extends TileEmc implements IEmcAcceptor, IEmcProvider 
         ItemStack stack = getBurn();
 
         if (!stack.isEmpty()) {
-            if (stack.getItem() instanceof IItemEmc) {
-                IItemEmc itemEmc = ((IItemEmc) stack.getItem());
+            if (stack.getItem() instanceof IItemEmc itemEmc) {
                 BigInteger emcVal = itemEmc.getStoredEMC(stack);
 
                 if (emcVal.compareTo(chargeRate) > 0) {
@@ -159,19 +158,17 @@ public class RelayMK1Tile extends TileEmc implements IEmcAcceptor, IEmcProvider 
         BigInteger maxStarEmc = itemEmc.getMaximumEMC(chargeable);
         BigInteger toSend = this.getStoredEmc().compareTo(chargeRate) < 0 ? this.getStoredEmc() : chargeRate;
 
-        if (starEmc.add(toSend).compareTo(maxStarEmc) <= 0) {
-            itemEmc.addEmc(chargeable, toSend);
-            this.removeEMC(toSend);
-        } else {
+        if (starEmc.add(toSend).compareTo(maxStarEmc) > 0) {
             toSend = maxStarEmc.subtract(starEmc);
-            itemEmc.addEmc(chargeable, toSend);
-            this.removeEMC(toSend);
         }
+        itemEmc.addEmc(chargeable, toSend);
+        this.removeEMC(toSend);
     }
 
     public BigDecimal getItemChargeProportion() {
         if (!getCharging().isEmpty() && getCharging().getItem() instanceof IItemEmc) {
-            return new BigDecimal(((IItemEmc) getCharging().getItem()).getStoredEMC(getCharging())).divide(new BigDecimal(((IItemEmc) getCharging().getItem()).getMaximumEMC(getCharging())));
+            return new BigDecimal(((IItemEmc) getCharging().getItem()).getStoredEMC(getCharging()))
+                    .divide(new BigDecimal(((IItemEmc) getCharging().getItem()).getMaximumEMC(getCharging())), RoundingMode.HALF_DOWN);
         }
 
         return BigDecimal.ZERO;
@@ -183,10 +180,12 @@ public class RelayMK1Tile extends TileEmc implements IEmcAcceptor, IEmcProvider 
         }
 
         if (getBurn().getItem() instanceof IItemEmc) {
-            return new BigDecimal(((IItemEmc) getBurn().getItem()).getStoredEMC(getBurn())).divide(new BigDecimal(((IItemEmc) getBurn().getItem()).getMaximumEMC(getBurn())));
+            return new BigDecimal(((IItemEmc) getBurn().getItem()).getStoredEMC(getBurn()))
+                    .divide(new BigDecimal(((IItemEmc) getBurn().getItem()).getMaximumEMC(getBurn())), RoundingMode.HALF_DOWN);
         }
 
-        return new BigDecimal(getBurn().getCount()).divide(BigDecimal.valueOf(getBurn().getMaxStackSize()));
+        return new BigDecimal(getBurn().getCount())
+                .divide(BigDecimal.valueOf(getBurn().getMaxStackSize()), RoundingMode.HALF_DOWN);
     }
 
     @Override

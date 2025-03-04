@@ -17,7 +17,6 @@ import java.util.Locale;
  */
 public class EMCFormat extends DecimalFormat {
     public static final EMCFormat INSTANCE = new EMCFormat();
-    private static final DecimalFormat decimalFormat = new DecimalFormat();
 
     private EMCFormat() {
         super("#,###");

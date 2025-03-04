@@ -72,8 +72,8 @@ public class SimpleGraphMapper<T, V extends Number & Comparable<V>, A extends IV
             reasonForChange.put(entry.getKey(), "fixValueBefore");
         }
 
-        for (int x = Constants.loopTimes; !changedValues.isEmpty() && 0 <= x; x--) {
-            for (int y = 0; !changedValues.isEmpty() && y < x; y++) {
+        for (int xx = Constants.loopTimes; !changedValues.isEmpty() && 0 <= xx; xx--) {
+            for (int yy = Constants.loopTimes; !changedValues.isEmpty() && 0 <= yy; yy--) {
                 // Changes that happened when processing current changes
                 Map<T, V> nextChangedValues = new HashMap<>();
 
@@ -84,12 +84,12 @@ public class SimpleGraphMapper<T, V extends Number & Comparable<V>, A extends IV
                     if (canOverride(key, value) && updateMapWithMinimum(values, key, value)) {
                         //The new Value is now set in 'values'
                         debugFormat("Set Value for {} to {} because {}", key, value, reasonForChange.get(key));
-                        //We have a new value for 'entry.getKey()' now we need to update everything that uses it as an ingredient.
+                        //We have a new value for 'key'.Now we need to update everything that uses it as an ingredient.
                         for (Conversion conversion : getUsesFor(key)) {
                             if (overwriteConversion.containsKey(conversion.output) && overwriteConversion.get(conversion.output) != conversion)
                                 //There is a "SetValue-Conversion" for this item, but it's not this one, so we skip it.
                                 continue;
-                            //Calculate how much the conversion-output costs with the new Value for entry.getKey
+                            //Calculate how much the conversion-output costs with the new Value for 'key'
                             V conversionValue = conversion.arithmeticForConversion.div(valueForConversion(values, conversion), conversion.outnumber);
                             if (conversionValue.compareTo(ZERO) > 0 || conversion.arithmeticForConversion.isFree(conversionValue))
                                 //We could calculate a valid value for the conversion
@@ -107,6 +107,8 @@ public class SimpleGraphMapper<T, V extends Number & Comparable<V>, A extends IV
             //Iterate over all Conversions for a single conversion output
             for (Map.Entry<T, Set<Conversion>> entry : conversionsFor.entrySet()) {
                 V minConversionValue = null;
+                //What is the actual emc value for the conversion output
+                V resultValueActual = values.getOrDefault(entry.getKey(), ZERO);
                 //For all Conversions. All these have the same output.
                 for (Conversion conversion : entry.getValue()) {
                     //entry.getKey() == conversion.output
@@ -114,8 +116,6 @@ public class SimpleGraphMapper<T, V extends Number & Comparable<V>, A extends IV
                     V ingredientValue = valueForConversion(values, conversion);
                     //What would the output cost be, if that conversion would be used
                     V resultValueConversion = conversion.arithmeticForConversion.div(ingredientValue, conversion.outnumber);
-                    //What is the actual emc value for the conversion output
-                    V resultValueActual = values.getOrDefault(entry.getKey(), ZERO);
 
                     //Find the smallest EMC value for the conversion.output
                     if (resultValueConversion.compareTo(ZERO) > 0 || conversion.arithmeticForConversion.isFree(resultValueConversion))
@@ -183,7 +183,7 @@ public class SimpleGraphMapper<T, V extends Number & Comparable<V>, A extends IV
                     //Ingredients with an amount of 'zero' do not need to be handled.
                     continue;
                 }
-                //value = value + amount * ingredientcost
+                //value = value + amount * ingredientCost
                 V ingredientValue = conversion.arithmeticForConversion.mul(entry.getValue(), values.get(entry.getKey()));
                 if (ingredientValue.compareTo(ZERO) != 0) {
                     if (!conversion.arithmeticForConversion.isFree(ingredientValue)) {

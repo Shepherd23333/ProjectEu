@@ -76,7 +76,7 @@ public class CondenserContainer extends BigIntContainer {
             displayEmc = tile.displayEmc;
         }
 
-        if (requiredEmc != tile.requiredEmc) {
+        if (!requiredEmc.equals(tile.requiredEmc)) {
             for (IContainerListener listener : listeners) {
                 PacketHandler.sendProgressBarUpdateBigInt(listener, this, 1, tile.requiredEmc);
             }
@@ -116,7 +116,7 @@ public class CondenserContainer extends BigIntContainer {
     public ItemStack transferStackInSlot(EntityPlayer player, int slotIndex) {
         Slot slot = this.getSlot(slotIndex);
 
-        if (slot == null || !slot.getHasStack()) {
+        if (!slot.getHasStack()) {
             return ItemStack.EMPTY;
         }
 
@@ -172,6 +172,6 @@ public class CondenserContainer extends BigIntContainer {
         }
 
         return new BigDecimal(displayEmc).divide(new BigDecimal(requiredEmc), 4, RoundingMode.HALF_DOWN)
-                .multiply(BigDecimal.valueOf(Constants.MAX_CONDENSER_PROGRESS)).intValueExact();
+                .multiply(BigDecimal.valueOf(Constants.MAX_CONDENSER_PROGRESS)).intValue();
     }
 }

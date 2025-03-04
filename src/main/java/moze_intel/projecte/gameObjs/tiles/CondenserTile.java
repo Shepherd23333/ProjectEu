@@ -30,7 +30,7 @@ public class CondenserTile extends TileEmc implements IEmcAcceptor {
     public float lidAngle;
     public float prevLidAngle;
     public int numPlayersUsing;
-    public BigInteger requiredEmc;
+    public BigInteger requiredEmc = BigInteger.ZERO;
 
     public ItemStackHandler getLock() {
         return lock;
@@ -113,7 +113,7 @@ public class CondenserTile extends TileEmc implements IEmcAcceptor {
         if (EMCHelper.doesItemHaveEmc(lock.getStackInSlot(0))) {
             BigInteger lockEmc = EMCHelper.getEmcValue(lock.getStackInSlot(0));
 
-            if (requiredEmc != lockEmc) {
+            if (!requiredEmc.equals(lockEmc)) {
                 requiredEmc = lockEmc;
                 this.isAcceptingEmc = true;
             }
@@ -239,7 +239,8 @@ public class CondenserTile extends TileEmc implements IEmcAcceptor {
         if (number == 1) {
             numPlayersUsing = arg;
             return true;
-        } else return super.receiveClientEvent(number, arg);
+        } else
+            return super.receiveClientEvent(number, arg);
     }
 
     @Override

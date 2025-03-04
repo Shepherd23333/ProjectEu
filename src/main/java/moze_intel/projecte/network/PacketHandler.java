@@ -73,7 +73,7 @@ public final class PacketHandler {
         for (Map.Entry<SimpleStack, BigInteger> entry : EMCMapper.emc.entrySet()) {
             SimpleStack stack = entry.getKey();
             int id = Item.REGISTRY.getIDForObject(Item.REGISTRY.getObject(stack.id));
-            ret[i] = new SyncEmcPKT.EmcPKTInfo(id, stack.damage, entry.getValue());
+            ret[i] = new SyncEmcPKT.EmcPKTInfo(id, stack.meta, entry.getValue());
             i++;
         }
         PECore.debugLog("EMC data size: {} bytes", ret.length * (2 * 4 + 8));

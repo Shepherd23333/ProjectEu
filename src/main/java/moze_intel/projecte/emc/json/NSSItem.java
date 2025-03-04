@@ -15,11 +15,11 @@ public class NSSItem implements NormalizedSimpleStack {
     static final Set<String> seenIds = new HashSet<>();
 
     public final String itemName;
-    public final int damage;
+    public final int meta;
 
-    NSSItem(String itemName, int damage) {
+    NSSItem(String itemName, int meta) {
         this.itemName = itemName;
-        this.damage = damage;
+        this.meta = meta;
     }
 
     public static NormalizedSimpleStack create(Block block) {
@@ -61,35 +61,34 @@ public class NSSItem implements NormalizedSimpleStack {
         NSSItem normStack;
         try {
             normStack = new NSSItem(itemName, damage);
+            seenIds.add(itemName);
         } catch (Exception e) {
             PECore.LOGGER.fatal("Could not create NSSItem: {}", e.getMessage());
             return null;
         }
-        seenIds.add(itemName);
         return normStack;
     }
 
     @Override
     public int hashCode() {
-        return itemName.hashCode() ^ damage;
+        return itemName.hashCode() ^ meta;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof NSSItem) {
-            NSSItem other = (NSSItem) obj;
-            return this.itemName.equals(other.itemName) && this.damage == other.damage;
-        }
+        if (obj instanceof NSSItem other)
+            return this.itemName.equals(other.itemName) && this.meta == other.meta;
+
         return false;
     }
 
     @Override
     public String json() {
-        return String.format("%s|%s", itemName, damage == OreDictionary.WILDCARD_VALUE ? "*" : damage);
+        return String.format("%s|%s", itemName, meta == OreDictionary.WILDCARD_VALUE ? "*" : meta);
     }
 
     @Override
     public String toString() {
-        return String.format("%s:%s", itemName, damage == OreDictionary.WILDCARD_VALUE ? "*" : damage);
+        return String.format("%s:%s", itemName, meta == OreDictionary.WILDCARD_VALUE ? "*" : meta);
     }
 }

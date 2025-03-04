@@ -9,8 +9,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Holds deserialized custom conversions.
- * Full grammar specification: https://gist.github.com/williewillus/9ebb0d04329526e31564
+ * Holds deserialized custom conversions.<p>
+ * Full grammar specification: <a href="https://gist.github.com/williewillus/9ebb0d04329526e31564">link</a>
  */
 public class CustomConversionFile {
     public String comment;

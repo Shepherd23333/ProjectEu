@@ -1,8 +1,12 @@
 package moze_intel.projecte.emc.json;
 
 import com.google.gson.*;
+import mekanism.api.gas.Gas;
+import mekanism.api.gas.GasRegistry;
 import moze_intel.projecte.PECore;
 import moze_intel.projecte.emc.collector.IMappingCollector;
+import moze_intel.projecte.integration.mekanism.NSSGas;
+import moze_intel.projecte.utils.Constants;
 import moze_intel.projecte.utils.ItemHelper;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
@@ -24,7 +28,7 @@ public interface NormalizedSimpleStack {
     static Iterable<NormalizedSimpleStack> getVariants(String id) {
         Item i = Item.getByNameOrId(id);
         if (i == null) {
-            PECore.LOGGER.error("null item in getVariants");
+            PECore.LOGGER.error("null item in getVariants({})", id);
             return Collections.emptyList();
         }
 
@@ -72,13 +76,34 @@ public interface NormalizedSimpleStack {
         }
     }
 
+    static int getItemDamage(String s, int pipeIndex) {
+        String itemDamageString = s.substring(pipeIndex + 1);
+        int itemDamage;
+        if (itemDamageString.equals("*"))
+            itemDamage = OreDictionary.WILDCARD_VALUE;
+        else {
+            try {
+                itemDamage = Integer.parseInt(itemDamageString);
+            } catch (NumberFormatException e) {
+                throw new JsonParseException(String.format("Could not parse '%s' to metadata-integer", itemDamageString), e);
+            }
+        }
+        return itemDamage;
+    }
+
     enum Serializer implements JsonSerializer<NormalizedSimpleStack>, JsonDeserializer<NormalizedSimpleStack> {
         INSTANCE;
 
         @Override
         public NormalizedSimpleStack deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
             String s = json.getAsString();
-            if (s.startsWith("OD|"))
+            if (Constants.loadMek && s.startsWith("GAS|")) {
+                String gasName = s.substring("GAS|".length());
+                Gas gas = GasRegistry.getGas(gasName);
+                if (gas == null)
+                    throw new JsonParseException("Tried to identify nonexistent Gas " + gasName);
+                return NSSGas.create(gas);
+            } else if (s.startsWith("OD|"))
                 return NSSOreDictionary.create(s.substring("OD|".length()));
             else if (s.startsWith("FAKE|"))
                 return NSSFake.create(s.substring("FAKE|".length()));
@@ -93,17 +118,7 @@ public interface NormalizedSimpleStack {
                 if (pipeIndex < 0)
                     throw new JsonParseException(String.format("Cannot parse '%s' as itemstack. Missing | to separate metadata.", s));
                 String itemName = s.substring(0, pipeIndex);
-                String itemDamageString = s.substring(pipeIndex + 1);
-                int itemDamage;
-                if (itemDamageString.equals("*"))
-                    itemDamage = OreDictionary.WILDCARD_VALUE;
-                else {
-                    try {
-                        itemDamage = Integer.parseInt(itemDamageString);
-                    } catch (NumberFormatException e) {
-                        throw new JsonParseException(String.format("Could not parse '%s' to metadata-integer", itemDamageString), e);
-                    }
-                }
+                int itemDamage = getItemDamage(s, pipeIndex);
 
                 return NSSItem.create(itemName, itemDamage);
             }
