@@ -7,17 +7,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Set up JDK
-        uses: actions/setup-java@v3
+      - name: Set up Java
+        uses: actions/setup-java@v4
         with:
           java-version: '11'
           distribution: 'adopt'
           cache: gradle
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Validate Gradle wrapper
         uses: gradle/wrapper-validation-action@v2
@@ -26,7 +26,10 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew build -Pnet.minecraftforge.gradle.disableUpdateChecker=true
+        #          ./gradlew javaToolchains
+        #          ./gradlew clean build --refresh-dependencies
+        run: |
+          ./gradlew build -Pnet.minecraftforge.gradle.disableUpdateChecker=true
 
       - name: Cleanup Gradle Cache
         # Remove some files from the Gradle cache, so they aren't cached by GitHub Actions.

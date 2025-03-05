@@ -310,12 +310,12 @@ tasks.register('cleanroomAfterSync') {
 }
 
 shadowJar {
+    dependsOn(classes, apiClasses)
     //Note: We use the include duplicate strategy instead of FAIL as minimize causes
     // the things to get "added" twice but it is filtered separately by the shadow
     // plugin anyways
     duplicatesStrategy(DuplicatesStrategy.INCLUDE)
-    archiveClassifier = 'dev' // Replace the default JAR
-    dependsOn(classes, apiClasses)
+    archiveClassifier.set('dev') // Replace the default JAR
     from([sourceSets.api.output, sourceSets.main.output])
 
     // Only shadow apache commons-math3
