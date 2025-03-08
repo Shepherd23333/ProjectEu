@@ -29,6 +29,7 @@ jobs:
         #          ./gradlew javaToolchains
         #          ./gradlew clean build --refresh-dependencies
         run: |
+          ./gradlew generateForgeSrgMappings
           ./gradlew build -Pnet.minecraftforge.gradle.disableUpdateChecker=true
 
       - name: Cleanup Gradle Cache
