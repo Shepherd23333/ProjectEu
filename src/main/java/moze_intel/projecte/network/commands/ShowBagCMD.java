@@ -39,14 +39,12 @@ public class ShowBagCMD extends CommandBase {
 
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-        if (!(sender instanceof EntityPlayerMP)) {
+        if (!(sender instanceof EntityPlayerMP senderPlayer))
             throw new CommandException("pe.command.showbag.notplayer");
-        }
-        if (args.length != 2) {
-            throw new WrongUsageException("pe.command.showbag.usage");
-        }
 
-        EntityPlayerMP senderPlayer = (EntityPlayerMP) sender;
+        if (args.length != 2)
+            throw new WrongUsageException("pe.command.showbag.usage");
+
         EnumDyeColor color;
         try {
             color = EnumDyeColor.valueOf(args[0].toUpperCase(Locale.ROOT));

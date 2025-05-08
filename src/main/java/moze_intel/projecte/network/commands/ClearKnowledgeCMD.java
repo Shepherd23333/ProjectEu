@@ -64,9 +64,4 @@ public class ClearKnowledgeCMD extends CommandBase {
             return Collections.emptyList();
         }
     }
-
-    @Override
-    public int getRequiredPermissionLevel() {
-        return 4;
-    }
 }

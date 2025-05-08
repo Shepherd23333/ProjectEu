@@ -10,8 +10,12 @@ import moze_intel.projecte.emc.json.NormalizedSimpleStack;
 import moze_intel.projecte.gameObjs.customRecipes.RecipeShapelessHidden;
 import moze_intel.projecte.gameObjs.customRecipes.RecipeShapelessKleinStar;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.*;
+import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.item.crafting.ShapedRecipes;
+import net.minecraft.item.crafting.ShapelessRecipes;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.oredict.ShapelessOreRecipe;
@@ -34,7 +38,7 @@ public class CraftingMapper implements IEMCMapper<NormalizedSimpleStack, BigInte
         recipeCount.clear();
         canNotMap.clear();
         nextRecipe:
-        for (IRecipe recipe : CraftingManager.REGISTRY) {
+        for (IRecipe recipe : ForgeRegistries.RECIPES) { //CraftingManager.REGISTRY
             boolean handled = false;
             ItemStack recipeOutput = recipe.getRecipeOutput();
             if (recipeOutput.isEmpty())

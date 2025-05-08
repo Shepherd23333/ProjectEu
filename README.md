@@ -9,3 +9,6 @@ It may break the compatibility.
 * EMC in BigInteger
 * new EMC formatter(from [Project EX](https://github.com/FTBTeam/FTB-ProjectEX))
 * Energy Collector recipes rework
+* [Mekanism CEu](https://github.com/sddsd2332/Mekanism-CE-Unofficial-1.12.2) Gas support
+* [Inventory Bogosorter](https://github.com/CleanroomMC/InventoryBogoSorter) support
+* EMC reloadable with [ZenRecipeReloading](https://github.com/friendlyhj/ZenRecipeReloading)

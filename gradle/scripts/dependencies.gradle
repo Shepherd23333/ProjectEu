@@ -63,11 +63,24 @@ dependencies {
     // implementation ('com.google.code.gson:gson:2.8.6') {
     //     transitive = false
     // }
-    implementation rfg.deobf("curse.maven:had-enough-items-557549:${curse_hei}")
+    implementation rfg.deobf("mezz:jei:${version_hei}")
     implementation rfg.deobf('curse.maven:baubles-227083:2518667')
+    compileOnly rfg.deobf('curse.maven:bogosorter-632327:5650807')
+    runtimeOnly 'zone.rong:mixinbooter:10.6'
+    runtimeOnly('com.cleanroommc:modularui:2.5.0-rc4') {
+        transitive = false
+    }
     implementation rfg.deobf("CraftTweaker2:CraftTweaker2-API:1.12-${version_crt}")
     implementation rfg.deobf("CraftTweaker2:ZenScript:1.12-${version_crt}")
     implementation rfg.deobf("CraftTweaker2:CraftTweaker2-MC1120-Main:1.12-${version_crt}")
+    runtimeOnly("CraftTweaker2:CraftTweaker2-MC1120-Mod-JEI:1.12-${version_crt}") {
+        transitive = false
+    }
+    runtimeOnly "com.cleanroommc:configanytime:3.0"
+    runtimeOnly "curse.maven:ZenUtils-401178:6482213"
+    runtimeOnly "curse.maven:MTLib-253211:3308160"
+    runtimeOnly "curse.maven:ModTweaker-220954:3840577"
+    runtimeOnly "curse.maven:ZenRecipeReload-911152:6024502"
     compileOnly rfg.deobf("curse.maven:MekanismCEu-840735:${curse_mekanism}")
     implementation 'org.apache.commons:commons-math3:3.6.1'
 }

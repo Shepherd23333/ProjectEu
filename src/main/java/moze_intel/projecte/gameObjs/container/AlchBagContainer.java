@@ -1,5 +1,8 @@
 package moze_intel.projecte.gameObjs.container;
 
+import com.cleanroommc.bogosorter.api.IPosSetter;
+import com.cleanroommc.bogosorter.api.ISortableContainer;
+import com.cleanroommc.bogosorter.api.ISortingContextBuilder;
 import invtweaks.api.container.ChestContainer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -8,13 +11,15 @@ import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
+import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.SlotItemHandler;
 
 import javax.annotation.Nonnull;
 
+@Optional.Interface(iface = "com.cleanroommc.bogosorter.api.ISortableContainer", modid = "bogosorter")
 @ChestContainer(isLargeChest = true, rowSize = 13)
-public class AlchBagContainer extends Container {
+public class AlchBagContainer extends Container implements ISortableContainer {
     public final EnumHand hand;
     private final int blocked;
     private final boolean immutable;
@@ -52,15 +57,13 @@ public class AlchBagContainer extends Container {
     @Nonnull
     @Override
     public ItemStack transferStackInSlot(EntityPlayer player, int slotIndex) {
-        if (immutable) {
+        if (immutable)
             return ItemStack.EMPTY;
-        }
 
         Slot slot = this.getSlot(slotIndex);
 
-        if (slot == null || !slot.getHasStack()) {
+        if (!slot.getHasStack())
             return ItemStack.EMPTY;
-        }
 
         ItemStack stack = slot.getStack();
         ItemStack newStack = stack.copy();
@@ -69,14 +72,13 @@ public class AlchBagContainer extends Container {
             if (!this.mergeItemStack(stack, 104, this.inventorySlots.size(), true))
                 return ItemStack.EMPTY;
             slot.onSlotChanged();
-        } else if (!this.mergeItemStack(stack, 0, 104, false)) {
+        } else if (!this.mergeItemStack(stack, 0, 104, false))
             return ItemStack.EMPTY;
-        }
-        if (stack.isEmpty()) {
+
+        if (stack.isEmpty())
             slot.putStack(ItemStack.EMPTY);
-        } else {
+        else
             slot.onSlotChanged();
-        }
 
         return slot.onTake(player, newStack);
     }
@@ -89,5 +91,17 @@ public class AlchBagContainer extends Container {
         }
 
         return super.slotClick(slot, button, flag, player);
+    }
+
+    @Override
+    @Optional.Method(modid = "bogosorter")
+    public void buildSortingContext(ISortingContextBuilder builder) {
+        builder.addSlotGroup(0, 104, 13).buttonPosSetter(IPosSetter.TOP_RIGHT_VERTICAL);
+    }
+
+    @Override
+    @Optional.Method(modid = "bogosorter")
+    public IPosSetter getPlayerButtonPosSetter() {
+        return IPosSetter.TOP_RIGHT_VERTICAL;
     }
 }

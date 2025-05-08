@@ -35,9 +35,4 @@ public class ReloadEmcCMD extends CommandBase {
 
         PacketHandler.sendFragmentedEmcPacketToAll();
     }
-
-    @Override
-    public int getRequiredPermissionLevel() {
-        return 4;
-    }
 }
